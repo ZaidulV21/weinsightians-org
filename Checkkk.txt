@@ -3,3 +3,7 @@ color
 #E3E7ED
 #0F122E
 #645876
+#231746-button
+#534277-hover effect
+
+

@@ -8,7 +8,7 @@
     box-sizing: border-box;
 }
 .bg-custom {
-    background-image: url('../public/freepik-export-20241213092546fexx.jpeg');
+    background-image: url('/freepik-export-20241213092546fexx.jpeg');
     filter: brightness(70%);
     background-size: cover;
     background-position: center;
