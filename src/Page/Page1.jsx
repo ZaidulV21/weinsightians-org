@@ -3,8 +3,9 @@ import Navbar from '../components/Navbar.jsx'
 const Page1 = () => {
   return (
     <div>
-        <div className="h-screen bg-white ">
+        <div className=" bg-custom relative text-black px-16 h-screen  ">
         <Navbar/>
+
         </div>
     </div>
   )
