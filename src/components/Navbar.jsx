@@ -7,7 +7,7 @@ const Navbar = () => {
     <div id='glass-morph' className="flex items-center justify-between font-medium overflow-hidden p-5 w-full h-20 bg-green-300 rounded-lg">
       <Link to='/'>
         <div className='flex items-center gap-2 font-medium'>
-          <img className='w-12 ' src='../../public/bgWIcon.png' alt="logo" />
+          <img className='w-12 ' src='/bgWIcon.png' alt="logo" />
           <p>WeInsightians</p>
         </div>
       </Link>
@@ -40,7 +40,7 @@ const Navbar = () => {
       </div>
 {/* Button  */}
       <div className='flex items-center gap-6'>
-        <button className='px-8 py-3 text-[#fff] rounded-full border-2 bg-[#231746] hover:bg-[#534277] '>Call Us</button>
+        <button className='px-8 py-3 text-[#fff] rounded-full transition-all duration-500 border-2 bg-[#231746] hover:bg-[#534277] '>Call Us</button>
       </div>
     </div>
   )

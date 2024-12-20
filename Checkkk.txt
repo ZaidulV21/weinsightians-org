@@ -7,3 +7,57 @@ color
 #534277-hover effect
 
 
+
+        <div className="bg-custom h-2/3 rounded-[2vw] flex justify-center items-center p-5 mt-20 mr-10">
+          <div className="bg-[#fff] h-full w-full rounded-[1vw] relative">
+            {/* Services Buttons */}
+            <div className="absolute top-3 right-3 flex space-x-2">
+              <button className="border-2 px-4 py-2 rounded-full text-sm font-medium text-[#231746] transition duration-300 hover:bg-[#534277] hover:text-white">
+                Our Services
+              </button>
+              <button className="border-2 px-4 py-2 rounded-full text-sm font-medium text-[#231746] transition duration-300 hover:bg-[#534277] hover:text-white">
+                2024
+              </button>
+            </div>
+
+            {/* Arrow Icon */}
+            <div className="absolute bottom-10 left-10 h-16 w-16 rounded-full bg-[#6B50A2] flex items-center justify-center p-2 border-2 transition-all duration-500 hover:rotate-45">
+              <img src="/right-arrow.png" alt="Arrow Icon" className="h-8 w-8" />
+            </div>
+
+          </div>
+        </div>
+
+
+
+
+
+
+       
+        {/* Left Card  */}
+
+
+
+
+
+
+
+
+
+      Righttttttttttttttttttttttt
+
+      {/* <div className="flex flex-col p-8 gap-8 w-1/2">
+        <div className='flex flex-end'>
+          <h1 className="">Transforming </h1>
+          <img className='w-[8vw]' src="/circle-design.png" alt="" />
+          <h1 className=""> <br /> ideas into visually <br /> stunning realities
+          </h1>
+        </div>
+        <ServiceCard />
+      </div> */}
+
+
+
+
+
+Hii My name is abhishek kushwaha and i'm Bca graduate from dr ram manohar lohia 
