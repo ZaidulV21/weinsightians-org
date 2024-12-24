@@ -3,6 +3,7 @@ import Page2 from "./Page/Page2"
 import Page3 from "./Page/Page3"
 import Page4 from "./Page/Page4"
 import Page5 from "./Page/Page5"
+import Footer from "./components/Footer"
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
       <Page3/>
       <Page4/>
       <Page5/>
+      <Footer/>
     </div>
   )
 }
