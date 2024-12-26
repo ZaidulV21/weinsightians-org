@@ -11,7 +11,7 @@ const Footer = () => {
                     <img src='/bgWIcon.png' alt='We Insightians Logo' className='mr-2 w-16 h-16' />
                     <h2 className='text-xl font-bold'>WeInsightians</h2>
                 </NavLink>
-                <p className='text-sm text-gray-600 mt-2'>
+                <p className='text-sm text-gray-600 mt-2 font-[gilroy]'>
                     We're here to help you with any inquiries <br />or project ideas you may have. Whether you have <br /> a question about our services, we’re ready to assist you.
                 </p>
                 </div>
@@ -39,6 +39,10 @@ const Footer = () => {
                         </ul>
                     </div>
                 </div>
+            </div>
+            <div className='mt-10 text-center'>
+               <a href="#"> <p className='text-sm text-gray-600'>© 2024 WeInsightians. All Rights Reserved.
+                </p></a>
             </div>
         </div>
     );
