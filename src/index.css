@@ -32,3 +32,51 @@
 }
 
 
+/* For Page3 */
+.section3{
+  height: 100%;
+  width: 100%;
+  padding: 0px;
+  display: flex;
+  gap: 30px;
+}
+
+.card{
+  height: 500px;
+  width: 380px;
+}
+
+.card .card1{
+  background-color: #E3E7ED;
+  padding: .75rem;
+  height: 60%;
+  width: 100%;
+  transition: all ease 0.5s;
+  border-top-left-radius: 12px;  
+  border-top-right-radius: 12px;
+  overflow: hidden;
+}
+
+.card .card1 img{
+  border-radius: 10px;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.card .card2{
+  height: 20%;
+  width: 100%;
+  border-bottom-left-radius: 12px;  
+  border-bottom-right-radius: 12px;
+  /* background-color: #AA81B7; */
+  transition: all ease 0.5s;
+
+}
+
+.card:hover .card1{
+  border-radius: 80px;
+}
+.card:hover .card2{
+  border-radius: 80px;
+}

@@ -1,6 +1,13 @@
 import React from 'react'
 
 const Page3 = () => {
+  const cardData = [
+    { src: "/img/bitbar.png", brandName: "BitBar", workName: "UI/UX Design" },
+    { src: "/img/code3.png", brandName: "Code3", workName: "Crypto Website Design" },
+    { src: "/img/creacy.png", brandName: "Creacy", workName: "Medicine Commerce Design" },
+    { src: "/img/wellplus.png", brandName: "WellPlus", workName: "Health Website Design" }
+  ];
+
   return (
     <div className='h-screen bg-white px-16'>
       <div className='w-full h-1/3 flex '>
@@ -21,8 +28,21 @@ const Page3 = () => {
       </div>
 
       {/* Bottom Card Content */}
-      <div className='w-full h-2/3 flex justify-center bg-red-500 items-center'>
-      
+      <div className='w-full h-2/3 flex justify-center mt-10 items-center'>
+        <div className="section3">
+          {cardData.map((card, index) => (
+            <div className="card" key={index}>
+              <div className="card1">
+                <img src={card.src} alt="" />
+              </div>
+              <div className="card2 px-8 py-2 bg-[#E3E7ED]">
+                <h2 className='text-[#6B50A2] font-bold'>{card.brandName}</h2>
+                <hr className="border-t border-white w-full my-4" />
+                <p>{card.workName}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
