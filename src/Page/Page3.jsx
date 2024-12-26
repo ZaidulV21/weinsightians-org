@@ -28,7 +28,7 @@ const Page3 = () => {
       </div>
 
       {/* Bottom Card Content */}
-      <div className='w-full h-2/3 flex justify-center mt-10 items-center'>
+      <div className='w-full h-2/3 flex justify-center mt-10 items-center font-[gilroy]'>
         <div className="section3">
           {cardData.map((card, index) => (
             <div className="card" key={index}>
@@ -36,7 +36,7 @@ const Page3 = () => {
                 <img src={card.src} alt="" />
               </div>
               <div className="card2 px-8 py-2 bg-[#E3E7ED]">
-                <h2 className='text-[#6B50A2] font-bold'>{card.brandName}</h2>
+                <h2 className='text-[#6B50A2] font-bold text-base'>{card.brandName}</h2>
                 <hr className="border-t border-white w-full my-4" />
                 <p>{card.workName}</p>
               </div>
