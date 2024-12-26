@@ -7,7 +7,7 @@ import Footer from "./components/Footer"
 
 export default function App() {
   return (
-    <div>
+    <div className="bg-white">
       <Page1/>
       <Page2/>
       <Page3/>
