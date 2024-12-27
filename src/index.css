@@ -26,6 +26,14 @@
     font-family: gilroy;
     src: url('/gilroy-regular.ttf');
   }
+@font-face {
+    font-family: larken;
+    src: url('/LarkenDEMO-Bold.otf');
+  }
+/* @font-face {
+    font-family: brevis;
+    src: url('/Brevis-Regular.ttf');
+  } */
 
 .curved{
     clip-path: path('M 0 0 H 100% V calc(100% - 40px) Q 100% 100% calc(100% - 40px) 100% H 0 Z');

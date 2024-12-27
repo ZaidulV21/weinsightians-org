@@ -90,9 +90,9 @@ export default function App() {
             <div className='bg-[#E3E7ED]  text-black p-4 rounded-lg border-2 border-white h-80 w-96'>
               <div className='mt-4'>
                 <p className='text-black font-[gilroy]'>{review.content}</p>
-                <h2 className='text-[#6B50A2] font-bold text-xl mt-10'>{review.title}</h2>
-                <hr className='my-2 border-t border-black' />
-                <p className='text-black'>{review.job}</p>
+                <h2 className='text-[#6B50A2] font-[larken] font-bold text-xl mt-10'>{review.title}</h2>
+                <hr className='my-2 border-t border-white' />
+                <p className='text-black font-black font-[gilroy]'>{review.job}</p>
               </div>
             </div>
           </SwiperSlide>

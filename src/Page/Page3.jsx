@@ -36,7 +36,7 @@ const Page3 = () => {
                 <img src={card.src} alt="" />
               </div>
               <div className="card2 px-8 py-2 bg-[#E3E7ED]">
-                <h2 className='text-[#6B50A2] font-bold text-base'>{card.brandName}</h2>
+                <h2 className='text-[#6B50A2] font-bold text-base font-[larken]'>{card.brandName}</h2>
                 <hr className="border-t border-white w-full my-4" />
                 <p>{card.workName}</p>
               </div>
