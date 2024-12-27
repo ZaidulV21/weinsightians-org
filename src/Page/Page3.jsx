@@ -15,7 +15,10 @@ const Page3 = () => {
         <div className='font-[gilroy]  mt-5 w-1/2'>
           <h1 className='text-xl font-bold'>See Our Portfolio Reels</h1>
           <h1 className='text-6xl mt-3'>Awesome</h1>
-          <h1 className='text-6xl flex '><img className='h-[3vw]' src="/circle-design.png" alt="" /> works</h1>
+         <div className='flex gap-3'> 
+         <img className='h-12' src="/circle-design.png" alt="" />
+          <h1 className='text-6xl '>works</h1>
+         </div>
         </div>
         {/* Right Side  */}
         <div className='flex flex-col font-[gilroy] justify-center w-full'>
