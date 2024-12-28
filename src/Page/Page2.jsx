@@ -1,5 +1,6 @@
 import React from 'react'
 import ServiceCard from '../components/ServiceCard'
+
 const Page2 = () => {
   return (
     <div className='h-[120vh] w-full bg-[#fff] flex px-16 '>
@@ -28,7 +29,7 @@ const Page2 = () => {
               <div className='mt-28 pl-10'>
                 <h1 className='text-4xl text-black font-[larken]'>720+ Projects Launched</h1>
                 <h1 className='text-base font-[gilroy]'>Empowering Our Agency's Growth and great power comes great responsbility. </h1>
-              <button className='mt-10 px-10 py-5 border-zinc-700 border-2 hover:text-white font-semibold bg-[] rounded-full transition duration-300 hover:bg-[#534277]'>Get started Now</button>
+                <button className='mt-10 px-10 py-5 border-zinc-700 border-2 hover:text-white font-semibold font-[gilroy] bg-[] rounded-full transition duration-300 hover:bg-[#534277]'>Get started Now</button>
               </div>
             </div>
           </div>
@@ -47,8 +48,14 @@ const Page2 = () => {
           </div>
         </div>
         {/* Right Side Service Content  */}
-        <div className='w-full h-2/3 bg-green-800'>
-
+        <div className='w-full h-2/3 bg-gree-800 overflow-x-auto flex flex-col gap-2 '>
+          <ServiceCard title="Digital Elevation 🡦" description="Empowering businesses with cutting-edge web development services that boost online visibility and drive success through tailored digital solutions designed for growth." />
+          <ServiceCard title="Web Mastery 🡦" description="Crafting exceptional websites with innovative designs and robust functionalities to ensure your brand stands out in the digital landscape and achieves its goals." />
+          <ServiceCard title="Design Excellence 🡦" description="Elevate your online presence with user-focused designs and development solutions that transform your ideas into impactful digital platforms tailored to your needs" />
+          <ServiceCard title="Site Brilliance 🡦" description="Building dynamic and responsive websites that align with your business goals, ensuring maximum engagement and seamless user experiences for your customers." />
+          <ServiceCard title="Online Impact 🡦" description="Transform your vision into reality with comprehensive web development services that amplify your digital presence and attract the right audience to your platform." />
+          <ServiceCard title="Online Impact 🡦" description="Transform your vision into reality with comprehensive web development services that amplify your digital presence and attract the right audience to your platform." />
+          <ServiceCard title="Online Impact 🡦" description="Transform your vision into reality with comprehensive web development services that amplify your digital presence and attract the right audience to your platform." />
         </div>
       </div>
     </div>
