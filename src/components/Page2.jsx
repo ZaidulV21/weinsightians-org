@@ -1,5 +1,5 @@
 import React from 'react'
-import ServiceCard from '../components/ServiceCard'
+import ServiceCard from './ServiceCard'
 
 const Page2 = () => {
   return (
@@ -48,7 +48,7 @@ const Page2 = () => {
           </div>
         </div>
         {/* Right Side Service Content  */}
-        <div className='w-full h-2/3 bg-gree-800 overflow-x-auto flex flex-col gap-2 '>
+        <div className='w-full h-2/3 bg-gree-800 overflow-x-auto flex flex-col gap-5 '>
           <ServiceCard title="Digital Elevation 🡦" description="Empowering businesses with cutting-edge web development services that boost online visibility and drive success through tailored digital solutions designed for growth." />
           <ServiceCard title="Web Mastery 🡦" description="Crafting exceptional websites with innovative designs and robust functionalities to ensure your brand stands out in the digital landscape and achieves its goals." />
           <ServiceCard title="Design Excellence 🡦" description="Elevate your online presence with user-focused designs and development solutions that transform your ideas into impactful digital platforms tailored to your needs" />

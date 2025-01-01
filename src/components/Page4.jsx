@@ -1,5 +1,5 @@
 import React from 'react'
-import ReviewSlider from '../components/ReviewSlider';
+import ReviewSlider from './ReviewSlider';
 
 
 
