@@ -89,3 +89,23 @@
   border-radius: 80px;
   
 }
+/* animation round*/
+@keyframes rotate360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Apply the animation to an image */
+.rotate36 {
+  transition: ease 0.5s;
+  display: inline-block; /* Ensures proper alignment */
+  animation: rotate360 4s linear infinite;
+}
+
+.rotate36:hover{
+  scale: 120%;
+}

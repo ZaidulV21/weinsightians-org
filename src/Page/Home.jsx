@@ -14,7 +14,9 @@ const Home = () => {
       <Page3/>
       <Page4/>
       <Page5/>
-      <Footer/>
+      <div className='px-16'>
+        <Footer/>
+        </div>
     </>
   );
 };
