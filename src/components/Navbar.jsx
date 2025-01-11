@@ -23,24 +23,44 @@ const Navbar = () => {
           )}
         </NavLink>
 
-        <NavLink to='/services' className='flex flex-col items-center gap-1 hover:text-gray-700'>
-          <p>Services</p>
-          <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
+        <NavLink to='/services' className='flex flex-col items-center gap-1 hover:text-gray-700' 
+          isActive={({ isActive }) => isActive}>
+          {({ isActive }) => (
+            <>
+              <p>Services</p>
+              <hr className={`w-2/3 border-none h-[1.5px] bg-gray-700 ${isActive ? 'block' : 'hidden'}`} />
+            </>
+          )}
         </NavLink>
 
-        <NavLink to='/about' className='flex flex-col items-center gap-1 hover:text-gray-700'>
-          <p>About Us</p>
-          <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
+        <NavLink to='/about' className='flex flex-col items-center gap-1 hover:text-gray-700' 
+          isActive={({ isActive }) => isActive}>
+          {({ isActive }) => (
+            <>
+              <p>About Us</p>
+              <hr className={`w-2/3 border-none h-[1.5px] bg-gray-700 ${isActive ? 'block' : 'hidden'}`} />
+            </>
+          )}
         </NavLink>
 
-        <NavLink to='/blog' className='flex flex-col items-center gap-1 hover:text-gray-700'>
-          <p>Blog</p>
-          <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
+        <NavLink to='/blog' className='flex flex-col items-center gap-1 hover:text-gray-700' 
+          isActive={({ isActive }) => isActive}>
+          {({ isActive }) => (
+            <>
+              <p>Blog</p>
+              <hr className={`w-2/3 border-none h-[1.5px] bg-gray-700 ${isActive ? 'block' : 'hidden'}`} />
+            </>
+          )}
         </NavLink>
 
-        <NavLink to='/contact' className='flex flex-col items-center gap-1 hover:text-gray-700'>
-          <p>Contact</p>
-          <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
+        <NavLink to='/contact' className='flex flex-col items-center gap-1 hover:text-gray-700' 
+          isActive={({ isActive }) => isActive}>
+          {({ isActive }) => (
+            <>
+              <p>Contact</p>
+              <hr className={`w-2/3 border-none h-[1.5px] bg-gray-700 ${isActive ? 'block' : 'hidden'}`} />
+            </>
+          )}
         </NavLink>
       </div>
       {/* Button  */}
