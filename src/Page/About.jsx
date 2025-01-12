@@ -55,6 +55,7 @@ const About = () => {
       {/* section-2  */}
       <div className='mt-10 h-screen'>
         <h1 className='text-center text-9xl font-[heligthon]'>Meet Our Team </h1>
+        
         <div className="section2-image-container">
           <img src="https://cdn.prod.website-files.com/648884be5f32a12e5da2392f/65492b6d98261b9aedd2482e_NS_Logo-NaN.jpg" alt="" />
         </div>
