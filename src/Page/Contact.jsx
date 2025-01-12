@@ -1,13 +1,14 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-
+import Faq from '../components/Faq'
 const Contact = () => {
   return (
     <div className='h-full w-full text-black px-16 p-5'>
       <Navbar />
-      <div className='mt-10 h-[70vh] bg-teal-600 rounded-3xl'>
-
+      <div className='mt-10 h-[70vh] rounded-3xl overflow-hidden'>
+        <h1 className='absolute bottom-12 z-10 text-9xl font-[larken] uppercase text-white'>contact Us</h1>
+      <video className='h-full w-full object-cover' src="/moon.mp4" autoPlay loop muted></video>
       </div>
       <div className='mt-10  flex h-full rounded-3xl'>
         {/* left form  */}
@@ -97,6 +98,10 @@ const Contact = () => {
           </form>
         </div>
       </div>
+
+      <Faq/>
+
+
       <Footer />
     </div>
   )
