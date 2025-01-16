@@ -2,17 +2,25 @@ import React from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import Faq from '../components/Faq'
+import Whatsapp from '../components/Whatsapp'
+import ContactForm from '../components/ContactForm'
+
 const Contact = () => {
   return (
-    <div className='h-full w-full text-black px-16 p-5'>
+    <div className='h-full w-full text-black px-5 md:px-16 p-5'>
+      <Whatsapp />
       <Navbar />
-      <div className='mt-10 h-[70vh] rounded-3xl overflow-hidden'>
-        <h1 className='absolute bottom-12 z-10 text-9xl font-[larken] uppercase text-white'>contact Us</h1>
+      <div className='relative mt-2 md:mt-10 h-[70vh] md:h-[70vh] rounded-3xl overflow-hidden bg-teal-500'>
       <video className='h-full w-full object-cover' src="/moon.mp4" autoPlay loop muted></video>
+        <div className=' absolute bottom-0 left-0 p-4'>
+          <h1 className='text-4xl md:text-9xl uppercase font-[larken] font-bold mb-4 text-white'>Contact us</h1>
+          <hr className='border-t border-white my-4' />
+          <p className='mb-8 text-sm md:text-2xl font-[gilroy] text-white'>Get in touch with us to discuss your project, ask questions, or simply say hello. We're always excited to meet new people and explore new opportunitiesGet in touch with us to discuss your project, ask questions, or simply say hello. We're always excited to meet new people and explore new opportunities.Get in touch with us to discuss your project, ask questions, or simply say hello. We're always excited to meet new people and explore new opportunities..</p>
+        </div>
       </div>
-      <div className='mt-10  flex h-full rounded-3xl'>
+      <div className='mt-2 md:mt-10  flex h-full rounded-3xl'>
         {/* left form  */}
-        <div className='w-1/3 flex flex-col justify-between '>
+        <div className='w-1/3 hidden md:flex flex-col justify-between '>
         {/* left top section  */}
           <div className='ml-14 font-[gilroy]'>
             <div>
@@ -44,64 +52,10 @@ const Contact = () => {
           </div>
         </div>
         {/* right form  */}
-        <div className='h-full font-[gilroy] w-2/3 bg-[#6B50A2] rounded-2xl p-10'>
-          <h1 className='text-5xl mt-10 mb-4'>Got ideas? We’ve got <br /> the skills. Let’s team up.</h1>
-          <h2 className='text-base  mb-6'>Tell us more about yourself and what you’ve got in mind.</h2>
-
-          <form className='flex flex-col gap-4'>
-            <input
-              type='text'
-              placeholder="What's your name?"
-              className='outline-none text-sm p-2 bg-inherit text-black placeholder-black  border-b-2 border-black'
-
-            />
-            <input
-              type='email'
-              placeholder='you@email.com'
-              className='outline-none text-sm p-2 bg-inherit text-black placeholder-black  border-b-2 border-black'
-            />
-            <textarea
-              placeholder='Tell us a little about the project...'
-              className='outline-none text-sm p-2 bg-inherit text-black placeholder-black  border-b-2 border-black h-24'
-            />
-
-            <h3 className='mt-4'>How can we help?</h3>
-            <div className='flex gap-10'>
-              <div className='flex flex-col gap-2'>
-                <label>
-                  <input type='checkbox' /> Website design
-                </label>
-                <label>
-                  <input type='checkbox' /> UX design
-                </label>
-                <label>
-                  <input type='checkbox' /> User research
-                </label>
-              </div>
-              <div className='flex flex-col gap-2'>
-                <label>
-
-                  <input type='checkbox' /> Content creation
-                </label>
-                <label>
-                  <input type='checkbox' /> Strategy & consulting
-                </label>
-                <label>
-                  <input type='checkbox' /> Other
-                </label>
-              </div>
-            </div>
-
-            <button className='mt-6 bg-zinc-900 text-white py-2 rounded transition-all duration-500 hover:bg-zinc-700'>
-              Let’s get started!
-            </button>
-          </form>
-        </div>
+        <ContactForm/>
       </div>
 
       <Faq/>
-
-
       <Footer />
     </div>
   )

@@ -30,11 +30,11 @@ const OurServices2 = () => {
       <div className='w-full md:w-1/3 relative'>
         <h1 className='absolute bottom-5 font-bold text-4xl md:text-6xl font-[larken]'>{service.title}</h1>
       </div>
-      <div className='w-full md:w-1/3 flex items-center'>
+      <div className='w-full md:w-1/3 flex items-center justify-center'>
         <img className="rounded-xl h-60 md:h-80 transition-all duration-500 hover:scale-105 object-contain" src={service.imgSrc} alt={service.title} />
       </div>
       <div className='w-full md:w-1/3 flex items-center font-[gilroy] font-bold text-zinc-800 bg-orange-00 overflow-hidden'>
-        <h1 className='text-lg md:text-xl'>{service.description}</h1>
+        <h1 className='text-base md:text-xl'>{service.description}</h1>
       </div>
       {/* <div className='border-t-2 border-zinc-400'></div> */}
     </div>

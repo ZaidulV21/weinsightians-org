@@ -11,7 +11,7 @@ const Page2 = () => {
           <h1 className='font-bold font-[larken] text-2xl'>About Us</h1>
           <h1 className='mt-6 w-[23rem] font-[gilroy] text-base'>An agency is an organization or entity that provides a specific service on behalf of another party. In many cases, agencies act as intermediaries.</h1>
           <div className='flex gap-2 sm:gap-2 mt-5'>
-            <button className='font-[gilroy] px-6 sm:px-8 md:px-10 py-1.5 sm:py-2 text-sm sm:text-base text-[#231746] font-semibold transition-transform-all duration-500 rounded-full border-2 bg-[#fff] hover:bg-[#534277] hover:text-white'>Learn More</button>
+            <button className='font-[gilroy] px-5 sm:px-8 md:px-10 py-1.5 sm:py-2 text-sm sm:text-base text-[#231746] font-semibold transition-transform-all duration-500 rounded-full border-2 bg-[#fff] hover:bg-[#534277] hover:text-white'>Learn More</button>
             <div className='h-10 w-10 sm:h-12 sm:w-12 rounded-full flex transition-all duration-500 items-center justify-center p-1.5 sm:p-2 border-2 hover:rotate-45'><img src="/right-arrow-black.png" alt="" /></div>
           </div>
         </div>
