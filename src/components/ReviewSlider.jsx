@@ -68,7 +68,7 @@ export default function App() {
         effect={'coverflow'}
         grabCursor={true}
         centeredSlides={true}
-        slidesPerView={'3'}
+        slidesPerView={window.innerWidth < 768 ? '1' : '3'}
         coverflowEffect={{
           rotate: 50,
           stretch: 0,
@@ -87,7 +87,7 @@ export default function App() {
       >
         {reviews.map((review, index) => (
           <SwiperSlide key={index}>
-            <div className='bg-[#E3E7ED]  text-black p-4 rounded-lg border-2 border-white h-80 w-96'>
+            <div className='bg-[#E3E7ED] text-black p-4 rounded-lg border-2 border-white w-full '>
               <div className='mt-4'>
                 <p className='text-black font-[gilroy]'>{review.content}</p>
                 <h2 className='text-[#6B50A2] font-[larken] font-bold text-xl mt-10'>{review.title}</h2>

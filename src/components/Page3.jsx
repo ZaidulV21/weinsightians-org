@@ -9,7 +9,7 @@ const Page3 = () => {
   ];
 
   return (
-    <div className='h-screen bg-white px-16'>
+    <div className='h-screen bg-white p-5 sm:px-16'>
       <div className='w-full h-1/3 flex '>
         {/* Left Side  */}
         <div className='font-[gilroy]  mt-5 w-1/2'>
@@ -21,7 +21,7 @@ const Page3 = () => {
          </div>
         </div>
         {/* Right Side  */}
-        <div className='flex flex-col font-[gilroy] justify-center w-full'>
+        <div className='hidden md:flex flex-col font-[gilroy] justify-center w-full'>
           <p className='text-end mb-4'>We crafted detailed botanical illustrations to highlight the <br />natural ingredients used in the products. Each design was <br />carefully integrated into the packaging layout.</p>
           <div className='flex justify-end'>
             <button className='px-10 py-2 text-[#231746] font-semibold transition-transform-all duration-500 rounded-full border-2 bg-[#fff] hover:bg-[#534277] '>Learn More</button>
@@ -31,17 +31,17 @@ const Page3 = () => {
       </div>
 
       {/* Bottom Card Content */}
-      <div className='w-full h-2/3 flex justify-center mt-10 items-center font-[gilroy]'>
-        <div className="section3">
+      <div className='w-full h-auto flex flex-wrap justify-center mt-10 items-center font-[gilroy]'>
+        <div className="h-auto w-full p-0 flex flex-nowrap overflow-x-auto scroll-snap-x mandatory gap-8">
           {cardData.map((card, index) => (
-            <div className="card" key={index}>
+            <div className="card h-[450px] w-full max-w-[290px] flex-shrink-0 flex-grow-0 mx-[10px] scroll-snap-start flex flex-col" key={index}>
               <div className="card1">
-                <img src={card.src} alt="" />
+                <img src={card.src} alt="" className="w-full h-auto" />
               </div>
-              <div className="card2 px-8 py-2 bg-[#E3E7ED]">
+              <div className="card2 px-4 bg-[#E3E7ED]">
                 <h2 className='text-[#6B50A2] font-bold text-base font-[larken]'>{card.brandName}</h2>
                 <hr className="border-t border-white w-full my-4" />
-                <p>{card.workName}</p>
+                <p className="text-sm">{card.workName}</p>
               </div>
             </div>
           ))}
