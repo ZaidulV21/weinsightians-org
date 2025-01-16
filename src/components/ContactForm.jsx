@@ -16,6 +16,7 @@ const ContactForm = () => {
         },
     });
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [errors, setErrors] = useState({});
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -35,12 +36,33 @@ const ContactForm = () => {
         }
     };
 
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.name) {
+            newErrors.name = 'Name is required.';
+        }
+        if (!formData.email) {
+            newErrors.email = 'Email is required.';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = 'Email address is invalid.';
+        }
+        if (!formData.projectDescription) {
+            newErrors.projectDescription = 'Project description is required.';
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        if (!validateForm()) {
+            return;
+        }
+
         // Prepare the email data
         const servicesList = Object.entries(formData.services)
-            .filter(([key, value]) => value) // Only include checked services
+            .filter(([key, value]) => value)
             .map(([key]) => key)
             .join(', ');
 
@@ -48,14 +70,13 @@ const ContactForm = () => {
             from_name: formData.name,
             from_email: formData.email,
             project_description: formData.projectDescription,
-            services: servicesList, // Send as a comma-separated string
+            services: servicesList,
         };
 
         // Send the email
         emailjs.send('service_pq5vuj7', 'template_urpnauj', emailData, 'gpseXxvd4rf_VugoR')
             .then((response) => {
-                console.log('Email sent successfully!', response.status, response.text);
-                // Reset the form and show the thank you message
+                // console.log('Email sent successfully!', response.status, response.text);
                 setFormData({
                     name: '',
                     email: '',
@@ -70,6 +91,7 @@ const ContactForm = () => {
                     },
                 });
                 setIsSubmitted(true);
+                setErrors({});
             })
             .catch((err) => {
                 console.error('Failed to send email. Error:', err);
@@ -95,6 +117,8 @@ const ContactForm = () => {
                         onChange={handleChange}
                         className='outline-none text-sm p-2 bg-inherit text-black placeholder-black border-b-2 border-black'
                     />
+                    {errors.name && <span className='text-red-500'>{errors.name}</span>}
+
                     <input
                         type='email'
                         name='email'
@@ -103,6 +127,8 @@ const ContactForm = () => {
                         onChange={handleChange}
                         className='outline-none text-sm p-2 bg-inherit text-black placeholder-black border-b-2 border-black'
                     />
+                    {errors.email && <span className='text-red-500'>{errors.email}</span>}
+
                     <textarea
                         name='projectDescription'
                         placeholder='Tell us a little about the project...'
@@ -110,6 +136,7 @@ const ContactForm = () => {
                         onChange={handleChange}
                         className='outline-none text-sm p-2 bg-inherit text-black placeholder-black border-b-2 border-black h-24'
                     />
+                    {errors.projectDescription && <span className='text-red-500'>{errors.projectDescription}</span>}
 
                     <h3 className='mt-4'>How can we help?</h3>
                     <div className='flex gap-10'>

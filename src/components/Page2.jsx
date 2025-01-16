@@ -30,18 +30,18 @@ const Page2 = () => {
                 </button>
               </div>
               {/* Circular Image */}
-              <div className="bg-[#6B50A2] h-10 w-10 sm:h-14 sm:w-14 md:h-20 md:w-20 rounded-full relative top-10 sm:top-14 md:top-20 left-3 sm:left-5 md:left-8 p-2 sm:p-3 md:p-4 flex items-center justify-center">
-                <img src="/right-arrow.png" alt="Arrow Icon" className="w-3 h-3 sm:w-5 sm:h-5 md:w-7 md:h-7" />
+              <div className="bg-[#6B50A2] h-14 w-14 md:h-20 md:w-20 rounded-full relative top-10 sm:top-14 md:top-20 left-3 sm:left-5 md:left-8 p-2 sm:p-3 md:p-4 flex items-center justify-center">
+                <img src="/right-arrow.png" alt="Arrow Icon" className="w-5 h-5 md:w-7 md:h-7" />
               </div>
               {/* Content */}
               <div className="mt-14 sm:mt-16 md:mt-24 pl-3 sm:pl-5 md:pl-8">
                 <h1 className="text-lg sm:text-xl md:text-3xl text-black font-[larken] leading-tight">
-                  720+ Projects Launched
+                  22+ Projects Launched
                 </h1>
                 <h2 className="text-xs sm:text-sm md:text-base font-[gilroy] mt-1 sm:mt-2">
                   Empowering Our Agency's Growth, and with great power comes great responsibility.
                 </h2>
-                <button className="mt-3 sm:mt-4 md:mt-8 px-3 sm:px-5 md:px-8 py-1.5 sm:py-2 md:py-4 border-zinc-700 border-2 text-xs sm:text-sm md:text-base hover:text-white font-semibold font-[gilroy] bg-transparent rounded-full transition duration-300 hover:bg-[#534277]">
+                <button className="mt-6 md:mt-20 px-5 md:px-8 py-2 md:py-4 border-zinc-700 border-2 text-xs sm:text-sm md:text-base hover:text-white font-semibold font-[gilroy] bg-transparent rounded-full transition duration-300 hover:bg-[#534277]">
                   Get Started Now
                 </button>
               </div>

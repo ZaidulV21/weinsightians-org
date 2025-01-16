@@ -176,7 +176,7 @@ const Navbar = () => {
             <hr className="border-t border-gray-300" />
           </div>
           {/* Mobile Call Button */}
-          <div className="mt-auto pb-6">
+          <div className="mt-auto mb-10 pb-6">
             <button className='w-full px-8 py-3 text-[#fff] rounded-full transition-all duration-500 border-2 bg-[#231746] hover:bg-[#534277]'>
               Call Us
             </button>

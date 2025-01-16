@@ -12,12 +12,12 @@ const Page3 = () => {
     <div className='h-screen bg-white p-5 sm:px-16'>
       <div className='w-full h-1/3 flex '>
         {/* Left Side  */}
-        <div className='font-[gilroy]  mt-5 w-1/2'>
+        <div className='font-[gilroy] mt-5 w-full md:w-1/2 flex flex-col items-center md:items-start'>
           <h1 className='text-xl font-bold'>See Our Portfolio Reels</h1>
-          <h1 className='text-6xl mt-3'>Awesome</h1>
+          <h1 className='text-5xl md:text-6xl mt-3'>Awesome</h1>
          <div className='flex gap-3'> 
-         <img className='h-12' src="/circle-design.png" alt="" />
-          <h1 className='text-6xl '>works</h1>
+         <img className='h-10 md:h-12' src="/circle-design.png" alt="" />
+          <h1 className='text-5xl md:text-6xl '>works</h1>
          </div>
         </div>
         {/* Right Side  */}
@@ -34,7 +34,7 @@ const Page3 = () => {
       <div className='w-full h-auto flex flex-wrap justify-center mt-10 items-center font-[gilroy]'>
         <div className="h-auto w-full p-0 flex flex-nowrap overflow-x-auto scroll-snap-x mandatory gap-8">
           {cardData.map((card, index) => (
-            <div className="card h-[450px] w-full max-w-[290px] flex-shrink-0 flex-grow-0 mx-[10px] scroll-snap-start flex flex-col" key={index}>
+            <div className="card overflow-x-hidden h-[450px] w-full max-w-[290px] flex-shrink-0 flex-grow-0 mx-[10px] scroll-snap-start flex flex-col" key={index}>
               <div className="card1">
                 <img src={card.src} alt="" className="w-full h-auto" />
               </div>

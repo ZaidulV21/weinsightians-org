@@ -9,7 +9,7 @@ import Whatsapp from '../components/Whatsapp';
 
 const Home = () => {
   return (
-    <>
+    <><div className='overflow-hidden'>
       <Whatsapp/>
       <Page1/>
       <Page2/>
@@ -18,6 +18,7 @@ const Home = () => {
       <Page5/>
       <div className='px-4 md:px-16'>
         <Footer/>
+        </div>
         </div>
     </>
   );

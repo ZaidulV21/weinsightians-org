@@ -21,6 +21,9 @@
     border: 1px solid rgba(255, 255, 255, 0.125);
 }
 
+::-webkit-scrollbar{
+    display: none;
+}
 
 @font-face {
     font-family: gilroy;
@@ -39,10 +42,6 @@
     clip-path: path('M 0 0 H 100% V calc(100% - 40px) Q 100% 100% calc(100% - 40px) 100% H 0 Z');
 }
 
-
-.card {
- 
-}
 
 .card .card1 {
   background-color: #E3E7ED;

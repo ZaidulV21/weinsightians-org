@@ -10,7 +10,7 @@ const Contact = () => {
     <div className='h-full w-full text-black px-5 md:px-16 p-5'>
       <Whatsapp />
       <Navbar />
-      <div className='relative mt-2 md:mt-10 h-[70vh] md:h-[70vh] rounded-3xl overflow-hidden bg-teal-500'>
+      <div className='relative mt-2 md:mt-10 h-[70vh] md:h-[70vh] rounded-3xl overflow-hidden'>
       <video className='h-full w-full object-cover' src="/moon.mp4" autoPlay loop muted></video>
         <div className=' absolute bottom-0 left-0 p-4'>
           <h1 className='text-4xl md:text-9xl uppercase font-[larken] font-bold mb-4 text-white'>Contact us</h1>
