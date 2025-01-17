@@ -11,7 +11,7 @@ import 'swiper/css/pagination';
 import '../app.css';
 
 // import required modules
-import { EffectCoverflow, Pagination, Autoplay } from 'swiper/modules';
+import { EffectCoverflow, Autoplay } from 'swiper/modules';
 
 const reviews = [
   {
@@ -76,8 +76,8 @@ export default function App() {
           modifier: 1,
           slideShadows: false,
         }}
-        pagination={true}
-        modules={[EffectCoverflow, Pagination, Autoplay]}
+        pagination={false}
+        modules={[EffectCoverflow, Autoplay]}
         className="mySwiper"
         loop={true}
         autoplay={{

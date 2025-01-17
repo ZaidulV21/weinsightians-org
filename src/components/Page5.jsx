@@ -3,7 +3,7 @@ import React from 'react'
 const Page5 = () => {
   return (
     <div className='bg-white px-4 md:px-16'>
-      <div className='text-5xl md:text-7xl uppercase font-[gilroy] mt-10'>
+      <div className='text-5xl md:text-7xl uppercase font-[gilroy]'>
         <h1>Create new </h1>
         <h1 className='flex flex-col  gap-2 md:flex-row'>innovation <img className='hidden w-32 md:flex' src="/circle-design.png" alt="" />together</h1>
       </div>

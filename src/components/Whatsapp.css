@@ -1,0 +1,17 @@
+/* Add this CSS to your styles */
+.vertical-button {
+    position: fixed; /* Fixes the button to the viewport */
+    right: 20px; /* Adjusts the distance from the right */
+    top: 50%; /* Centers the button vertically */
+    transform: translateY(-50%); /* Adjusts the vertical alignment */
+    background-color: #4dff5c; /* Red background */
+    color: white; /* White text */
+    padding: 15px 20px; /* Padding for the button */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 12px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    writing-mode: vertical-rl; /* Rotates the text */
+    text-align: center; /* Centers the text */
+    z-index: 1000; /* Ensures it appears above other elements */
+}
