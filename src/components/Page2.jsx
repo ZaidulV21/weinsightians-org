@@ -3,7 +3,7 @@ import ServiceCard from './ServiceCard'
 
 const Page2 = () => {
   return (
-    <div className='min-h-[120vh] w-full bg-[#fff]  flex flex-col md:flex-row px-4 sm:px-8 md:px-12 lg:px-16'>
+    <div className='min-h-[120vh] w-full  flex flex-col md:flex-row px-4 sm:px-8 md:px-12 lg:px-16'>
       {/* Left Side  */}
       <div className='h-full w-1/2 '>
         {/* Left Side Content */}

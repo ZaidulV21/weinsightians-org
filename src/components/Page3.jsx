@@ -9,7 +9,7 @@ const Page3 = () => {
   ];
 
   return (
-    <div className='h-screen bg-white p-5 sm:px-16'>
+    <div className='h-screen p-5 sm:px-16'>
       <div className='w-full h-1/3 flex '>
         {/* Left Side  */}
         <div className='font-[gilroy] mt-5 w-full md:w-1/2 flex flex-col items-center md:items-start'>

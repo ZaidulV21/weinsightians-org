@@ -4,16 +4,37 @@ import Footer from '../components/Footer'
 
 
 const About = () => {
+  const TeamMemberCard = ({ name, role, imgSrc, socialLinks }) => {
+    return (
+      <div className='card overflow-x-hidden h-[450px] w-full max-w-[290px] flex-shrink-0 flex-grow-0 mx-[10px] scroll-snap-start flex flex-col'>
+        <div className='card1'>
+          <img src={imgSrc} alt="team member" />
+        </div>
+        <div className='card2 p-5'>
+          <h3 className='text-xl font-bold font-[gilroy] text-[#6B50A2]'>{name}</h3>
+          <p className='text-gray-600 font-[gilroy] text-base'>{role}</p>
+          <div className='flex mt-8'>
+            {socialLinks.map((link, index) => (
+              <a key={index} href={link.url} target="_blank" rel="noopener noreferrer" className='mr-4'>
+                <img src={link.icon} alt={`${link.platform} Icon`} className='h-8 w-8' />
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className='h-full w-full text-black px-4 md:px-16 p-5'>
       {/* top */}
-      <div className='h-auto w-full grid'>
         <Navbar />
+      <div className='h-auto w-full grid'>
         <div className='mt-5 md:mt-16 w-full h-[70vh] relative'>
           <img className='absolute rounded-md top-0 md:right-0 md:h-full w-full md:w-2/3' src="https://www.anthropics.com/portraitpro/img/page-images/homepage/v24/out-now-2.jpg" alt="" />
           <div className='absolute mt-48 md:-mt-0 md:left-5 md:-top-12 font-[larken] w-full md:w-1/2 z-10'>
             <h1 className='uppercase text-[#0F122E] text-5xl md:text-[16vh] leading-none'>
-              We really love to work with people. <br />
+              We really  <br /> love to <br /> work with <br /> people. <br />
               <span className='text-4xl md:text-6xl relative md:-top-12 font-[heligthon] capitalize'>WeInsightians</span>
             </h1>
           </div>
@@ -60,11 +81,39 @@ const About = () => {
         </div>
       </div>
       {/* section-2  */}
-      <div className='mt-[20rem] md:mt-10 h-screen'>
+      <div className='mt-[20rem] md:mt-10 h-auto'>
         <h1 className='text-center text-5xl md:text-9xl font-[heligthon]'>Meet Our Team </h1>
-        
-        <div className="section2-image-container">
-          <img src="https://cdn.prod.website-files.com/648884be5f32a12e5da2392f/65492b6d98261b9aedd2482e_NS_Logo-NaN.jpg" alt="" />
+        <div className='flex overflow-x-auto gap-0 md:gap-10 md:justify-center items-center mt-10 '>
+          <TeamMemberCard 
+            name="Akshat Jaiswal" 
+            role="Full Stack Developer" 
+            imgSrc="/img/Akshat.png" 
+            socialLinks={[
+              { platform: 'Instagram', url: 'https://www.instagram.com/akshhat___/', icon: '/img/instagram.png' },
+              { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/akshatjaiswal4841', icon: '/img/linkedin.png' },
+              { platform: 'Facebook', url: 'https://www.facebook.com/akshat.jaiswal.96592', icon: '/img/facebook.png' }
+            ]}
+          />
+          <TeamMemberCard 
+            name="Abhishek Kushwaha" 
+            role="Ads Expert" 
+            imgSrc="/img/Abhishek.jpg" 
+            socialLinks={[
+              { platform: 'Instagram', url: 'https://www.instagram.com/its.me_void', icon: '/img/instagram.png' },
+              { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/contactabhikushwaha/', icon: '/img/linkedin.png' },
+              { platform: 'Facebook', url: 'https://www.facebook.com/profile.php?id=100015401582577', icon: '/img/facebook.png' }
+            ]}
+          />
+          <TeamMemberCard 
+            name="Zaidul Vasf" 
+            role="Web Designer" 
+            imgSrc="/img/Zaid.jpg" 
+            socialLinks={[
+              { platform: 'Instagram', url: 'https://www.instagram.com/__zaidulvasf__', icon: '/img/instagram.png' },
+              { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/zaidul-vasf-37a91a230/', icon: '/img/linkedin.png' },
+              { platform: 'Facebook', url: 'https://www.facebook.com/profile.php?id=100034579388077', icon: '/img/facebook.png' }
+            ]}
+          />
         </div>
       </div>
       <Footer />

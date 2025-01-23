@@ -8,7 +8,7 @@ const Footer = () => {
             <div className='mt-10 flex flex-col md:flex-row justify-between'>
                 <div className='w-full md:w-1/2'>
                 <NavLink to="/" className='w-1/3 flex items-center'>
-                    <img src='/bgWIcon.png' alt='We Insightians Logo' className='mr-2 w-16 h-16' />
+                    <img src='/img/bgWIcon.png' alt='We Insightians Logo' className='mr-2 w-16 h-16' />
                     <h2 className='text-xl font-bold'>WeInsightians</h2>
                 </NavLink>
                 <p className='text-sm text-gray-600 mt-2 font-[gilroy]'>

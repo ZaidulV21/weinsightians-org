@@ -7,8 +7,14 @@
     padding: 0;
     box-sizing: border-box;
 }
-.bg-custom {
+/* .bg-custom {
     background-image: url('/freepik-export-20241213092546fexx.jpeg');
+    filter: brightness(90%);
+    background-size: cover;
+    background-position: center;
+  } */
+  .bg-custom {
+    background-image: url('/img/bg1.jpg');
     filter: brightness(90%);
     background-size: cover;
     background-position: center;
@@ -27,15 +33,15 @@
 
 @font-face {
     font-family: gilroy;
-    src: url('/gilroy-regular.ttf');
+    src: url('/font/gilroy-regular.ttf');
   }
 @font-face {
     font-family: larken;
-    src: url('/LarkenDEMO-Bold.otf');
+    src: url('/font/LarkenDEMO-Bold.otf');
   }
 @font-face {
     font-family: heligthon;
-    src: url('/Heligthon Signature.otf');
+    src: url('/font/Heligthon_Signature.otf');
   }
 
 .curved{

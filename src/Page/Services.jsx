@@ -4,7 +4,7 @@ import Whatsapp from '../components/Whatsapp';
 
 const Services = () => {
   return (
-    <div className='h-screen'>
+    <div className='h-screen bg-custom'>
       <Whatsapp/>
       <ServicePage1/>
     </div>

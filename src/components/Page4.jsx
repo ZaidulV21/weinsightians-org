@@ -6,7 +6,7 @@ import ReviewSlider from './ReviewSlider';
 
 const Page4 = () => {
   return (
-    <div className='h-screen bg-white px-4 md:px-16'>
+    <div className='h-screen px-4 md:px-16'>
       {/* Top Content */}
       <div className='w-full h-1/3 flex flex-col justify-center items-center space-y-2'>
         <h1 className='text-2xl md:text-xl font-semibold'>See from our client</h1>
