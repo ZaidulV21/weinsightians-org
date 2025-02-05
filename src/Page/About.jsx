@@ -8,7 +8,7 @@ const About = () => {
     return (
       <div className='card overflow-x-hidden h-[450px] w-full max-w-[290px] flex-shrink-0 flex-grow-0 mx-[10px] scroll-snap-start flex flex-col'>
         <div className='card1'>
-          <img src={imgSrc} alt="team member" />
+          <img className="transition-all duration-500 hover:scale-90" src={imgSrc} alt="team member" />
         </div>
         <div className='card2 p-5'>
           <h3 className='text-xl font-bold font-[gilroy] text-[#6B50A2]'>{name}</h3>
@@ -28,14 +28,14 @@ const About = () => {
   return (
     <div className='h-full w-full text-black px-4 md:px-16 p-5'>
       {/* top */}
-        <Navbar />
+      <Navbar />
       <div className='h-auto w-full grid'>
         <div className='mt-5 md:mt-16 w-full h-[70vh] relative'>
           <img className='absolute rounded-md top-0 md:right-0 md:h-full w-full md:w-2/3' src="https://www.anthropics.com/portraitpro/img/page-images/homepage/v24/out-now-2.jpg" alt="" />
           <div className='absolute mt-48 md:-mt-0 md:left-5 md:-top-12 font-[larken] w-full md:w-1/2 z-10'>
-            <h1 className='uppercase text-[#0F122E] text-5xl md:text-[16vh] leading-none'>
-              We really  <br /> love to <br /> work with <br /> people. <br />
-              <span className='text-4xl md:text-6xl relative md:-top-12 font-[heligthon] capitalize'>WeInsightians</span>
+            <h1 className='uppercase text-[#0F122E] text-5xl md:text-[13vh] leading-none'>
+              Meet the Insightians: Your Digital Growth Partners!<br />
+              <span className='text-4xl md:text-6xl relative md:-top-2 font-[heligthon] capitalize'>WeInsightians</span>
             </h1>
           </div>
         </div>
@@ -65,18 +65,18 @@ const About = () => {
           </div>
           <div className='w-full md:w-1/3 font-[gilroy] relative -mt-10 md:mt-0 '>
             <p className="mt-4 text-sm md:text-base text-gray-700">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.
+              At We Insightians, three passionate individuals came together with one goal: to help local businesses in Lucknow thrive online.
             </p>
             <p className="mt-4 text-sm md:text-base text-gray-700">
-              Laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+              We understand that every small business has its own unique story, and we’re here to make sure that story gets told the right way. By focusing on the power of small data, we create websites that not only look great but drive real results.
             </p>
           </div>
           <div className='w-full md:w-1/3 p-5 font-[gilroy] relative '>
             <blockquote className="mb-10 text-lg md:text-xl font-bold">
-              " Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur. "
+              "The future belongs to those who believe in the beauty of their dreams. "
             </blockquote>
             <div className='border-t-2 border-zinc-300'></div>
-            <h1 className='text-zinc-800 mt-5'>Akshat Jaiswal</h1>
+            <h1 className='text-zinc-800 mt-5'>Eleanor Roosevelt</h1>
           </div>
         </div>
       </div>
@@ -84,30 +84,30 @@ const About = () => {
       <div className='mt-[20rem] md:mt-10 h-auto'>
         <h1 className='text-center text-5xl md:text-9xl font-[heligthon]'>Meet Our Team </h1>
         <div className='flex overflow-x-auto gap-0 md:gap-10 md:justify-center items-center mt-10 '>
-          <TeamMemberCard 
-            name="Akshat Jaiswal" 
-            role="Full Stack Developer" 
-            imgSrc="/img/Akshat.png" 
+          <TeamMemberCard
+            name="Akshat Jaiswal"
+            role="Full Stack Developer"
+            imgSrc="/img/Akshat.png"
             socialLinks={[
               { platform: 'Instagram', url: 'https://www.instagram.com/akshhat___/', icon: '/img/instagram.png' },
               { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/akshatjaiswal4841', icon: '/img/linkedin.png' },
               { platform: 'Facebook', url: 'https://www.facebook.com/akshat.jaiswal.96592', icon: '/img/facebook.png' }
             ]}
           />
-          <TeamMemberCard 
-            name="Abhishek Kushwaha" 
-            role="Ads Expert" 
-            imgSrc="/img/Abhishek.jpg" 
+          <TeamMemberCard
+            name="Abhishek Kushwaha"
+            role="Ads Expert"
+            imgSrc="/img/Abhishek.jpg"
             socialLinks={[
               { platform: 'Instagram', url: 'https://www.instagram.com/its.me_void', icon: '/img/instagram.png' },
               { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/contactabhikushwaha/', icon: '/img/linkedin.png' },
               { platform: 'Facebook', url: 'https://www.facebook.com/profile.php?id=100015401582577', icon: '/img/facebook.png' }
             ]}
           />
-          <TeamMemberCard 
-            name="Zaidul Vasf" 
-            role="Web Designer" 
-            imgSrc="/img/Zaid.jpg" 
+          <TeamMemberCard
+            name="Zaidul Vasf"
+            role="Web Designer"
+            imgSrc="/img/Zaid.jpg"
             socialLinks={[
               { platform: 'Instagram', url: 'https://www.instagram.com/__zaidulvasf__', icon: '/img/instagram.png' },
               { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/zaidul-vasf-37a91a230/', icon: '/img/linkedin.png' },
