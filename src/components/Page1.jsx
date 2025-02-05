@@ -6,8 +6,8 @@ const Page1 = () => {
     <div className="bg-custom text-black px-4 sm:px-8 md:px-12 lg:px-16 min-h-screen p-3 sm:p-5">
       <Navbar />
       <div className='font-[larken] uppercase mt-16 font-semibold text-3xl sm:text-4xl md:text-5xl lg:text-6xl'>
-        <h1 className='mb-2'>Empowering businesses</h1>
-        <h1 className='mb-2'>with stunning websites </h1>
+        <h1 className='mb-2 text-[#0F122E]'>Bringing Your Vision to Life – </h1>
+        <h1 className='mb-2 text-[#0F122E]'>Innovative Services Designed for Growth and Excellence</h1>
       </div>
       <div className='mt-6 font-thin text-base sm:text-lg md:text-xl font-[gilroy] max-w-2xl'>
         <p className='leading-relaxed'>
