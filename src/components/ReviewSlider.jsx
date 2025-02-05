@@ -15,50 +15,51 @@ import { EffectCoverflow, Autoplay } from 'swiper/modules';
 
 const reviews = [
   {
-    content: "We Insightians helped us achieve our goals by providing expert guidance and support throughout the project. Their insights were invaluable in navigating challenges, and their commitment to our success made a significant difference in our outcomes.",
-    title: "Aarav Sharma",
-    job: "Software Engineer"
+    content: '"We needed a modern website to showcase our cakes and pastries, and We insightians delivered beyond our expectations! Their team not only designed a stunning site but also optimized it for mobile, which has brought in so many new customers. Truly the best web development team in Lucknow!"',
+    title: "Rakesh Sharma, Owner",
+    job: "Sharma’s Delight Bakery"
   },
   {
-    content: "We Insightians provided valuable insights for our project, enabling us to make informed decisions. Their analytical approach and attention to detail helped us identify key areas for improvement, ultimately leading to a more successful implementation.",
-    title: "Vivaan Gupta",
-    job: "Data Scientist"
+    content: '"As a local electronics wholesaler, we were struggling to reach online customers.We Insightians team helped us create an e-commerce website that’s both functional and user-friendly. Their attention to detail and prompt support made the process seamless. Highly recommended!"',
+    title: "Archita Rana, Manager",
+    job: "Apex Electronics"
   },
   {
-    content: "We Insightians guided us through the challenges we faced during the development phase. Their expertise and proactive problem-solving skills ensured that we stayed on track and met our deadlines without compromising on quality.",
-    title: "Aditya Verma",
-    job: "Product Manager"
+    content: '"Starting an online presence was daunting, but We Insightians team made it easy for us. They designed an elegant website that perfectly matches our brand. It’s helped us connect with clients beyond Lucknow. Thank you for your incredible work!"',
+    title: " Meera Joshi, Founder",
+    job: "Krishna Boutique"
   },
   {
-    content: "We Insightians supported our team in reaching new heights by fostering a collaborative environment. Their innovative strategies and creative solutions inspired us to think outside the box and push the boundaries of our capabilities.",
-    title: "Vihaan Rao",
-    job: "Graphic Designer"
+    content: '"The team at We Insightians transformed our outdated website into a sleek, professional platform. Now, our booking system works flawlessly, and we’ve seen a significant increase in inquiries. They truly understand the needs of local businesses!"',
+    title: " Abhinav Tripathi, Owner",
+    job: "Blissful Stays"
   },
   {
-    content: "We Insightians helped us streamline our processes, which significantly improved our efficiency. Their thorough analysis and recommendations allowed us to eliminate redundancies and focus on what truly matters for our business.",
-    title: "Reyansh Patel",
-    job: "Marketing Specialist"
+    content: '"We were looking for a sleek website to promote our fitness center and online coaching services. The Insightians team not only delivered a stylish website but also integrated booking features seamlessly. We’ve seen a major increase in sign-ups and online engagement!"',
+    title: "Arvind Sharma, Founder",
+    job: "Urban Edge Fitness"
   },
   {
-    content: "We Insightians enabled us to make data-driven decisions that transformed our approach to business. Their insights into market trends and consumer behavior were instrumental in shaping our strategies and achieving our objectives.",
-    title: "Krishna Iyer",
-    job: "Business Analyst"
+    content: '"Our old website wasn’t giving us the results we needed. After working with We Insightians, they revamped the entire site to reflect our business values. It\'s now an engaging experience for our customers, and we\'ve noticed a significant uptick in inquiries. Excellent work!"',
+    title: "Prakash Gupta, Director",
+    job: "Vibrant Ventures"
   },
   {
-    content: "We Insightians assisted us in enhancing our online presence through targeted strategies and effective digital marketing. Their expertise in SEO and content creation helped us reach a wider audience and engage with our customers.",
-    title: "Sai Kiran",
-    job: "Web Developer"
+    content: '"I wanted a personal website to showcase my portfolio and blog, but I wasn’t sure where to start. The team at We Insightians took the time to understand my vision and designed a beautiful, clean, and professional website. It reflects my style perfectly, and I\'ve already received great feedback from clients and peers. The entire process was seamless, and I’m so glad I chose them!"',
+    title: "Preeti Verma",
+    job: "Freelancer"
   },
   {
-    content: "We Insightians empowered us to build a strong team by providing training and development resources. Their focus on team dynamics and individual growth has led to a more cohesive and motivated workforce.",
-    title: "Riya Singh",
-    job: "HR Manager"
+    content: '"We needed a modern website to showcase our business and services, but we weren’t sure where to start. The team at We Insightians took the time to understand our vision and designed a beautiful, clean, and professional website. It reflects our brand perfectly, and we’ve already received great feedback from customers and partners. The entire process was seamless, and we’re so glad we chose them!"',
+    title: "Nikhil Agrahari, Owner",
+    job: "Agrahari Urban Developments"
   },
   {
-    content: "We Insightians inspired us to innovate and grow by encouraging a culture of creativity and experimentation. Their support in brainstorming sessions and workshops has led to groundbreaking ideas that have propelled our business forward.",
-    title: "Anaya Mehta",
-    job: "Content Writer"
-  }
+    content: '"We were looking for a professional website to represent our car washing service online, and We Insightians delivered beyond our expectations. The site is clean, easy to navigate, and has attracted more customers than we anticipated. Their team also made sure the site was mobile-friendly, which has been great for our on-the-go customers. Highly recommend them for any local business!"',
+    title: "Shivansh Verma, Owner",
+    job: "Ayodhya Car Washing Hub"
+  },
+  
 ];
 
 export default function App() {
