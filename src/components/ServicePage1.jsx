@@ -9,7 +9,7 @@ const ServicePage1 = () => {
       {/* section1 */}
       <div className='h-screen px-4 md:px-16 p-5'>
         <Navbar />
-        <div className='absolute top-36'><h1 className='text-4xl md:text-6xl font-medium font-[larken]'>Shaping the best brands <br /> and websites of <br /><span className='text-zinc-500'>tommorrow's greatest players</span></h1></div>
+        <div className='absolute top-36'><h1 className='text-[#0F122E] text-4xl md:text-6xl font-medium font-[larken]'>Empowering Your Vision <br />with Custom Services that <br />Create Real Impact</h1></div>
         <div className='absolute bottom-10 flex justify-between w-[90%] md:w-[90%]'>
           <h1 className='font-[gilroy] text-sm md:text-base font-semibold ' >WeInsightians is here for the ones who don't just follow trends, they set <br />them. Our services go beyond design, we're talking premium, high-impact <br />branding and web experiences that make your brand unforgettable.</h1>
           <img className='h-20 rotate36 md:h-28' src="/img/64bbbf416decd23360ebb88c_get-in-touch-badge.svg" alt="getintotouch" loading="lazy" />
