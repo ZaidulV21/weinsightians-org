@@ -13,7 +13,7 @@ const Page3 = () => {
       <div className='w-full h-1/3 flex '>
         {/* Left Side  */}
         <div className='font-[gilroy] mt-5 w-full md:w-1/2 flex flex-col items-center md:items-start'>
-          <h1 className='text-xl font-bold'>See Our Portfolio Reels</h1>
+          <h1 className='text-xl font-bold'>See Our Work </h1>
           <h1 className='text-5xl md:text-6xl mt-3'>Awesome</h1>
          <div className='flex gap-3'> 
          <img className='h-10 md:h-12' src="/circle-design.png" alt="" />
