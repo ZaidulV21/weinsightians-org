@@ -6,22 +6,22 @@ const OurServices2 = () => {
     {
       title: "Web Design",
       imgSrc: "/img/ser_Design.png",
-      description: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+      description: "We create visually appealing and user-friendly website designs tailored to your business needs. Our designs ensure a seamless user experience, optimized for both desktop and mobile devices. We focus on modern aesthetics, intuitive navigation, and engaging layouts that captivate visitors and drive conversions."
     },
     {
       title: "Web Development",
       imgSrc: "/img/ser_Development.png",
-      description: "It is a long established fact that  Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+      description: "Our web development services bring your ideas to life with clean, efficient, and scalable code. We specialize in creating responsive, fast, and secure websites using the latest technologies. Whether you need a business website, an e-commerce platform, or a custom solution, we build high-performance websites that deliver results."
     },
     {
       title: "Social Media Management",
       imgSrc: "/img/ser_Social.png",
-      description: "It  a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+      description: "We help businesses grow their online presence with effective social media strategies. From content creation to engagement and analytics, we manage your social media profiles to enhance brand awareness and connect with your audience. Our goal is to increase your reach and drive meaningful interactions."
     },
     {
-      title: "Animation",
+      title: "SEO & Digital Marketing",
       imgSrc: "/img/ser_Animation.png",
-      description: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
+      description: "Boost your business visibility and attract more customers with our internet marketing services. We implement SEO strategies, pay-per-click advertising, email marketing, and content marketing to enhance your online reach. Our data-driven approach ensures maximum return on investment and business growth."
     }
   ];
 
