@@ -31,9 +31,9 @@ const About = () => {
       <Navbar />
       <div className='h-auto w-full grid'>
         <div className='mt-5 md:mt-16 w-full h-[70vh] relative'>
-          <img className='absolute rounded-md top-0 md:right-0 md:h-full w-full md:w-2/3' src="https://www.anthropics.com/portraitpro/img/page-images/homepage/v24/out-now-2.jpg" alt="" />
-          <div className='absolute mt-48 md:-mt-0 md:left-5 md:-top-12 font-[larken] w-full md:w-1/2 z-10'>
-            <h1 className='uppercase text-[#0F122E] text-5xl md:text-[13vh] leading-none'>
+          <img className='absolute rounded-md bg-[#679ead] top-0 md:right-0 md:h-full w-full md:w-2/3' src="/img/about_us.jpg" alt="" style={{objectFit: 'cover'}} />
+          <div className='absolute mt-56 md:-mt-0 md:left-5 md:-top-12 font-[larken] w-full md:w-1/2 z-10'>
+            <h1 className='uppercase text-[#0F122E] text-5xl md:text-[11vh] leading-none'>
               Meet the Insightians: Your Digital Growth Partners!<br />
               <span className='text-4xl md:text-6xl relative md:-top-2 font-[heligthon] capitalize'>WeInsightians</span>
             </h1>
@@ -46,20 +46,26 @@ const About = () => {
             <div className='absolute bottom-10 w-full mr-14 font-[gilroy]'>
               <h1 className="text-xl md:text-2xl font-bold ">Follow Us</h1>
 
-              <div className='flex mt-5 justify-between text-sm md:text-base'>
-                <h1>Instagram</h1>
-                <h1>↗</h1>
-              </div>
+              <a href="https://instagram.com/weinsightians">
+                <div className='flex mt-5 justify-between text-sm md:text-base'>
+                  <h1>Instagram</h1>
+                  <h1>↗</h1>
+                </div>
+              </a>
               <div className='border-t-2 border-zinc-300'></div>
-              <div className='flex mt-2 justify-between text-sm md:text-base'>
-                <h1>LinkedIn</h1>
-                <h1>↗</h1>
-              </div>
-              <div className='border-t-2 border-zinc-300'></div>
-              <div className='flex mt-2 justify-between text-sm md:text-base'>
-                <h1>Facebook</h1>
-                <h1>↗</h1>
-              </div>
+              <a href="https://www.linkedin.com/company/we-insightians/">
+                <div className='flex mt-2 justify-between text-sm md:text-base'>
+                  <h1>LinkedIn</h1>
+                  <h1>↗</h1>
+                </div>
+              </a>
+              <a href="https://www.facebook.com/profile.php?id=61552381883595">
+                <div className='border-t-2 border-zinc-300'></div>
+                <div className='flex mt-2 justify-between text-sm md:text-base'>
+                  <h1>Facebook</h1>
+                  <h1>↗</h1>
+                </div>
+              </a>
               <div className='border-t-2 border-zinc-300'></div>
             </div>
           </div>
