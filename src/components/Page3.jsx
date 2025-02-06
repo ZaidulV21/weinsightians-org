@@ -9,7 +9,7 @@ const Page3 = () => {
   ];
 
   return (
-    <div className='h-screen p-5 sm:px-16'>
+    <div id='our-work' className=' h-screen p-5 sm:px-16'>
       <div className='w-full h-1/3 flex '>
         {/* Left Side  */}
         <div className='font-[gilroy] mt-5 w-full md:w-1/2 flex flex-col items-center md:items-start'>
@@ -36,7 +36,7 @@ const Page3 = () => {
           {cardData.map((card, index) => (
             <div className="card overflow-x-hidden h-[450px] w-full max-w-[290px] flex-shrink-0 flex-grow-0 mx-[10px] scroll-snap-start flex flex-col" key={index}>
               <div className="card1">
-                <img src={card.src} alt="" className="w-full h-auto" />
+                <img src={card.src} alt="" className="w-full h-auto transition-all duration-500 hover:scale-90" />
               </div>
               <div className="card2 px-4 bg-[#E3E7ED]">
                 <h2 className='text-[#6B50A2] font-bold text-base font-[larken]'>{card.brandName}</h2>
