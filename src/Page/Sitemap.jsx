@@ -1,21 +1,39 @@
 import React from 'react';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
-const Sitemap = () => {
+const sitemap = () => {
   return (
-    <div className="h-full w-full text-black px-5 md:px-16 p-5">
-      <h1 className="text-4xl md:text-9xl uppercase font-[larken] font-bold mb-4">Sitemap</h1>
-      <hr className="border-t border-black my-4" />
-      <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/services">Services</a></li>
-        <li><a href="/about">About</a></li>
-        <li><a href="/blog">Blog</a></li>
-        <li><a href="/contact">Contact</a></li>
-        <li><a href="/privacy">Privacy Policy</a></li>
-      </ul>
+    <div className="h-full w-full text-black px-5 md:px-16 p-5 font-[gilroy]">
+      <Navbar/>
+      <div className="mt-10">
+        <h2 className="text-4xl md:text-7xl text-center font-bold mb-4 ">Sitemap</h2>
+        <ul className="list-none">
+          <li className="mb-4">
+            <a href="/" className='text-[#0F122E] text-lg'>Home</a>
+          </li>
+          <li className="mb-4">
+            <a href="/about" className='text-[#0F122E] text-lg'>About Us</a>
+          </li>
+          <li className="mb-4">
+            <a href="/services" className='text-[#0F122E] text-lg'>Services</a>
+          </li>
+          
+          <li className="mb-4">
+            <a href="/contact" className='text-[#0F122E] text-lg'>Contact Us</a>
+          </li>
+          <li className="mb-4">
+            <a href="/blog" className='text-[#0F122E] text-lg'>Blog</a>
+          </li>
+          <li className="mb-4">
+            <a href="/privacy" className='text-[#0F122E] text-lg'>Privacy Policy</a>
+          </li>
+        </ul>
+      </div>
+      <Footer/>
     </div>
   );
 };
 
-export default Sitemap;
+export default sitemap;
 
