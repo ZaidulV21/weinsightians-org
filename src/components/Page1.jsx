@@ -20,7 +20,6 @@ const Page1 = () => {
         <button className='font-[gilroy] px-10 py-2 text-[#231746] font-thin transition-transform-all duration-500 rounded-full border-2 bg-[#fff] hover:bg-[#534277] '>Get Started</button>
         <div className='bg-[#231746] h-12 w-12 rounded-full flex transition-all duration-500 items-center justify-center p-2 border-2 hover:rotate-45'><img src="/right-arrow.png" alt="" /></div>
       </div>
-    
     </div>
   ) 
 }
