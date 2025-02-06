@@ -78,9 +78,12 @@ const Navbar = () => {
 
         {/* Desktop Call Button */}
         <div className='hidden md:flex font-semibold items-center gap-6 font-[gilroy]'>
-          <button className='px-8 py-3 text-[#fff] rounded-full transition-all duration-500 border-2 bg-[#231746] hover:bg-[#534277]'>
+          <a 
+            href="tel:+917309975088" 
+            className='px-8 py-3 text-[#fff] rounded-full transition-all duration-500 border-2 bg-[#231746] hover:bg-[#534277]'
+          >
             Call Us
-          </button>
+          </a>
         </div>
 
         {/* Mobile Menu Button */}
@@ -177,9 +180,12 @@ const Navbar = () => {
           </div>
           {/* Mobile Call Button */}
           <div className="mt-auto mb-10 pb-6">
-            <button className='w-full px-8 py-3 text-[#fff] rounded-full transition-all duration-500 border-2 bg-[#231746] hover:bg-[#534277]'>
+            <a 
+              href="tel:+917309975088" 
+              className='w-full px-8 py-3 text-[#fff] rounded-full transition-all duration-500 border-2 bg-[#231746] hover:bg-[#534277]'
+            >
               Call Us
-            </button>
+            </a>
           </div>
         </div>
       </div>

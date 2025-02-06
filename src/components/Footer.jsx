@@ -20,22 +20,26 @@ const Footer = () => {
                         <h3 className='font-semibold text-2xl'>Home</h3>
                         <ul className='text-base mt-3'>
                             <li className='hover:pl-4 transition-all duration-300'><NavLink to="/about">About Us</NavLink></li>
-                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/our-work">Our Work</NavLink></li>
-                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/community">Community</NavLink></li>
+                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/">Our Work</NavLink></li>
+                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/contact">Send Request</NavLink></li>
+                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/contact#faq">FAQs</NavLink></li>
                         </ul>
                     </div>
                     <div className='w-full mt-5 md:mt-0 md:w-1/3 font-[gilroy]'>
                         <h3 className='font-semibold text-2xl'>Features</h3>
                         <ul className='text-base mt-3'>
-                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/get-started">Get Started</NavLink></li>
-                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/privacy-policy">Privacy Policy</NavLink></li>
+                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/">Get Started</NavLink></li>
+                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/blog">Blog</NavLink></li>
+                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/privacy">Privacy Policy</NavLink></li>
+                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/sitemap">Sitemap</NavLink></li>
                         </ul>
                     </div>
                     <div className='w-full mt-5 md:mt-0 md:w-1/3 font-[gilroy]'>
                         <h3 className='font-semibold text-2xl'>Social Media</h3>
                         <ul className='text-base mt-3'>
-                            <li className='hover:pl-4 transition-all duration-300'><a href="https://instagram.com/whokilledakshhat" target="_blank" rel="noopener noreferrer">Instagram</a></li>
-                            <li className='hover:pl-4 transition-all duration-300'><a href="https://www.linkedin.com/in/akshatjaiswal4841" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+                            <li className='hover:pl-4 transition-all duration-300'><a href="https://instagram.com/weinsightians" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                            <li className='hover:pl-4 transition-all duration-300'><a href="https://www.facebook.com/profile.php?id=61552381883595" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+                            <li className='hover:pl-4 transition-all duration-300'><a href="https://www.linkedin.com/company/we-insightians/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
                         </ul>
                     </div>
                 </div>
