@@ -99,7 +99,7 @@ const ContactForm = () => {
     };
 
     return (
-        <div className='h-full font-[gilroy] w-full md:w-2/3 bg-[#6B50A2] rounded-2xl p-10'>
+        <div className='h-full font-[gilroy] w-full md:w-2/3 bg-[#c7d5fd] rounded-2xl p-10'>
             <h1 className='text-5xl mt-10 mb-4'>Got ideas? We’ve got <br /> the skills. Let’s team up.</h1>
             <h2 className='text-base mb-6'>Tell us more about yourself and what you’ve got in mind.</h2>
 
