@@ -22,9 +22,9 @@ const Page2 = () => {
             <div className="bg-[#ebebec] h-full rounded-xl relative">
               {/* Buttons */}
               <div className="absolute top-3 right-3 sm:top-6 sm:right-6 md:top-10 md:right-8 flex flex-col sm:flex-row gap-2 sm:space-x-2">
-                <button className="border-2 border-zinc-700 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-xs sm:text-sm font-medium text-[#231746] transition duration-300 hover:bg-[#534277] hover:text-white">
+                <a href='/services' className="border-2 border-zinc-700 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-xs sm:text-sm font-medium text-[#231746] transition duration-300 hover:bg-[#534277] hover:text-white">
                   Our Services
-                </button>
+                </a>
                 <button className="border-2 border-zinc-700 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-xs sm:text-sm font-medium text-[#231746] transition duration-300 hover:bg-[#534277] hover:text-white">
                   2024
                 </button>
