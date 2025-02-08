@@ -10,7 +10,7 @@ const Sitemap = () => {
         <h2 className="text-4xl text-[#6B50A2] md:text-7xl font-bold mb-4">Sitemap</h2>
         <div className="grid mt-10 grid-cols-2 md:grid-cols-4 gap-10">
           <div>
-            <h3 className="font-bold text-2xl">Main</h3>
+            <h3 className="font-bold text-2xl ">Main</h3>
             <ul className="leading-10 text-lg">
               <li><a href="/">Home</a></li>
               <li><a href="/services">Services</a></li>
