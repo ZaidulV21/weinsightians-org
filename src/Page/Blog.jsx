@@ -1,10 +1,16 @@
 import React from 'react'
+import { Helmet } from 'react-helmet';
 import Navbar from '../components/Navbar'
 import Whatsapp from '../components/Whatsapp'
 
 const Blog = () => {
   return (
     <>
+     <Helmet>
+        <title>We Insightians Blog - Latest News & Tips</title>
+        <meta name="description" content="Read the latest articles, web development tips, and insights from the We Insightians team." />
+        <link rel="canonical" href="https://weinsightians.tech/blog" />
+      </Helmet>
     <div className='h-screen bg-[#E3E7ED] w-full px-4 md:px-16 pt-5 text-black '>
       {/* <Whatsapp/> */}
       <Navbar/>
