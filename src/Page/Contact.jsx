@@ -1,4 +1,5 @@
 import React from 'react'
+import { Helmet } from 'react-helmet';
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import Faq from '../components/Faq'
@@ -7,15 +8,26 @@ import ContactForm from '../components/ContactForm'
 
 const Contact = () => {
   return (
+  <><Helmet>
+  <title>Contact Us - We Insightians | Let's Build Something Great</title>
+  <meta name="description" content="Get in touch with We Insightians for web development, branding, and UI/UX design solutions. Let's work together to grow your business!" />
+  <meta name="keywords" content="Contact We Insightians, Web Design Consultation, Digital Solutions, Business Inquiry" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://weinsightians.tech/contact" />
+  <meta property="og:title" content="Contact We Insightians - Let's Connect" />
+  <meta property="og:description" content="Reach out to us for top-tier digital solutions. We specialize in web design, branding, and creative business growth strategies." />
+  <meta property="og:url" content="https://weinsightians.tech/contact" />
+  <meta property="og:type" content="website" />
+</Helmet>
     <div className=' h-full w-full text-black px-5 md:px-16 p-5'>
       <Whatsapp />
       <Navbar />
       <div className='relative mt-2 md:mt-10 h-[70vh] md:h-[70vh] rounded-3xl overflow-hidden'>
       <video className='h-full w-full object-cover brightness-[50%]' src="/video/moon.mp4" autoPlay loop muted></video>
         <div className=' absolute bottom-0 left-0 p-4'>
-          <h1 className='text-4xl md:text-9xl uppercase font-[larken] font-bold mb-4 text-white'>Contact us</h1>
+          <h1 className='text-4xl md:text-9xl uppercase font-[larken] font-bold mb-4 text-gray-300'>Contact us</h1>
           <hr className='border-t border-white my-4' />
-          <p className='mb-8 text-sm md:text-2xl font-[gilroy] text-white'>We're here to help with anything you need. Want to get in touch with us? </p>
+          <p className='mb-8 text-sm md:text-2xl font-[gilroy] text-gray-300'>We're here to help with anything you need. Want to get in touch with us? </p>
         </div>
       </div>
       <div className='mt-2 md:mt-10  flex h-full rounded-3xl'>
@@ -60,6 +72,7 @@ const Contact = () => {
       <Faq/>
       <Footer />
     </div>
+    </>
   )
 }
 
