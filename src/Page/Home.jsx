@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet';
 import Page1 from "../components/Page1"
 import Page2 from "../components/Page2"
 import Page3 from "../components/Page3"
@@ -9,7 +10,19 @@ import Whatsapp from '../components/Whatsapp';
 
 const Home = () => {
   return (
-    <><div className='overflow-hidden'>
+    <div>
+      <Helmet>
+        <title>We Insightians - Expert Web Development & Branding</title>
+        <meta name="description" content="We Insightians provides top-tier web development, UI/UX design, and digital solutions to grow your business." />
+        <meta name="keywords" content="We Insightians, Web Development, Branding, Digital Solutions, UI/UX Design" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://weinsightians.tech/" />
+        <meta property="og:title" content="We Insightians - Bringing Your Vision to Life" />
+        <meta property="og:description" content="We Insightians is a leading digital agency specializing in branding, website design, and business growth strategies." />
+        <meta property="og:url" content="https://weinsightians.tech/" />
+        <meta property="og:type" content="website" />
+      </Helmet>
+    <div className='overflow-hidden'>
       <Whatsapp/>
       <Page1/>
       <Page2/>
@@ -20,7 +33,7 @@ const Home = () => {
         <Footer/>
         </div>
         </div>
-    </>
+    </div>
   );
 };
 
