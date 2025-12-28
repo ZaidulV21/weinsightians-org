@@ -1,0 +1,71 @@
+[33m6fce6ed[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m updated website
+[33m036a787[m Add SEO metadata to Services page using React Helmet
+[33me737b09[m Add SEO metadata to Contact page using React Helmet
+[33m0b05fa0[m Add SEO metadata to Blog page using React Helmet
+[33m539934d[m Enhance About Page: Add SEO metadata, new background section, and improve semantic HTML
+[33m6a8f1bd[m Add SEO metadata to Home page using React Helmet
+[33mc206990[m Add ediss.jpg image to project resources
+[33m6811fe6[m Add React Helmet for SEO and metadata across pages
+[33m308039a[m Configure Vite base path for deployment
+[33me29a9fb[m Final Changes
+[33mdb20794[m Refactor Sitemap: Enhance layout with grid structure and add comprehensive navigation sections
+[33ma8db64d[m Remove Whatsapp component from Services page
+[33m995edf3[m Update Contact Page: Add social media links with actual URLs
+[33m659ed69[m Update ContactForm: Modify background color to light blue
+[33m4f56dad[m Update Page1 and Page2: Convert buttons to anchor links for navigation
+[33m6b7445c[m Refactor Privacy and Sitemap Pages: Add Navbar and Footer, improve styling and layout
+[33me160e3c[m Update Contact Page: Refine contact details with interactive links and styling
+[33m3b07cab[m Update About Page: Add social media links and refine image and text styling
+[33m3d25360[m Refine Page5: Adjust Contact Us button styling and spacing
+[33m79267c3[m Update OurServices2: Replace Lorem Ipsum with targeted service descriptions
+[33m8943363[m Add Privacy and Sitemap page components with responsive design
+[33mfef3d8d[m Remove Card component and add about us image
+[33ma64da14[m Update Footer and Navbar: Refactor navigation links and contact information
+[33m6055786[m Enhance Page3: Add anchor ID and image hover effect
+[33m17823ce[m Refactor Page2: Add navigation links and adjust styling
+[33mb0eebf2[m Cleanup Page1: Remove unnecessary whitespace
+[33m988f363[m Add Privacy and Sitemap routes to App component
+[33mdd5da54[m Refactor About Page: Update hero section and team description with more personalized, mission-driven content
+[33mdb53395[m Refactor ServicePage1: Update hero section text with more impactful, client-focused messaging
+[33mc97fd50[m Update ReviewSlider: Replace generic testimonials with specific, localized client success stories
+[33m6f4db9f[m Refactor Page5: Update hero section with more focused and client-centric messaging
+[33m9b07af3[m Refactor Page3: Update portfolio section heading to be more concise
+[33m6a02873[m Refactor Page2: Update About Us section and service descriptions with more targeted, client-focused content
+[33ma8587f1[m Refactor Page1 hero section: Update headings with more descriptive and impactful text
+[33m27cce28[m `Update Page1 component: replace heading text with new content`
+[33m257d0d2[m feat:update background and
+[33mdd0b55a[m Complete About responsiveness
+[33mefbaf11[m Chota Mota Sudhar
+[33m396f864[m Form Completed ,Add Whatsapp Button
+[33m2815dc2[m Complete Blog responsive
+[33m221f207[m Complete Service Route responsiveness
+[33m385c792[m Complete page 1 responsive
+[33m57522e9[m Home Route Pgae2 Responsive
+[33m2e7269c[m Contact ROute done
+[33m09f53b8[m Contact bottom design done
+[33m6e36fbd[m Form done
+[33m816a8f2[m blog route done
+[33m8c36dde[m About ROute Done
+[33m9b4970d[m Service Route Completed
+[33m71b30fc[m Structure Update
+[33mf7676ce[m completed page2
+[33ma79cc8c[m Completed Left Section
+[33m4b4306f[m Update Right Section Page 2 and page3
+[33ma1d8fcd[m Change Font TExt SiZe
+[33m319416f[m update Page3
+[33madc1435[m Page3 Done
+[33m11486d4[m Update Page5
+[33m6e93f7a[m Update Footer
+[33maece429[m Complete Review Section
+[33m4dabd65[m add Footer compnent and complete page5 Section
+[33m9a4a569[m Update Structure
+[33m2c37c54[m Update Page3
+[33mf8a6f57[m Update page 2 and 3
+[33m69bb3cf[m Update page1
+[33md45c4d4[m Update Navbar
+[33m6c479cc[m Did some work in Navbar
+[33md4e2833[m Co-authored-by: Akshat Jaiswal <akshatjaiswal4841@gmail.com>
+[33mcd37081[m Change in Components
+[33m4d3c53f[m Update Packages
+[33mb91c78c[m Change ESlint Config
+[33mee7d130[m first commit
