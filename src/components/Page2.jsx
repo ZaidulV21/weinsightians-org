@@ -108,7 +108,7 @@ const Page2 = () => {
         }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-        <div className='w-full h-1/3 pt-10 transforming-heading'>
+        <div className='relative w-full h-1/3 pt-10 transforming-heading'>
           <div className='font-[Gilroy] font-bold text-5xl flex gap-5 justify-end'>
             <h1 className='uppercase '>Transforming</h1>
        <div> <GooeyBlob/></div>

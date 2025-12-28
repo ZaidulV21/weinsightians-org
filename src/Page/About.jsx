@@ -183,16 +183,6 @@ const About = () => {
           <h1 className='text-center text-5xl md:text-9xl font-[heligthon]'>Meet Our Team</h1>
           <div className='flex overflow-x-auto gap-24 md:gap-20 md:justify-center items-center mt-20 '>
             <TeamMemberCard
-              name="Akshat Jaiswal"
-              role="Full Stack Developer"
-              imgSrc="/img/Akshat.png"
-              socialLinks={[
-                { platform: 'Instagram', url: 'https://www.instagram.com/akshhat___/', icon: '/img/instagram.png' },
-                { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/akshatjaiswal4841', icon: '/img/linkedin.png' },
-                { platform: 'Facebook', url: 'https://www.facebook.com/akshat.jaiswal.96592', icon: '/img/facebook.png' }
-              ]}
-            />
-            <TeamMemberCard
               name="Abhishek Kushwaha"
               role="Ads Expert"
               imgSrc="/img/Abhishek.jpg"
@@ -204,7 +194,7 @@ const About = () => {
             />
             <TeamMemberCard
               name="Zaidul Vasf"
-              role="Web Designer"
+              role="Web Developer"
               imgSrc="/img/Zaid.jpg"
               socialLinks={[
                 { platform: 'Instagram', url: 'https://www.instagram.com/__zaidulvasf__', icon: '/img/instagram.png' },
@@ -212,6 +202,16 @@ const About = () => {
                 { platform: 'Facebook', url: 'https://www.facebook.com/profile.php?id=100034579388077', icon: '/img/facebook.png' }
               ]}
             />
+              <TeamMemberCard
+                name="Akshat Jaiswal"
+                role="Full Stack Developer"
+                imgSrc="/img/Akshat.png"
+                socialLinks={[
+                  { platform: 'Instagram', url: 'https://www.instagram.com/akshhat___/', icon: '/img/instagram.png' },
+                  { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/akshatjaiswal4841', icon: '/img/linkedin.png' },
+                  { platform: 'Facebook', url: 'https://www.facebook.com/akshat.jaiswal.96592', icon: '/img/facebook.png' }
+                ]}
+              />
           </div>
         </motion.div>
 
