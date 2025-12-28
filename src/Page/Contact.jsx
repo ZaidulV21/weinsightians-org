@@ -75,7 +75,7 @@ const Contact = () => {
           </div>
           {/* social Links  */}
           <div className='flex gap-2 ml-5 mb-5'>
-          <a href="https://wa.me/+917309975088"><img className='w-10' src="/img/whatsapp.png" alt="whatsapp" /></a>
+          <a href="https://wa.me/+918081657756"><img className='w-10' src="/img/whatsapp.png" alt="whatsapp" /></a>
           <a href=""><img className='w-10' src="/img/facebook.png" alt="facebook" /></a>
           <a href=""><img className='w-10' src="/img/twitter.png" alt="twitter" /></a>
           <a href="https://www.instagram.com/weinsightians"><img className='w-10' src="/img/instagram.png" alt="instagram" /></a>
