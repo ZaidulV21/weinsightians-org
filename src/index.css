@@ -7,23 +7,56 @@
     padding: 0;
     box-sizing: border-box;
 }
-/* .bg-custom {
-    background-image: url('/freepik-export-20241213092546fexx.jpeg');
-    filter: brightness(90%);
+
+/* Hides scrollbar */
+/* .no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+} */
+
+
+.bg-custom {
+    background-image: url('/img/ediss.jpg');
+    filter: brightness(100%);
     background-size: cover;
     background-position: center;
-  } */
-  .bg-custom {
-    background-image: url('/img/bg1.jpg');
-    filter: brightness(90%);
+  }
+
+  .bg-custom , .bg-custom-2 {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+  
+  .bg-custom-2::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2); /* optional dark overlay */
+    /* z-index: 1; */
+  }
+  .bg-services{
+    /* background-image: url('img/ediss.jpg'); */
+    filter: brightness(100%);
     background-size: cover;
     background-position: center;
+  }
+  video.bg{
+
   }
 #glass-morph{
     backdrop-filter: blur(25px) saturate(200%);
     -webkit-backdrop-filter: blur(25px) saturate(200%);
-    background-color: rgba(17, 25, 40, 0.5);
-    border-radius: 12px;
+    background-color: rgba(228, 228, 228, 0.755);
+    border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.125);
 }
 
@@ -48,10 +81,15 @@
     clip-path: path('M 0 0 H 100% V calc(100% - 40px) Q 100% 100% calc(100% - 40px) 100% H 0 Z');
 }
 
+.gap-1 {
+  font-family: sans-serif;
+  text-transform: uppercase;
+  font-size: 1vw;
+  gap: 0.25rem;
+}
 
 .card .card1 {
   background-color: #E3E7ED;
-  padding: .75rem;
   height: 60%;
   width: 100%;
   transition: all ease 0.5s;
@@ -65,6 +103,7 @@
   height: 100%;
   width: 100%;
   object-fit: cover;
+  padding: 1vw;
 }
 
 .card .card2 {
@@ -73,14 +112,17 @@
   border-bottom-left-radius: 12px;  
   border-bottom-right-radius: 12px;
   transition: all ease 0.5s;
+  /* text-align: center; */
 }
 
 .card:hover .card1 {
-  border-radius: 80px;
+  border-radius: 2px;
 }
 
 .card:hover .card2 {
-  border-radius: 80px;
+  margin-top: 12px;
+  padding-top: 5px;
+  /* border-radius: 30px; */
 }
 /* animation round*/
 @keyframes rotate360 {
@@ -91,7 +133,10 @@
     transform: rotate(360deg);
   }
 }
+.arrow-img:hover img{
+    animation: rotate360 3s linear infinite;
 
+}
 /* Apply the animation to an image */
 .rotate36 {
   transition: ease 0.5s;
@@ -136,3 +181,81 @@
 
 }
 
+
+
+@media screen and (max-width:768px ) {
+  .abt-us-h1 {
+    width: 100%;
+  }
+  .project-box{
+height: 45vh;
+  }
+  .project-box-h1{
+    font-size: 14vw;
+  }
+  .transforming-heading{
+    padding: 2.5rem 0;
+  }
+  .transforming-heading img{
+    height: 8vw;
+  }
+  .transforming-heading h1{
+    font-size: 9vw;
+  }
+  .transforming-heading h2{
+font-size: 1.55rem;
+  }
+  .page-1 h1 {
+    font-size: 10vw;
+    line-height: normal;
+  }
+  .services-flex{
+    flex-direction: column;
+    gap: 4rem;
+  align-items: start;
+  }
+  .about-page-top{
+    flex-direction: column;
+    padding-bottom: 6rem;
+    gap: 2rem;
+  }
+  .our-story{
+    margin-top:3rem;
+  }
+  .our-story-span{
+    font-size: 4vw;
+  }
+  .abt-top-heading{
+    padding: 8vw 2vw;
+  }
+  .get-in-touch{
+    height: 25vh;
+  }
+  .form-top{
+    padding: 2rem 1rem;
+  }
+}
+
+/*  */
+
+@media screen and (max-width:480px ) {
+  .weinsightians{
+    font-size: 6vw;
+  }
+  .weinsightians-img{
+    width: 9vw;
+  }
+}
+
+/* goey circle */
+.gooey-wrapper {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.gooey-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}

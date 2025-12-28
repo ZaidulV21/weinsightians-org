@@ -16,7 +16,7 @@ const Services = () => {
   <meta property="og:url" content="https://weinsightians.tech/services" />
   <meta property="og:type" content="website" />
 </Helmet>
-    <div className='h-screen bg-custom'>
+    <div className='h-screen bg-services'>
       
       <ServicePage1/>
     </div>

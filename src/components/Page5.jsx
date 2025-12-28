@@ -1,22 +1,53 @@
-import React from 'react'
+// import React from 'react'
+
+// const Page5 = () => {
+//   return (
+//     <div className='px-4 md:px-16'>
+//       <div className='text-5xl md:text-7xl uppercase font-[gilroy]'>
+//         <h1 className='text-2xl md:text-4xl'>Transform Your Vision into Reality with</h1>
+//         <h1 className='flex flex-col  gap-2 md:flex-row'>Our Insights <img className='w-20 md:w-32' src="/circle-design.png" alt="" />Your Success</h1>
+//       </div>
+//       <div className='flex flex-col md:flex-row justify-between mt-10 md:mt-28 -mb-2'>
+//         <h1 className='w-full md:w-1/2 font-[gilroy]'>"At We Insightians, we don’t just build websites—we craft digital experiences that empower businesses to grow, connect, and thrive. Based in Lucknow, we’re committed to helping local businesses shine in the digital world."</h1>
+//         <div className='flex flex-row md:justify-end mt-4 md:mt-0'>
+//             <a href="/contact" className='px-8 md:px-8 py-3 h-12 text-[#231746] font-semibold transition-transform-all duration-500 rounded-full border-2 bg-[#fff] hover:bg-[#534277] '>Contact Us</a>
+//             <div className='h-12 w-12 rounded-full flex transition-all duration-500 items-center justify-center p-2 border-2 hover:rotate-45 ml-4 md:mt-0'><img src="/right-arrow-black.png" alt="" /></div>
+//           </div>
+//       </div>
+      
+//     </div>
+//   )
+// }
+
+// export default Page5
+
+import React from 'react';
+import { motion } from 'framer-motion';
 
 const Page5 = () => {
   return (
-    <div className='px-4 md:px-16'>
-      <div className='text-5xl md:text-7xl uppercase font-[gilroy]'>
+    <motion.div
+      initial={{ y: 50, opacity: 0 }}
+      whileInView={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      className='px-4 md:px-16'
+    >
+      <div className='text-5xl md:text-7xl uppercase font-[Gilroy]'>
         <h1 className='text-2xl md:text-4xl'>Transform Your Vision into Reality with</h1>
-        <h1 className='flex flex-col  gap-2 md:flex-row'>Our Insights <img className='w-20 md:w-32' src="/circle-design.png" alt="" />Your Success</h1>
+        <h1 className='flex flex-col md:flex-row gap-2'>Our Insights <img className='w-20 md:w-32' src='/circle-design.png' alt='' /> Your Success</h1>
       </div>
-      <div className='flex flex-col md:flex-row justify-between mt-10 md:mt-28 -mb-2'>
-        <h1 className='w-full md:w-1/2 font-[gilroy]'>"At We Insightians, we don’t just build websites—we craft digital experiences that empower businesses to grow, connect, and thrive. Based in Lucknow, we’re committed to helping local businesses shine in the digital world."</h1>
-        <div className='flex flex-row md:justify-end mt-4 md:mt-0'>
-            <a href="/contact" className='px-8 md:px-8 py-3 h-12 text-[#231746] font-semibold transition-transform-all duration-500 rounded-full border-2 bg-[#fff] hover:bg-[#534277] '>Contact Us</a>
-            <div className='h-12 w-12 rounded-full flex transition-all duration-500 items-center justify-center p-2 border-2 hover:rotate-45 ml-4 md:mt-0'><img src="/right-arrow-black.png" alt="" /></div>
-          </div>
-      </div>
-      
-    </div>
-  )
-}
 
-export default Page5
+      <div className='flex flex-col md:flex-row justify-between mt-10 md:mt-28'>
+        <h1 className='w-full md:w-1/2 font-[Gilroy]'>"At We Insightians, we don’t just build websites—we craft digital experiences..."</h1>
+        <div className='flex mt-4 md:mt-0'>
+          <a href='/contact' className='px-8 py-3 h-12 text-[#231746] font-semibold border-2 bg-white hover:bg-[#a380ed] transition-all duration-300 rounded-full'>Contact Us</a>
+          <div className='h-12 w-12 rounded-full flex items-center justify-center p-2 border-2 transition-all duration-300 hover:rotate-45 ml-4'>
+            <img src='/right-arrow-black.png' alt='' />
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default Page5;

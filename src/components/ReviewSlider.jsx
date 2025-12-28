@@ -88,13 +88,26 @@ export default function App() {
       >
         {reviews.map((review, index) => (
           <SwiperSlide key={index}>
-            <div className='bg-[#E3E7ED] text-black p-4 rounded-lg border-2 border-white w-full '>
-              <div className='mt-4'>
-                <p className='text-black font-[gilroy]'>{review.content}</p>
-                <h2 className='text-[#6B50A2] font-[larken] font-bold text-xl mt-10'>{review.title}</h2>
-                <hr className='my-2 border-t border-white' />
-                <p className='text-black font-black font-[gilroy]'>{review.job}</p>
-              </div>
+<div className="relative  from-[#1e1b2c] bg-gradient-to-br to-[#2c2540] backdrop-blur-xl p-6 md:p-8 rounded-2xl shadow-xl border border-white/20">
+<div className="flex flex-col justify-between h-full">
+  
+  {/* Quote */}
+  <p className="text-gray-200 text-sm md:text-base leading-relaxed font-[gilroy]">
+    {review.content}
+  </p>
+
+  {/* User Info */}
+  <div className="mt-8">
+    <h2 className="text-[#7c5cdd] font-[gilroy] font-semibold text-lg">
+      {review.title}
+    </h2>
+
+    <p className="text-sm text-gray-400 mt-1">
+      {review.job}
+    </p>
+  </div>
+</div>
+
             </div>
           </SwiperSlide>
         ))}

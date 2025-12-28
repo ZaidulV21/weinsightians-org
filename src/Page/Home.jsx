@@ -7,6 +7,7 @@ import Page4 from "../components/Page4"
 import Page5 from "../components/Page5"
 import Footer from "../components/Footer"
 import Whatsapp from '../components/Whatsapp';
+import PricingPlans from '../components/PricingSection';
 
 const Home = () => {
   return (
@@ -27,6 +28,7 @@ const Home = () => {
       <Page1/>
       <Page2/>
       <Page3/>
+      <PricingPlans/>
       <Page4/>
       <Page5/>
       <div className='px-4 md:px-16'>

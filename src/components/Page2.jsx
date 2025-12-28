@@ -1,80 +1,143 @@
-import React from 'react'
-import ServiceCard from './ServiceCard'
+import React from 'react';
+import { motion } from 'framer-motion';
+import ServiceCard from './ServiceCard';
+import GooeyBlob from './GoeyCircle';
 
 const Page2 = () => {
+  const services = [
+    {
+      title: "E-Commerce",
+      description: "From product listings to secure checkout, we build fully-featured online stores that convert."
+    },
+    {
+      title: "UI/UX Design",
+      description: "Intuitive and visually engaging interfaces focused on improving user experience and retention."
+    },
+    {
+      title: "Custom Websites",
+      description: "We design and develop fast, responsive, and custom-coded websites tailored to your brand identity."
+    },
+    {
+      title: "SEO & Marketing",
+      description: "Drive more traffic with smart SEO strategies and marketing techniques that bring real results."
+    },
+    
+    {
+      title: "Website Support",
+      description: "Ongoing website maintenance, updates, and technical support to keep your site running smoothly."
+    },
+    {
+      title: "Social Media Marketing",
+      description: "We manage and grow your brand’s presence on platforms like Instagram, Facebook, LinkedIn, and X through content strategies, campaigns, and community engagement."
+    }
+  ];
+
   return (
-    <div className='min-h-[120vh] w-full  flex flex-col md:flex-row px-4 sm:px-8 md:px-12 lg:px-16'>
-      {/* Left Side  */}
-      <div className='h-full w-1/2 '>
-        {/* Left Side Content */}
-        <div className='w-full h-1/3 pt-10'>
-          <h1 className='font-bold font-[larken] text-2xl'>About Us</h1>
-          <h1 className='mt-6 w-[23rem] font-[gilroy] text-base'>Welcome to WeInsightians, a Lucknow-based web development agency. We create stunning, high-performing websites for individuals, startups, and businesses of all sizes. Whether for a personal brand or a company profile, we bring your vision to life with tailored digital solutions. </h1>
-          <div className='flex gap-2 sm:gap-2 mt-5'>
-            <a href='/about' className='font-[gilroy] px-5 sm:px-8 md:px-10 py-1.5 sm:py-2 text-sm sm:text-base text-[#231746] font-semibold transition-transform-all duration-500 rounded-full border-2 bg-[#fff] hover:bg-[#534277] hover:text-white'>Learn More</a>
-            <a href='/about' className='h-10 w-10 sm:h-12 sm:w-12 rounded-full flex transition-all duration-500 items-center justify-center p-1.5 sm:p-2 border-2 hover:rotate-45'><img src="/right-arrow-black.png" alt="" /></a>
+    <motion.div
+      className='min-h-[110vh] w-full tab-page-2-main-box flex flex-col md:flex-row px-4 sm:px-8 md:px-12 lg:px-16'
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ staggerChildren: 0.3 }}
+    >
+
+      {/* Left Side */}
+      <motion.div
+        className='h-full w-full md:w-1/2'
+        variants={{
+          hidden: { opacity: 0, x: -100 },
+          visible: { opacity: 1, x: 0 },
+        }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+      >
+        <div className='w-full abt-heading h-1/3 pt-10'>
+          <h1 className='font-bold font-[Gilroy] text-5xl'>About Us</h1>
+          <h2 className=' abt-us-h1 mt-6 w-[35rem] font-[gilroy] text-xl'>
+            Welcome to WeInsightians, a Lucknow-based web development agency. We create stunning, high-performing websites...
+          </h2>
+          <div className='flex gap-2 mt-5'>
+            <a href='/about' className='font-[gilroy] px-6 py-2 text-[#231746] mt-4  rounded-full border-2 bg-white hover:bg-[#a380ed] hover:text-white transition-all duration-500'>Learn More</a>
+            <a href='/about' className='h-10 w-10 rounded-full flex items-center mt-4 justify-center hover:bg-[#a380ed] border-2 hover:rotate-45 transition-all duration-500'>
+              <img src="/right-arrow-black.png" alt="arrow" />
+            </a>
           </div>
         </div>
 
-        {/* Left side Card  */}
-        <div className="w-[90vw] sm:w-[40vw] mt-5">
-          <div className="bg-custom h-[45vh] sm:h-[70vh] md:h-[80vh] rounded-2xl p-4">
-            <div className="bg-[#ebebec] h-full rounded-xl relative">
+        {/* Card */}
+        <div className="project-box w-[90vw] sm:w-[40vw] mt-16">
+          <div className="bg-custom  tab-page-2 h-[95vh] sm:h-[70vh] md:h-[90vh]  rounded-3xl p-4">
+            <div className="bg-[#e7e7e735] h-full rounded-sm relative">
               {/* Buttons */}
-              <div className="absolute top-3 right-3 sm:top-6 sm:right-6 md:top-10 md:right-8 flex flex-col sm:flex-row gap-2 sm:space-x-2">
-                <a href='/services' className="border-2 border-zinc-700 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-xs sm:text-sm font-medium text-[#231746] transition duration-300 hover:bg-[#534277] hover:text-white">
+              <div className="absolute top-3 right-3 flex flex-col sm:flex-row gap-2">
+                <a href='/services' className="border-2 border-zinc-500 px-4 py-2 rounded-full text-sm font-medium text-[#231746] hover:bg-[#a380ed] hover:text-white transition duration-300">
                   Our Services
                 </a>
-                <button className="border-2 border-zinc-700 px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full text-xs sm:text-sm font-medium text-[#231746] transition duration-300 hover:bg-[#534277] hover:text-white">
+                <button className="border-2 border-zinc-500 px-4 py-2 rounded-full text-sm font-medium text-[#231746] hover:bg-[#a380ed] hover:text-white transition duration-300">
                   2024
                 </button>
               </div>
-              {/* Circular Image */}
-              <div className="bg-[#6B50A2] h-14 w-14 md:h-20 md:w-20 rounded-full relative top-10 sm:top-14 md:top-20 left-3 sm:left-5 md:left-8 p-2 sm:p-3 md:p-4 flex items-center justify-center">
-                <img src="/right-arrow.png" alt="Arrow Icon" className="w-5 h-5 md:w-7 md:h-7" />
+
+              {/* Arrow Icon */}
+              <div className="bg-[#1f1f1f] h-14 w-14 md:h-20 md:w-20 rounded-full relative top-10 left-3 p-4 flex items-center justify-center">
+                <img src="/right-arrow.png" alt="Arrow Icon" className="w-5 h-5 md:w-7 md:h-7 transition-all duration-1000" />
               </div>
+
               {/* Content */}
-              <div className="mt-14 sm:mt-16 md:mt-24 pl-3 sm:pl-5 md:pl-8">
-                <h1 className="text-lg sm:text-xl md:text-3xl text-black font-[larken] leading-tight">
+              <div className="mt-14 sm:mt-20 pl-5">
+                <h1 className="text-4xl sm:text-6xl md:text-8xl uppercase font-[gilroy] leading-tight">
                   22+ Projects Launched
                 </h1>
-                <h2 className="text-xs sm:text-sm md:text-base font-[gilroy] mt-1 sm:mt-2">
-                  Empowering Our Agency's Growth, and with great power comes great responsibility.
+                <h2 className="text-sm md:text-2xl font-[gilroy] mt-2">
+                  Empowering our agency's growth, and with great power comes great responsibility.
                 </h2>
-                <button className="mt-6 md:mt-20 px-5 md:px-8 py-2 md:py-4 border-zinc-700 border-2 text-xs sm:text-sm md:text-base hover:text-white font-semibold font-[gilroy] bg-transparent rounded-full transition duration-300 hover:bg-[#534277]">
-                  <a href="/contact" >
-                  Get Started Now
-                </a>
+                <button className="mt-6 px-6 py-3 text-[#231746] border-zinc-400 border-2 text-sm hover:text-white font-semibold bg-transparent rounded-full hover:bg-[#a380ed] transition duration-300">
+                  <a href="/contact">Get Started Now</a>
                 </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Right Side  */}
-      <div className='h-full w-full md:w-1/2'>
-        {/* Right Side Content */}
-        <div className='w-full h-1/3 pt-10'>
-          <div className='font-[larken] font-bold text-4xl sm:text-5xl md:text-6xl flex gap-5 justify-end'>
-            <h1>Transforming</h1>
-            <img className='h-10 sm:h-12 md:h-14' src="/circle-design.png" alt="" />
+      {/* Right Side */}
+      <motion.div
+        className='h-full w-full md:w-1/2'
+        variants={{
+          hidden: { opacity: 0, x: 100 },
+          visible: { opacity: 1, x: 0 },
+        }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
+        <div className='w-full h-1/3 pt-10 transforming-heading'>
+          <div className='font-[Gilroy] font-bold text-5xl flex gap-5 justify-end'>
+            <h1 className='uppercase '>Transforming</h1>
+       <div> <GooeyBlob/></div>
+            <img className='h-10' src="/circle-design.png" alt="circle" />
           </div>
-          <div className='font-bold font-[larken] text-4xl sm:text-5xl flex justify-end'>
-            <h1>ideas into visually <br /> stunning realities.</h1>
+          <div className='font-bold font-[gilroy] uppercase text-4xl flex justify-end'>
+            <h2>ideas into visually <br /> stunning realities.</h2>
           </div>
         </div>
-        {/* Right Side Service Content  */}
-        <div className='w-full mt-8 sm:mt-20 sm:h-full h-[calc(5*4rem)] overflow-x-auto flex flex-col gap-5'>
-          <ServiceCard title="Custom Websites 🡦" description="We build high-performance, user-friendly websites tailored to your business needs, ensuring a seamless experience, strong security, and smooth functionality across all devices." />
-          <ServiceCard title="E-Commerce 🡦" description="Launch and grow your online store with secure, scalable e-commerce platforms, complete with smooth navigation, payment gateways, and order management for an effortless shopping experience." />
-          <ServiceCard title="UI/UX Design 🡦" description="We create visually stunning, intuitive designs that enhance user experience, boost engagement, and reflect your brand’s identity, ensuring an easy and enjoyable journey for your visitors." />
-          <ServiceCard title="SEO & Marketing 🡦" description="Improve your online visibility with expert SEO and targeted digital marketing strategies that drive traffic, enhance search rankings, and connect you with the right audience." />
-          <ServiceCard title="Website Support 🡦" description="Keep your website secure, updated, and optimized with regular maintenance, performance enhancements, and technical support for a hassle-free online presence." />
+        {/* Service Cards Scroll */}
+        <div className="w-full sm:mt-40 services-sections max-h-[49rem] overflow-y-auto flex flex-col gap-5 scroll-smooth">
+          {services.map((service, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1, duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              <ServiceCard
+                title={`${service.title} 🡦`}
+                description={service.description}
+              />
+            </motion.div>
+          ))}
         </div>
-      </div>
-    </div>
-  )
-}
+      </motion.div>
+    </motion.div>
+  );
+};
 
-export default Page2
+export default Page2;

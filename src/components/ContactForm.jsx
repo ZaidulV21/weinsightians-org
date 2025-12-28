@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import emailjs from 'emailjs-com';
 
+
 const ContactForm = () => {
     const [formData, setFormData] = useState({
         name: '',
@@ -99,8 +100,8 @@ const ContactForm = () => {
     };
 
     return (
-        <div className='h-full font-[gilroy] w-full md:w-2/3 bg-[#c7d5fd] rounded-2xl p-10'>
-            <h1 className='text-5xl mt-10 mb-4'>Got ideas? We’ve got <br /> the skills. Let’s team up.</h1>
+        <div className='h-full font-[gilroy] w-full md:w-[60%]  rounded-2xl p-10 form-top'>
+            {/* <h1 className='text-5xl mt-10 mb-4'>Got ideas? We’ve got <br /> the skills. Let’s team up.</h1> */}
             <h2 className='text-base mb-6'>Tell us more about yourself and what you’ve got in mind.</h2>
 
             {isSubmitted ? (
@@ -115,7 +116,7 @@ const ContactForm = () => {
                         placeholder="What's your name?"
                         value={formData.name}
                         onChange={handleChange}
-                        className='outline-none text-sm p-2 bg-inherit text-black placeholder-black border-b-2 border-black'
+                        className='outline-none text-sm p-2 bg-inherit text-black placeholder-black border-b-2 border-[#adadad]'
                     />
                     {errors.name && <span className='text-red-500'>{errors.name}</span>}
 
@@ -125,7 +126,7 @@ const ContactForm = () => {
                         placeholder='you@email.com'
                         value={formData.email}
                         onChange={handleChange}
-                        className='outline-none text-sm p-2 bg-inherit text-black placeholder-black border-b-2 border-black'
+                        className='outline-none text-sm p-2 bg-inherit text-black placeholder-black border-b-2 border-[#adadad]'
                     />
                     {errors.email && <span className='text-red-500'>{errors.email}</span>}
 
@@ -134,7 +135,7 @@ const ContactForm = () => {
                         placeholder='Tell us a little about the project...'
                         value={formData.projectDescription}
                         onChange={handleChange}
-                        className='outline-none text-sm p-2 bg-inherit text-black placeholder-black border-b-2 border-black h-24'
+                        className='outline-none text-sm p-2 bg-inherit text-black placeholder-black border-b-2 border-[#adadad] h-24'
                     />
                     {errors.projectDescription && <span className='text-red-500'>{errors.projectDescription}</span>}
 

@@ -5,6 +5,8 @@ import Footer from '../components/Footer'
 import Faq from '../components/Faq'
 import Whatsapp from '../components/Whatsapp'
 import ContactForm from '../components/ContactForm'
+import { motion } from 'framer-motion';
+
 
 const Contact = () => {
   return (
@@ -22,35 +24,50 @@ const Contact = () => {
     <div className=' h-full w-full text-black px-5 md:px-16 p-5'>
       <Whatsapp />
       <Navbar />
-      <div className='relative mt-2 md:mt-10 h-[70vh] md:h-[70vh] rounded-3xl overflow-hidden'>
-      <video className='h-full w-full object-cover brightness-[50%]' src="/video/moon.mp4" autoPlay loop muted></video>
+      <motion.div
+  initial={{ opacity: 0, y: 50 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+  viewport={{ once: true }}
+>
+      <div className=' get-in-touch relative mt-2 md:mt-4 h-[45vh] md:h-[45vh] rounded-3xl overflow-hidden'>
+      {/* <video className='h-full w-full object-cover brightness-[50%]' src="/video/moon.mp4" autoPlay loop muted></video> */}
         <div className=' absolute bottom-0 left-0 p-4'>
-          <h1 className='text-4xl md:text-9xl uppercase font-[larken] font-bold mb-4 text-gray-300'>Contact us</h1>
-          <hr className='border-t border-white my-4' />
-          <p className='mb-8 text-sm md:text-2xl font-[gilroy] text-gray-300'>We're here to help with anything you need. Want to get in touch with us? </p>
+          <h1 className='text-4xl md:text-6xl uppercase font-[Gilroy] font-bold mb-4 text-gray-800'>Get in Touch</h1>
+          <hr className='border- border-[#adadad] my-4' />
+          <p className='mb-8 text-sm md:text-xl font-[gilroy] text-gray-600'>We're here to help with anything you need. Want to get in touch with us? </p>
         </div>
       </div>
-      <div className='mt-2 md:mt-10  flex h-full rounded-3xl'>
+      </motion.div>
+
+      <motion.div
+  initial={{ opacity: 0, y: 50 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6, delay: 0.2 }}
+  viewport={{ once: true }}
+>
+      <div className='mt-2 md:mt-10  flex h-full rounded-3xl gap-10'>
         {/* left form  */}
+               <ContactForm/>
         <div className='w-1/3 hidden md:flex flex-col justify-between '>
         {/* left top section  */}
           <div className='ml-14 font-[gilroy]'>
-            <div>
-              <img className='border-2 rounded-lg p-1 w-10 absolute left-16' src="/img/chat.png" alt="" />
+            <div className='relative'>
+              <img className='border-2 rounded-lg p-1 w-10 absolute right-[28vw]' src="/img/chat.png" alt="" />
               <h1 className='mt-5 text-lg font-bold'>Email us</h1>
               <h1 className=''>Our friendly team is here to help you</h1>
               <h1 className='font-bold mt-3 hover:text-gray-700 transition-all duration-500'>
                 <a href="mailto:mailtoweinsightians@gmail.com">mailtoweinsightians@gmail.com</a>
               </h1>
             </div>
-            <div>
-              <img className='border-2 rounded-lg p-1 w-10 absolute left-16' src="/img/location.png" alt="" />
+            <div className='relative '>
+              <img className='border-2 rounded-lg p-1 w-10 absolute right-[28vw]' src="/img/location.png" alt="" />
               <h1 className='mt-5 text-lg font-bold'>Visit us</h1>
               <h1 className=''>Come say hello to our office HQ.</h1>
               <a href="https://maps.app.goo.gl/TdXPwrSrYNBB1oKs5"><h1 className='font-bold mt-3 hover:text-gray-700 transition-all duration-500'> Matiyari Lucknow</h1></a>
             </div>
-            <div>
-              <img className='border-2 rounded-lg p-1 w-10 absolute left-16' src="/img/call.png" alt="" />
+            <div className='relative '>
+              <img className='border-2 rounded-lg p-1 w-10 absolute right-[28vw]' src="/img/call.png" alt="" />
               <h1 className='mt-5 text-lg font-bold'>Talk to us</h1>
               <h1 className=''>Mon to Fri 8AM-9PM.</h1>
               <a href="tel:+917309975088" className='font-bold mt-3 hover:text-gray-700 transition-all duration-500'>+91 73099 75088</a>
@@ -66,11 +83,19 @@ const Contact = () => {
           </div>
         </div>
         {/* right form  */}
-        <ContactForm/>
+ 
       </div>
+</motion.div>
 
+<motion.div
+  initial={{ opacity: 0 }}
+  whileInView={{ opacity: 1 }}
+  transition={{ duration: 0.6, delay: 0.4 }}
+  viewport={{ once: true }}
+>
       <Faq/>
       <Footer />
+      </motion.div>
     </div>
     </>
   )

@@ -9,7 +9,6 @@ import Blog from "./Page/Blog"
 import Privacy from "./Page/privacy"
 import Sitemap from "./Page/Sitemap"
 
-
 export default function App() {
   return (
     <div className="bg-white">
