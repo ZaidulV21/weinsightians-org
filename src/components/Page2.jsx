@@ -85,7 +85,7 @@ const Page2 = () => {
               {/* Content */}
               <div className="mt-14 sm:mt-20 pl-5">
                 <h1 className="text-4xl sm:text-6xl md:text-8xl uppercase font-[gilroy] leading-tight">
-                  22+ Projects Launched
+                  150+ Projects Launched
                 </h1>
                 <h2 className="text-sm md:text-2xl font-[gilroy] mt-2">
                   Empowering our agency's growth, and with great power comes great responsibility.
