@@ -38,7 +38,16 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Simple CORS setup 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+  })
+);
+
+
 
 // =========================================
 // ROUTES

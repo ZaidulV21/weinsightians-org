@@ -1,6 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
 import Blog from '../models/Blog.js';
 import { NotFoundError } from '../errors/customErrors.js';
+import slugify from "slugify";
+
 
 // GET /api/v1/blogs
 // Public route — returns all blogs
@@ -11,25 +13,55 @@ export const getAllBlogs = async (req, res) => {
 
 // GET /api/v1/blogs/:id
 // Public route — returns a single blog by ID
-export const getBlog = async (req, res) => {
-    const { id } = req.params;
-    const blog = await Blog.findById(id);
+// export const getBlog = async (req, res) => {
+//     const { id } = req.params;
+//     const blog = await Blog.findById(id);
 
-    // This check is redundant if validateIdParam ran, but keeping for safety
+//     // This check is redundant if validateIdParam ran, but keeping for safety
+//     if (!blog) {
+//         throw new NotFoundError(`no blog with id ${id}`);
+//     }
+
+//     res.status(StatusCodes.OK).json({ blog });
+// };
+
+export const getBlog = async (req, res) => {
+    const { slug } = req.params;
+    const blog = await Blog.findOne({ slug });
+
     if (!blog) {
-        throw new NotFoundError(`no blog with id ${id}`);
+        throw new NotFoundError(`no blog with slug ${slug}`);
     }
 
     res.status(StatusCodes.OK).json({ blog });
 };
 
+
 // POST /api/v1/blogs
 // Admin-only — creates a new blog post
+// export const createBlog = async (req, res) => {
+//     const { title, description, content, author } = req.body;
+
+//     const blog = await Blog.create({
+//         title,
+//         description,
+//         content,
+//         author,
+//     });
+
+//     res.status(StatusCodes.CREATED).json({ msg: 'blog created', blog });
+// };
 export const createBlog = async (req, res) => {
     const { title, description, content, author } = req.body;
 
+    const slug = slugify(title, {
+        lower: true,
+        strict: true,
+    });
+
     const blog = await Blog.create({
         title,
+        slug,
         description,
         content,
         author,
@@ -37,6 +69,7 @@ export const createBlog = async (req, res) => {
 
     res.status(StatusCodes.CREATED).json({ msg: 'blog created', blog });
 };
+
 
 // PATCH /api/v1/blogs/:id
 // Admin-only — updates an existing blog
@@ -46,7 +79,7 @@ export const updateBlog = async (req, res) => {
 
     const blog = await Blog.findByIdAndUpdate(
         id,
-        { title, description, content, author },
+        { title, slug: slugify(title, { lower: true, strict: true }), description, content, author },
         { new: true, runValidators: true }
     );
 

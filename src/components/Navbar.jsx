@@ -32,7 +32,7 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className='hidden md:flex gap-5 text-sm font-[larken]'>
-          {['/', '/about', '/services', '/blog', '/contact'].map((path, idx) => {
+          {['/', '/about', '/services', '/blogs', '/contact'].map((path, idx) => {
             const labels = ['Home', 'About', 'Services', 'Blog', 'Contact'];
             return (
               <NavLink key={path} to={path} className='flex flex-col items-center gap-1 hover:text-gray-700'>
@@ -109,8 +109,8 @@ const Navbar = () => {
 
               {/* Navigation Links */}
               <div className="flex flex-col space-y-3">
-                {['/', '/services', '/about', '/blog', '/contact'].map((path, idx) => {
-                  const labels = ['Home', 'Services', 'About Us', 'Blog', 'Contact'];
+                {['/', '/services', '/about', '/blogs', '/contact'].map((path, idx) => {
+                  const labels = ['Home', 'Services', 'About Us', 'Blogs', 'Contact'];
                   return (
                     <React.Fragment key={path}>
                       <NavLink
