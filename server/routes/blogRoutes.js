@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import upload from "../middlewares/upload.js";
 import {
     getAllBlogs,
     getBlog,
@@ -20,6 +21,7 @@ router.get('/', getAllBlogs);
 // router.get('/:id', validateIdParam, getBlog);
 router.get("/:slug", getBlog);
 
+router.post("/", upload.single("image"), createBlog);
 
 // Protected routes — require authentication AND admin role
 // The middleware chain: authenticate -> check admin -> validate input -> controller

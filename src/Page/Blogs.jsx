@@ -36,6 +36,14 @@ const Blogs = () => {
       {blog.title}
     </h2>
 
+    {blog.image && (
+      <img
+        src={`http://localhost:6200${blog.image}`}
+        alt={blog.title}
+        className="w-full h-48 object-cover rounded-lg mb-4"
+      />
+    )}
+
     <p className="text-gray-600 mb-4 line-clamp-3">
       {blog.description}
     </p>
@@ -52,6 +60,7 @@ const Blogs = () => {
     </Link>
   </div>
 ))}
+
 
       </div>
     </div>

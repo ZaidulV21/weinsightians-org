@@ -23,6 +23,15 @@ const SingleBlog = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12">
+
+      {blog.image && (
+        <img
+          src={`http://localhost:6200${blog.image}`}
+          alt={blog.title}
+          className="w-full h-[30vw] object-cover rounded-lg mb-6"
+        />
+      )}
+
       <h1 className="text-4xl font-bold mb-4">
         {blog.title}
       </h1>

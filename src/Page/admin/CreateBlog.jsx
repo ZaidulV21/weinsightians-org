@@ -10,6 +10,7 @@ const CreateBlog = () => {
     description: "",
     content: "",
     author: "",
+    image: null,
   });
 
   const handleChange = (e) =>
@@ -20,7 +21,15 @@ const CreateBlog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await createBlog(formData);
+
+    const form = new FormData();
+    form.append("title", formData.title);
+    form.append("description", formData.description);
+    form.append("content", formData.content);
+    form.append("author", formData.author);
+    form.append("image", formData.image);
+
+    await createBlog(form);
     navigate("/admin/dashboard");
   };
 
@@ -29,6 +38,24 @@ const CreateBlog = () => {
       <h1 className="text-3xl font-bold mb-6">Create Blog</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+
+        <input
+          type="file"
+          name="image"
+          onChange={(e) =>
+            setFormData({ ...formData, image: e.target.files[0] })
+          }
+          className="w-full border p-3 rounded"
+        />
+
+        {formData.image && (
+          <img
+            src={URL.createObjectURL(formData.image)}
+            alt="Preview"
+            className="w-full h-48 object-cover rounded-lg"
+          />
+        )}
+
         <input
           name="title"
           placeholder="Title"

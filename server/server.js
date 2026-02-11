@@ -10,6 +10,9 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 
+
+import path from "path";
+import { fileURLToPath } from "url";
 // Route imports
 import authRoutes from './routes/authRoutes.js';
 import blogRoutes from './routes/blogRoutes.js';
@@ -47,7 +50,10 @@ app.use(
   })
 );
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // =========================================
 // ROUTES

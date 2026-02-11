@@ -52,23 +52,27 @@ export const getBlog = async (req, res) => {
 //     res.status(StatusCodes.CREATED).json({ msg: 'blog created', blog });
 // };
 export const createBlog = async (req, res) => {
-    const { title, description, content, author } = req.body;
+  const { title, description, content, author } = req.body;
 
-    const slug = slugify(title, {
-        lower: true,
-        strict: true,
-    });
+  const slug = slugify(title, {
+    lower: true,
+    strict: true,
+  });
 
-    const blog = await Blog.create({
-        title,
-        slug,
-        description,
-        content,
-        author,
-    });
+  const image = req.file ? `/uploads/${req.file.filename}` : null;
 
-    res.status(StatusCodes.CREATED).json({ msg: 'blog created', blog });
+  const blog = await Blog.create({
+    title,
+    slug,
+    description,
+    content,
+    author,
+    image,
+  });
+
+  res.status(StatusCodes.CREATED).json({ msg: "blog created", blog });
 };
+
 
 
 // PATCH /api/v1/blogs/:id
