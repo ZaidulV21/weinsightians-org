@@ -1,9 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FiMoon, FiSun } from "react-icons/fi";
+
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+const [darkMode, setDarkMode] = useState(
+  localStorage.getItem("theme") === "dark"
+);
+
+
+useEffect(() => {
+  if (darkMode) {
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("theme", "dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+    localStorage.setItem("theme", "light");
+  }
+}, [darkMode]);
+
 
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
@@ -46,6 +64,7 @@ const Navbar = () => {
             );
           })}
         </div>
+
 
         {/* Desktop Call Button */}
         <div className='hidden md:flex font-semibold items-center gap-6 font-[gilroy]'>

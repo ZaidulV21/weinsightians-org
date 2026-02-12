@@ -17,6 +17,8 @@ import Dashboard from "./Page/admin/Dashboard";
 import CreateBlog from "./Page/admin/CreateBlog";
 import EditBlog from "./Page/admin/EditBlog";
 
+// Auth
+
 // Protected Route
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -72,6 +74,11 @@ export default function App() {
 
         {/* ================= FALLBACK ================= */}
         <Route path="*" element={<Navigate to="/" />} />
+
+        <Route path="/admin" element={<Dashboard />} />
+        <Route path="/admin/create" element={<CreateBlog />} />
+        <Route path="/admin/edit/:id" element={<EditBlog />} />
+        <Route path="/login" element={<AdminLogin />} />
       </Routes>
     </div>
   );
