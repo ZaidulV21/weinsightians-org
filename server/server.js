@@ -9,7 +9,7 @@ import mongoose from 'mongoose';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-
+import { StatusCodes } from "http-status-codes";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -69,6 +69,15 @@ app.use('/api/v1/auth', authRoutes);
 
 // Blog routes — CRUD operations
 app.use('/api/v1/blogs', blogRoutes);
+
+
+// Serve static files from the React frontend build
+app.use(express.static(path.join(import.meta.dirname, "public")));
+app.get("*", (req, res) => {
+  res
+    .status(StatusCodes.OK)
+    .sendFile(path.join(import.meta.dirname, "public", "index.html"));
+});
 
 // =========================================
 // ERROR HANDLING
