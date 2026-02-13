@@ -4,7 +4,7 @@ import axiosInstance from "../api/axiosInstance";
 import Navbar from "../components/Navbar";
 import { FiSearch } from "react-icons/fi";
 import { motion } from "framer-motion";
-
+import Footer from "../components/Footer";
 
 
 const Blogs = () => {
@@ -36,9 +36,11 @@ const Blogs = () => {
     <>
     <div className="h-full bg-[#ffffff] w-full text-black px-4 md:px-16 p-5">
 
-    <Navbar />    <div className="max-w-6xl mx-auto px-6 py-12">
-      <div className="flex w-full justify-between items-center border-b-2 mb-12">
-      <h1 className="text-4xl font-bold mb-10 text-center ">
+    <Navbar />  
+    <div className="max-w-6xl mx-auto px-6 py-12">
+      
+      <div className="flex w-full flex-col sm:flex-row justify-between items-center border-b-2 mb-12">
+      <h1 className="text-4xl font-[Larken] font-bold mb-10 text-center ">
         Our Latest Insights & Articles
       </h1>
 
@@ -123,6 +125,7 @@ const Blogs = () => {
 </div>
 
     </div>
+    <Footer/>
       </div>
     </>
   );

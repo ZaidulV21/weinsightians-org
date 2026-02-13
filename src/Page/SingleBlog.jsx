@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import { FiArrowLeft } from "react-icons/fi";
 
 const SingleBlog = () => {
   const { slug } = useParams();
@@ -87,9 +89,10 @@ const SingleBlog = () => {
         {/* Back Button */}
         <Link
           to="/blogs"
-          className="text-indigo-600 font-semibold hover:underline mb-6 inline-block"
+          className="text-gray-600 font-semibold hover:underline mb-6 inline-block"
         >
-          ← Back to Blogs
+          <FiArrowLeft className="inline-block text-gray-600 mr-1" />
+          Back to Blogs
         </Link>
 
         {/* Featured Image */}
@@ -186,7 +189,6 @@ const SingleBlog = () => {
           </form>
         </div>
 
-{/* Related Blogs Section */}
 {/* Related Posts Section */}
 <div className="mt-20 border-t pt-12">
   <h2 className="text-2xl font-bold mb-8">Related Articles</h2>
