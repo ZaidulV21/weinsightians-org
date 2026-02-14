@@ -90,7 +90,7 @@ const Blogs = () => {
     >
       {blog.image && (
         <img
-          src={`http://localhost:6200${blog.image}`}
+          src={`https://weinsightians-backend-repo.onrender.com${blog.image}`}
           alt={blog.title}
           className="w-full h-56 object-cover"
         />

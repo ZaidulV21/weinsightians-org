@@ -99,7 +99,7 @@ const SingleBlog = () => {
         {blog.image && (
           <div className="mb-8">
 <img
-  src={`http://localhost:6200${blog.image.startsWith("/") ? blog.image : `/${blog.image}`}`}
+  src={`https://weinsightians-backend-repo.onrender.com${blog.image.startsWith("/") ? blog.image : `/${blog.image}`}`}
   alt={blog.title}
   className="w-full h-full object-cover rounded-2xl shadow-lg"
 />
@@ -201,7 +201,7 @@ const SingleBlog = () => {
       >
         {post.image && (
           <img
-            src={`http://localhost:6200${post.image}`}
+            src={`https://weinsightians-backend-repo.onrender.com${post.image}`}
             alt={post.title}
             className="w-full h-40 object-cover"
           />

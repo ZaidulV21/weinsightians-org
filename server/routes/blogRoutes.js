@@ -21,7 +21,6 @@ router.get('/', getAllBlogs);
 // router.get('/:id', validateIdParam, getBlog);
 router.get("/:slug", getBlog);
 
-router.post("/", upload.single("image"), createBlog);
 
 // Protected routes — require authentication AND admin role
 // The middleware chain: authenticate -> check admin -> validate input -> controller
@@ -29,18 +28,21 @@ router.post(
     '/',
     authenticateUser,
     adminRouteMiddleware,
+    upload.single("image"),
     validateBlogInput,
     createBlog
 );
 
 router.patch(
-    '/:id',
-    authenticateUser,
-    adminRouteMiddleware,
-    validateIdParam,
-    validateBlogInput,
-    updateBlog
+  "/:id",
+  authenticateUser,
+  adminRouteMiddleware,
+  upload.single("image"),
+  validateIdParam,
+  validateBlogInput,
+  updateBlog
 );
+
 
 router.delete(
     '/:id',
