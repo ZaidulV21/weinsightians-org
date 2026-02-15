@@ -55,6 +55,7 @@ export const createBlog = async (req, res) => {
     author,
     image: imageUrl,
   });
+console.log("Uploading to Cloudinary...");
 
   res.status(StatusCodes.CREATED).json({
     msg: "blog created",
