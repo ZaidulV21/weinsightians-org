@@ -51,9 +51,9 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "development"
-        ? "https://weinsightian.tech" // change in production
-        : "http://localhost:5173", // Vite frontend
-    credentials: true, // Required for cookies
+        ? "http://localhost:5173"
+        : "https://weinsightian.tech",
+    credentials: true,
   })
 );
 
