@@ -18,9 +18,8 @@ const router = Router();
 
 // Public routes — no authentication required
 router.get('/', getAllBlogs);
-// router.get('/:id', validateIdParam, getBlog);
-// router.get("/:slug", getBlog);
-router.get("/:id", validateIdParam, getBlog);
+
+router.get("/:slug", getBlog);
 
 
 // Protected routes — require authentication AND admin role

@@ -12,19 +12,20 @@ const SingleBlog = () => {
   const [relatedBlogs, setRelatedBlogs] = useState([]);
   
   // Related blogs fetching logic 
-  useEffect(() => {
+useEffect(() => {
   const fetchBlog = async () => {
     try {
+      // Fetch single blog
+
       const { data } = await axiosInstance.get(`/blogs/${slug}`);
       setBlog(data.blog);
 
+
       // Fetch all blogs for related section
       const allBlogs = await axiosInstance.get("/blogs");
-
       const filtered = allBlogs.data.blogs
         .filter((b) => b.slug !== slug)
         .slice(0, 3);
-
       setRelatedBlogs(filtered);
 
     } catch (error) {
@@ -36,23 +37,8 @@ const SingleBlog = () => {
 
   fetchBlog();
 }, [slug]);
+
  
-  // Related blogs fetching logic  
-
-  useEffect(() => {
-    const fetchBlog = async () => {
-      try {
-        const { data } = await axiosInstance.get(`/blogs/${slug}`);
-        setBlog(data.blog);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBlog();
-  }, [slug]);
 
   // Calculate read time
   const calculateReadTime = (text) => {
@@ -99,7 +85,8 @@ const SingleBlog = () => {
         {blog.image && (
           <div className="mb-8">
 <img
-  src={`https://weinsightians-backend-repo.onrender.com${blog.image.startsWith("/") ? blog.image : `/${blog.image}`}`}
+  // src={`https://weinsightians-backend-repo.onrender.com${blog.image.startsWith("/") ? blog.image : `/${blog.image}`}`}
+  src={blog.image}
   alt={blog.title}
   className="w-full h-full object-cover rounded-2xl shadow-lg"
 />
@@ -201,7 +188,8 @@ const SingleBlog = () => {
       >
         {post.image && (
           <img
-            src={`https://weinsightians-backend-repo.onrender.com${post.image}`}
+            // src={`https://weinsightians-backend-repo.onrender.com${post.image}`}
+            src={post.image}
             alt={post.title}
             className="w-full h-40 object-cover"
           />
@@ -229,6 +217,7 @@ const SingleBlog = () => {
 </div>
 
       </div>
+      <Footer />
     </>
   );
 };

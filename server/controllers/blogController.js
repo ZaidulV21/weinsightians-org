@@ -8,6 +8,9 @@ import { NotFoundError } from "../errors/customErrors.js";
 import slugify from "slugify";
 import fs from "fs";
 import { v2 as cloudinary } from "cloudinary";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 
 // ==========================================
@@ -15,18 +18,13 @@ import { v2 as cloudinary } from "cloudinary";
 // ==========================================
 // This runs once when the file loads
 // dotenv must already be configured in server.js
-
-// cloudinary.config({
-//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME?.trim(),
-//   api_key: process.env.CLOUDINARY_API_KEY?.trim(),
-//   api_secret: process.env.CLOUDINARY_API_SECRET?.trim(),
-// });
-
 cloudinary.config({
-  cloud_name: "dgj0p6odr",
-  api_key: "333219444599415",
-  api_secret: "2CzZDSMjTUz-MIhXQs613bHRATI",
-})
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME?.trim(),
+  api_key: process.env.CLOUDINARY_API_KEY?.trim(),
+  api_secret: process.env.CLOUDINARY_API_SECRET?.trim(),
+});
+
+
 
 
 // ==========================================
