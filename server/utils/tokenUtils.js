@@ -18,6 +18,18 @@ export const verifyJWT = (token) => {
 
 // Attaches JWT as an HTTP-only cookie — this is the only way we store tokens.
 // maxAge is set to match the JWT expiry (1 day = 86400000 ms).
+// export const attachCookiesToResponse = (res, user) => {
+//     const token = createJWT({ userId: user._id, role: user.role });
+
+//     const oneDay = 1000 * 60 * 60 * 24;
+
+//     res.cookie('token', token, {
+//         httpOnly: true,
+//         expires: new Date(Date.now() + oneDay),
+//         secure: process.env.NODE_ENV === 'production',
+//         sameSite: ,
+//     });
+// };
 export const attachCookiesToResponse = (res, user) => {
     const token = createJWT({ userId: user._id, role: user.role });
 
@@ -26,7 +38,7 @@ export const attachCookiesToResponse = (res, user) => {
     res.cookie('token', token, {
         httpOnly: true,
         expires: new Date(Date.now() + oneDay),
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production', // required for HTTPS
+        sameSite: 'None',  // required for cross-origin cookies
     });
 };
