@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { getSingleBlog, updateBlog } from "../../api/blogApi";
+import { FiArrowLeft, FiUpload } from "react-icons/fi";
 
 const EditBlog = () => {
   const { id } = useParams();
@@ -13,70 +14,262 @@ const EditBlog = () => {
     author: "",
   });
 
+  const [imageFile, setImageFile] = useState(null);         // New image file selected by user
+  const [imagePreview, setImagePreview] = useState(null);   // Preview of new image
+  const [existingImage, setExistingImage] = useState(null); // Current image from DB
+  const [loading, setLoading] = useState(true);             // Fetching blog data
+  const [submitting, setSubmitting] = useState(false);      // Form submission in progress
+  const [error, setError] = useState(null);                 // Error message
+  const [success, setSuccess] = useState(false);            // Success state
+
+  // ==========================================
+  // Fetch existing blog data to pre-fill form
+  // ==========================================
   useEffect(() => {
     const fetchBlog = async () => {
-      const { data } = await getSingleBlog(id);
-      setFormData(data.blog);
+      try {
+        setLoading(true);
+        const { data } = await getSingleBlog(id);
+        const blog = data.blog;
+
+        // Pre-fill the form with existing blog data
+        setFormData({
+          title: blog.title || "",
+          description: blog.description || "",
+          content: blog.content || "",
+          author: blog.author || "",
+        });
+
+        // Store existing image URL to show as preview
+        setExistingImage(blog.image || null);
+      } catch (err) {
+        setError("Failed to load blog. Please try again.");
+        console.error("Fetch blog error:", err);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchBlog();
   }, [id]);
 
-  const handleChange = (e) =>
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await updateBlog(id, formData);
-    navigate("/admin/dashboard");
+  // ==========================================
+  // Handle text input changes
+  // ==========================================
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // ==========================================
+  // Handle image file selection
+  // Shows a local preview before uploading
+  // ==========================================
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImageFile(file);
+
+    // Generate a local preview URL for the selected image
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl);
+  };
+
+  // ==========================================
+  // Handle form submission
+  // Sends multipart/form-data to support image upload
+  // ==========================================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      // Use FormData to support both text fields and optional image file
+      const payload = new FormData();
+      payload.append("title", formData.title);
+      payload.append("description", formData.description);
+      payload.append("content", formData.content);
+      payload.append("author", formData.author);
+
+      // Only append image if user selected a new one
+      if (imageFile) {
+        payload.append("image", imageFile);
+      }
+
+      await updateBlog(id, payload);
+
+      setSuccess(true);
+
+      // Redirect to dashboard after short delay
+      setTimeout(() => navigate("/admin/dashboard"), 1500);
+    } catch (err) {
+      setError("Failed to update blog. Please try again.");
+      console.error("Update blog error:", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // ==========================================
+  // LOADING STATE
+  // ==========================================
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-500">Loading blog data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // MAIN RENDER
+  // ==========================================
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Edit Blog</h1>
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-3xl mx-auto">
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          required
-        />
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Link
+            to="/admin/dashboard"
+            className="text-gray-500 hover:text-indigo-600 transition"
+          >
+            <FiArrowLeft size={22} />
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-800">Edit Blog</h1>
+        </div>
 
-        <input
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          required
-        />
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
 
-        <input
-          name="author"
-          value={formData.author}
-          onChange={handleChange}
-          className="w-full border p-3 rounded"
-          required
-        />
+        {/* Success Message */}
+        {success && (
+          <div className="mb-6 bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg">
+            ✅ Blog updated successfully! Redirecting...
+          </div>
+        )}
 
-        <textarea
-          name="content"
-          value={formData.content}
-          onChange={handleChange}
-          className="w-full border p-3 rounded h-40"
-          required
-        />
-
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-6 py-3 rounded"
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl shadow-sm p-8 space-y-6"
         >
-          Update Blog
-        </button>
-      </form>
+
+          {/* Title */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Title <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="Enter blog title"
+              required
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Description <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Short description of the blog"
+              required
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            />
+          </div>
+
+          {/* Author */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Author <span className="text-red-500">*</span>
+            </label>
+            <input
+              name="author"
+              value={formData.author}
+              onChange={handleChange}
+              placeholder="Author name"
+              required
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            />
+          </div>
+
+          {/* Content */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Content <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              name="content"
+              value={formData.content}
+              onChange={handleChange}
+              placeholder="Write the full blog content here..."
+              required
+              rows={10}
+              className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y"
+            />
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Blog Image
+            </label>
+
+            {/* Show new preview or existing image */}
+            {(imagePreview || existingImage) && (
+              <div className="mb-3">
+                <p className="text-xs text-gray-400 mb-1">
+                  {imagePreview ? "New image preview:" : "Current image:"}
+                </p>
+                <img
+                  src={imagePreview || existingImage}
+                  alt="Blog preview"
+                  className="w-full h-56 object-cover rounded-xl border"
+                />
+              </div>
+            )}
+
+            {/* File input styled as upload box */}
+            <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 transition">
+              <FiUpload className="text-gray-400 text-2xl mb-2" />
+              <span className="text-sm text-gray-500">
+                {imageFile ? imageFile.name : "Click to upload a new image (optional)"}
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-semibold py-3 rounded-lg transition"
+          >
+            {submitting ? "Updating..." : "Update Blog"}
+          </button>
+
+        </form>
+      </div>
     </div>
   );
 };
