@@ -6,7 +6,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-
+console.log("VERSION 2 CORS ACTIVE");
 import express from "express";
 import "express-async-errors";
 
