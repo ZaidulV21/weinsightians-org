@@ -1,9 +1,10 @@
-// src/api/axiosInstance.js
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://weinsightians-backend-repo.onrender.com/api/v1",
-  withCredentials: true, // 🔥 REQUIRED for cookies
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
+
+console.log("BASE URL:", import.meta.env.VITE_API_URL); // 👈 add this
 
 export default axiosInstance;

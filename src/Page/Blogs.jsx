@@ -9,17 +9,15 @@ import Footer from "../components/Footer";
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
-  
   const [searchTerm, setSearchTerm] = useState("");
-
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         const { data } = await axiosInstance.get("/blogs");
-        setBlogs(data.blogs);
+        setBlogs(data.blogs); // ✅ FIXED HERE
       } catch (error) {
-        console.log(error);
+        console.log("Error fetching blogs:", error);
       }
     };
 
@@ -27,10 +25,10 @@ const Blogs = () => {
   }, []);
 
   const filteredBlogs = blogs.filter((blog) =>
-  blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  blog.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  blog.author.toLowerCase().includes(searchTerm.toLowerCase())
-);
+    blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    blog.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    blog.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
@@ -90,7 +88,8 @@ const Blogs = () => {
     >
       {blog.image && (
         <img
-          src={`https://weinsightians-backend-repo.onrender.com${blog.image}`}
+          // src={`https://weinsightians-backend-repo.onrender.com${blog.image}`}
+          src={blog.image}
           alt={blog.title}
           className="w-full h-56 object-cover"
         />

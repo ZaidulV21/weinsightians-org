@@ -19,18 +19,18 @@ const router = Router();
 // Public routes — no authentication required
 router.get('/', getAllBlogs);
 // router.get('/:id', validateIdParam, getBlog);
-router.get("/:slug", getBlog);
+// router.get("/:slug", getBlog);
+router.get("/:id", validateIdParam, getBlog);
 
 
 // Protected routes — require authentication AND admin role
 // The middleware chain: authenticate -> check admin -> validate input -> controller
 router.post(
-    '/',
-    authenticateUser,
-    adminRouteMiddleware,
-    upload.single("image"),
-    validateBlogInput,
-    createBlog
+  '/',
+  authenticateUser,
+  adminRouteMiddleware,
+  upload.single("image"),
+  createBlog
 );
 
 router.patch(

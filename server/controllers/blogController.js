@@ -1,34 +1,73 @@
-import { StatusCodes } from 'http-status-codes';
-import Blog from '../models/Blog.js';
-import { NotFoundError } from '../errors/customErrors.js';
+// ==========================================
+// IMPORTS
+// ==========================================
+
+import { StatusCodes } from "http-status-codes";
+import Blog from "../models/Blog.js";
+import { NotFoundError } from "../errors/customErrors.js";
 import slugify from "slugify";
-import cloudinary from "../utils/cloudinary.js";
 import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
 
 
-// GET /api/v1/blogs
-// Public route — returns all blogs
+// ==========================================
+// CLOUDINARY CONFIGURATION
+// ==========================================
+// This runs once when the file loads
+// dotenv must already be configured in server.js
+
+// cloudinary.config({
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME?.trim(),
+//   api_key: process.env.CLOUDINARY_API_KEY?.trim(),
+//   api_secret: process.env.CLOUDINARY_API_SECRET?.trim(),
+// });
+
+cloudinary.config({
+  cloud_name: "dgj0p6odr",
+  api_key: "333219444599415",
+  api_secret: "2CzZDSMjTUz-MIhXQs613bHRATI",
+})
+
+
+// ==========================================
+// GET ALL BLOGS
+// Public Route
+// ==========================================
 export const getAllBlogs = async (req, res) => {
-    const blogs = await Blog.find({}).sort({ createdAt: -1 });
-    res.status(StatusCodes.OK).json({ count: blogs.length, blogs });
+  const blogs = await Blog.find({}).sort({ createdAt: -1 });
+
+  res.status(StatusCodes.OK).json({
+    count: blogs.length,
+    blogs,
+  });
 };
 
+
+// ==========================================
+// GET SINGLE BLOG BY SLUG
+// Public Route
+// ==========================================
 export const getBlog = async (req, res) => {
-    const { slug } = req.params;
-    const blog = await Blog.findOne({ slug });
+  const { slug } = req.params;
 
-    if (!blog) {
-        throw new NotFoundError(`no blog with slug ${slug}`);
-    }
+  const blog = await Blog.findOne({ slug });
 
-    res.status(StatusCodes.OK).json({ blog });
+  if (!blog) {
+    throw new NotFoundError(`No blog with slug: ${slug}`);
+  }
+
+  res.status(StatusCodes.OK).json({ blog });
 };
 
 
-
+// ==========================================
+// CREATE BLOG
+// Admin Route
+// ==========================================
 export const createBlog = async (req, res) => {
   const { title, description, content, author } = req.body;
 
+  // Generate slug from title
   const slug = slugify(title, {
     lower: true,
     strict: true,
@@ -36,15 +75,19 @@ export const createBlog = async (req, res) => {
 
   let imageUrl = null;
 
+  // If image uploaded
   if (req.file) {
+    // Upload to Cloudinary
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "weinsightians_blogs",
     });
 
     imageUrl = result.secure_url;
 
-    // delete local file after upload
-    fs.unlinkSync(req.file.path);
+    // Delete local file after upload
+    if (fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
   }
 
   const blog = await Blog.create({
@@ -55,38 +98,44 @@ export const createBlog = async (req, res) => {
     author,
     image: imageUrl,
   });
-console.log("Uploading to Cloudinary...");
 
   res.status(StatusCodes.CREATED).json({
-    msg: "blog created",
+    msg: "Blog created successfully",
     blog,
   });
 };
 
 
-
-// PATCH /api/v1/blogs/:id
-// Admin-only — updates an existing blog
+// ==========================================
+// UPDATE BLOG
+// Admin Route
+// ==========================================
 export const updateBlog = async (req, res) => {
   const { id } = req.params;
   const { title, description, content, author } = req.body;
 
   const blog = await Blog.findById(id);
+
   if (!blog) {
-    throw new NotFoundError(`no blog with id ${id}`);
+    throw new NotFoundError(`No blog with id: ${id}`);
   }
 
   let imageUrl = blog.image;
 
+  // If new image uploaded
   if (req.file) {
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "weinsightians_blogs",
     });
 
     imageUrl = result.secure_url;
-    fs.unlinkSync(req.file.path);
+
+    if (fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
   }
 
+  // Update fields
   blog.title = title;
   blog.slug = slugify(title, { lower: true, strict: true });
   blog.description = description;
@@ -97,22 +146,26 @@ export const updateBlog = async (req, res) => {
   await blog.save();
 
   res.status(StatusCodes.OK).json({
-    msg: "blog updated",
+    msg: "Blog updated successfully",
     blog,
   });
 };
 
 
-// DELETE /api/v1/blogs/:id
-// Admin-only — deletes a blog
+// ==========================================
+// DELETE BLOG
+// Admin Route
+// ==========================================
 export const deleteBlog = async (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    const blog = await Blog.findByIdAndDelete(id);
+  const blog = await Blog.findByIdAndDelete(id);
 
-    if (!blog) {
-        throw new NotFoundError(`no blog with id ${id}`);
-    }
+  if (!blog) {
+    throw new NotFoundError(`No blog with id: ${id}`);
+  }
 
-    res.status(StatusCodes.OK).json({ msg: 'blog deleted' });
+  res.status(StatusCodes.OK).json({
+    msg: "Blog deleted successfully",
+  });
 };
