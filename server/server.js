@@ -47,16 +47,16 @@ app.use(cookieParser());
 
 // 4️⃣ CORS CONFIGURATION (VERY IMPORTANT)
 // This allows frontend (5173) to talk to backend (6200)
+
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:5173"
-        : "https://weinsightian.tech",
+    origin: [
+      "http://localhost:5173",
+      "https://weinsightian.tech"
+    ],
     credentials: true,
   })
 );
-
 
 // ==========================================
 // ROUTES
