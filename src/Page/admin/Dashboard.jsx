@@ -97,7 +97,7 @@ const Dashboard = () => {
       {/* Logout at bottom */}
       <button
         onClick={handleLogout}
-        className="flex items-center gap-3 px-3 py-2 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600 transition mt-auto"
+        className="flex items-center gap-3  px-3 py-2 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600 transition mt-auto"
       >
         <FiLogOut /> Logout
       </button>
@@ -147,7 +147,7 @@ const Dashboard = () => {
           >
             <FiMenu size={24} />
           </button>
-          <h1 className="text-xl font-bold">Dashboard</h1>
+          <h1 className="text-xl font-[Larken]">Dashboard</h1>
           <Link
             to="/admin/create"
             className="flex items-center gap-1 bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm"
@@ -158,7 +158,7 @@ const Dashboard = () => {
 
         {/* Desktop header */}
         <div className="hidden md:flex justify-between items-center mb-10">
-          <h1 className="text-3xl font-bold">Dashboard Overview</h1>
+          <h1 className="text-3xl font-[Larken]">Dashboard Overview</h1>
           <Link
             to="/admin/create"
             className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
@@ -256,7 +256,7 @@ const Dashboard = () => {
 
         {/* Blog Cards — Mobile */}
         <div className="md:hidden space-y-4">
-          <h2 className="text-lg font-semibold">All Blogs</h2>
+          <h2 className="text-lg font-[Larken] font-semibold">All Blogs</h2>
 
           {loading ? (
             <div className="flex justify-center py-10">
@@ -281,7 +281,7 @@ const Dashboard = () => {
                   />
                 )}
 
-                <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2">
+                <h3 className="font-semibold text-gray-800 font-[lato] mb-1 line-clamp-2">
                   {blog.title}
                 </h3>
 
@@ -298,7 +298,7 @@ const Dashboard = () => {
                   {/* ✅ Uses blog.slug — matches EditBlog useParams slug */}
                   <Link
                     to={`/admin/edit/${blog.slug}`}
-                    className="flex-1 flex items-center justify-center gap-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition text-sm"
+                    className="flex-1 flex items-center justify-center gap-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition text-xl md:text-sm"
                   >
                     <FiEdit size={14} /> Edit
                   </Link>

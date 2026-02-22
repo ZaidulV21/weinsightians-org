@@ -1,5 +1,5 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import Page1 from "../components/Page1"
 import Page2 from "../components/Page2"
 import Page3 from "../components/Page3"
