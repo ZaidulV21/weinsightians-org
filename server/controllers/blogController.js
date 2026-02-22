@@ -8,10 +8,6 @@ import { NotFoundError } from "../errors/customErrors.js";
 import slugify from "slugify";
 import { v2 as cloudinary } from "cloudinary";
 import streamifier from "streamifier";
-import dotenv from "dotenv";
-
-dotenv.config();
-
 
 // ==========================================
 // CLOUDINARY CONFIGURATION

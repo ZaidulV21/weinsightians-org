@@ -77,7 +77,7 @@ export default function App() {
 
         <Route path="/admin" element={<Dashboard />} />
         <Route path="/admin/create" element={<CreateBlog />} />
-        <Route path="/admin/edit/:id" element={<EditBlog />} />
+        <Route path="/admin/edit/:slug" element={<EditBlog />} />
         <Route path="/login" element={<AdminLogin />} />
       </Routes>
     </div>

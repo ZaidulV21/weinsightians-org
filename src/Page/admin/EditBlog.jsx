@@ -4,8 +4,10 @@ import { getSingleBlog, updateBlog } from "../../api/blogApi";
 import { FiArrowLeft, FiUpload } from "react-icons/fi";
 
 const EditBlog = () => {
-  const { id } = useParams();
+  const { slug } = useParams();  // slug comes from the URL e.g. /admin/edit/my-blog-post
   const navigate = useNavigate();
+
+  const [blogId, setBlogId] = useState(null); // ← stores MongoDB _id for the PATCH request
 
   const [formData, setFormData] = useState({
     title: "",
@@ -23,16 +25,22 @@ const EditBlog = () => {
   const [success, setSuccess] = useState(false);            // Success state
 
   // ==========================================
-  // Fetch existing blog data to pre-fill form
+  // Fetch existing blog data by SLUG to pre-fill form
+  // Then store the _id separately for the update call
   // ==========================================
   useEffect(() => {
     const fetchBlog = async () => {
       try {
         setLoading(true);
-        const { data } = await getSingleBlog(id);
+
+        // Fetch by slug — matches backend GET /:slug route
+        const { data } = await getSingleBlog(slug);
         const blog = data.blog;
 
-        // Pre-fill the form with existing blog data
+        // Store MongoDB _id — needed for PATCH /:id route
+        setBlogId(blog._id);
+
+        // Pre-fill form with existing blog data
         setFormData({
           title: blog.title || "",
           description: blog.description || "",
@@ -40,8 +48,9 @@ const EditBlog = () => {
           author: blog.author || "",
         });
 
-        // Store existing image URL to show as preview
+        // Store existing Cloudinary image URL for preview
         setExistingImage(blog.image || null);
+
       } catch (err) {
         setError("Failed to load blog. Please try again.");
         console.error("Fetch blog error:", err);
@@ -51,33 +60,24 @@ const EditBlog = () => {
     };
 
     fetchBlog();
-  }, [id]);
+  }, [slug]);
 
-  // ==========================================
   // Handle text input changes
-  // ==========================================
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ==========================================
-  // Handle image file selection
-  // Shows a local preview before uploading
-  // ==========================================
+  // Handle image file selection — shows local preview before uploading
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
     setImageFile(file);
-
-    // Generate a local preview URL for the selected image
-    const previewUrl = URL.createObjectURL(file);
-    setImagePreview(previewUrl);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   // ==========================================
   // Handle form submission
-  // Sends multipart/form-data to support image upload
+  // Uses blogId (_id) for the PATCH request — NOT the slug
   // ==========================================
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,6 +85,13 @@ const EditBlog = () => {
     setError(null);
 
     try {
+      // Guard — should never happen but just in case _id didn't load
+      if (!blogId) {
+        setError("Blog ID not found. Please refresh and try again.");
+        setSubmitting(false);
+        return;
+      }
+
       // Use FormData to support both text fields and optional image file
       const payload = new FormData();
       payload.append("title", formData.title);
@@ -97,14 +104,18 @@ const EditBlog = () => {
         payload.append("image", imageFile);
       }
 
-      await updateBlog(id, payload);
+      // Use blogId (_id) NOT slug — matches backend PATCH /:id route
+      await updateBlog(blogId, payload);
 
       setSuccess(true);
 
       // Redirect to dashboard after short delay
       setTimeout(() => navigate("/admin/dashboard"), 1500);
+
     } catch (err) {
-      setError("Failed to update blog. Please try again.");
+      // Shows actual backend error — helpful for debugging on mobile too
+      const message = err?.response?.data?.msg || err?.message || "Unknown error";
+      setError(`Failed to update blog: ${message}`);
       console.error("Update blog error:", err);
     } finally {
       setSubmitting(false);
@@ -153,7 +164,7 @@ const EditBlog = () => {
         {/* Success Message */}
         {success && (
           <div className="mb-6 bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg">
-            ✅ Blog updated successfully! Redirecting...
+            Blog updated successfully! Redirecting...
           </div>
         )}
 
@@ -162,7 +173,6 @@ const EditBlog = () => {
           onSubmit={handleSubmit}
           className="bg-white rounded-2xl shadow-sm p-8 space-y-6"
         >
-
           {/* Title */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
