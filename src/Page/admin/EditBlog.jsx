@@ -2,53 +2,84 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getSingleBlog, updateBlog } from "../../api/blogApi";
 import { FiArrowLeft, FiUpload } from "react-icons/fi";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
+// ==========================================
+// QUILL TOOLBAR CONFIGURATION
+// Same toolbar as CreateBlog for consistency
+// ==========================================
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, 4, false] }],
+    [{ font: [] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ color: [] }, { background: [] }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    [{ indent: "-1" }, { indent: "+1" }],
+    [{ align: [] }],
+    ["blockquote", "code-block"],
+    ["link"],
+    ["clean"],
+  ],
+};
+
+const quillFormats = [
+  "header", "font",
+  "bold", "italic", "underline", "strike",
+  "color", "background",
+  "list", "bullet", "indent",
+  "align",
+  "blockquote", "code-block",
+  "link",
+];
 
 const EditBlog = () => {
-  const { slug } = useParams();  // slug comes from the URL e.g. /admin/edit/my-blog-post
+  const { slug } = useParams();
   const navigate = useNavigate();
 
-  const [blogId, setBlogId] = useState(null); // ← stores MongoDB _id for the PATCH request
+  const [blogId, setBlogId] = useState(null);          // MongoDB _id for PATCH request
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    content: "",
     author: "",
   });
 
-  const [imageFile, setImageFile] = useState(null);         // New image file selected by user
-  const [imagePreview, setImagePreview] = useState(null);   // Preview of new image
+  const [content, setContent] = useState("");           // Quill rich text content
+  const [imageFile, setImageFile] = useState(null);     // New image file
+  const [imagePreview, setImagePreview] = useState(null); // New image preview
   const [existingImage, setExistingImage] = useState(null); // Current image from DB
-  const [loading, setLoading] = useState(true);             // Fetching blog data
-  const [submitting, setSubmitting] = useState(false);      // Form submission in progress
-  const [error, setError] = useState(null);                 // Error message
-  const [success, setSuccess] = useState(false);            // Success state
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   // ==========================================
-  // Fetch existing blog data by SLUG to pre-fill form
-  // Then store the _id separately for the update call
+  // Fetch existing blog data by SLUG
+  // Store _id separately for the PATCH call
   // ==========================================
   useEffect(() => {
     const fetchBlog = async () => {
       try {
         setLoading(true);
-
-        // Fetch by slug — matches backend GET /:slug route
         const { data } = await getSingleBlog(slug);
         const blog = data.blog;
 
-        // Store MongoDB _id — needed for PATCH /:id route
+        // Store MongoDB _id for update call
         setBlogId(blog._id);
 
-        // Pre-fill form with existing blog data
+        // Pre-fill text fields
         setFormData({
           title: blog.title || "",
           description: blog.description || "",
-          content: blog.content || "",
           author: blog.author || "",
         });
 
-        // Store existing Cloudinary image URL for preview
+        // Pre-fill Quill editor with existing HTML content
+        setContent(blog.content || "");
+
+        // Store existing image
         setExistingImage(blog.image || null);
 
       } catch (err) {
@@ -63,57 +94,67 @@ const EditBlog = () => {
   }, [slug]);
 
   // Handle text input changes
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
-  // Handle image file selection — shows local preview before uploading
+  // Handle image selection with size validation
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image too large. Please choose an image under 5MB.");
+      return;
+    }
+
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
+    setError(null);
   };
 
   // ==========================================
   // Handle form submission
-  // Uses blogId (_id) for the PATCH request — NOT the slug
+  // Uses blogId (_id) for PATCH — NOT slug
   // ==========================================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
 
+    // Validate content
+    if (!content || content === "<p><br></p>") {
+      setError("Content cannot be empty.");
+      setSubmitting(false);
+      return;
+    }
+
     try {
-      // Guard — should never happen but just in case _id didn't load
       if (!blogId) {
         setError("Blog ID not found. Please refresh and try again.");
         setSubmitting(false);
         return;
       }
 
-      // Use FormData to support both text fields and optional image file
       const payload = new FormData();
       payload.append("title", formData.title);
       payload.append("description", formData.description);
-      payload.append("content", formData.content);
       payload.append("author", formData.author);
 
-      // Only append image if user selected a new one
+      // content is HTML string from Quill
+      payload.append("content", content);
+
+      // Only append image if a new one was selected
       if (imageFile) {
         payload.append("image", imageFile);
       }
 
-      // Use blogId (_id) NOT slug — matches backend PATCH /:id route
+      // Use _id for update — matches backend PATCH /:id route
       await updateBlog(blogId, payload);
 
       setSuccess(true);
-
-      // Redirect to dashboard after short delay
       setTimeout(() => navigate("/admin/dashboard"), 1500);
 
     } catch (err) {
-      // Shows actual backend error — helpful for debugging on mobile too
       const message = err?.response?.data?.msg || err?.message || "Unknown error";
       setError(`Failed to update blog: ${message}`);
       console.error("Update blog error:", err);
@@ -136,19 +177,13 @@ const EditBlog = () => {
     );
   }
 
-  // ==========================================
-  // MAIN RENDER
-  // ==========================================
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-3xl mx-auto">
 
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Link
-            to="/admin/dashboard"
-            className="text-gray-500 hover:text-indigo-600 transition"
-          >
+          <Link to="/admin/dashboard" className="text-gray-500 hover:text-indigo-600 transition">
             <FiArrowLeft size={22} />
           </Link>
           <h1 className="text-3xl font-bold text-gray-800">Edit Blog</h1>
@@ -164,15 +199,45 @@ const EditBlog = () => {
         {/* Success Message */}
         {success && (
           <div className="mb-6 bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg">
-            Blog updated successfully! Redirecting...
+            ✅ Blog updated successfully! Redirecting...
           </div>
         )}
 
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-2xl shadow-sm p-8 space-y-6"
-        >
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-8 space-y-6">
+
+          {/* Image Upload */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Blog Image
+            </label>
+
+            {(imagePreview || existingImage) && (
+              <div className="mb-3">
+                <p className="text-xs text-gray-400 mb-1">
+                  {imagePreview ? "New image preview:" : "Current image:"}
+                </p>
+                <img
+                  src={imagePreview || existingImage}
+                  alt="Blog preview"
+                  className="w-full h-56 object-cover rounded-xl border"
+                />
+              </div>
+            )}
+
+            <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 transition">
+              <FiUpload className="text-gray-400 text-2xl mb-2" />
+              <span className="text-sm text-gray-500">
+                {imageFile ? imageFile.name : "Click to upload a new image (optional)"}
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </label>
+          </div>
+
           {/* Title */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -218,55 +283,23 @@ const EditBlog = () => {
             />
           </div>
 
-          {/* Content */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Content <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="content"
-              value={formData.content}
-              onChange={handleChange}
-              placeholder="Write the full blog content here..."
-              required
-              rows={10}
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition resize-y"
-            />
-          </div>
-
-          {/* Image Upload */}
+          {/* Content — React Quill Editor */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Blog Image
+              Content <span className="text-red-500">*</span>
             </label>
-
-            {/* Show new preview or existing image */}
-            {(imagePreview || existingImage) && (
-              <div className="mb-3">
-                <p className="text-xs text-gray-400 mb-1">
-                  {imagePreview ? "New image preview:" : "Current image:"}
-                </p>
-                <img
-                  src={imagePreview || existingImage}
-                  alt="Blog preview"
-                  className="w-full h-56 object-cover rounded-xl border"
-                />
-              </div>
-            )}
-
-            {/* File input styled as upload box */}
-            <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 transition">
-              <FiUpload className="text-gray-400 text-2xl mb-2" />
-              <span className="text-sm text-gray-500">
-                {imageFile ? imageFile.name : "Click to upload a new image (optional)"}
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
+            <div className="rounded-lg overflow-hidden border border-gray-200">
+              <ReactQuill
+                theme="snow"
+                value={content}
+                onChange={setContent}
+                modules={quillModules}
+                formats={quillFormats}
+                placeholder="Write your blog content here..."
+                className="bg-white"
+                style={{ minHeight: "300px" }}
               />
-            </label>
+            </div>
           </div>
 
           {/* Submit Button */}

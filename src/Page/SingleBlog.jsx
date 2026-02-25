@@ -165,9 +165,10 @@ const SingleBlog = () => {
         </div>
 
         {/* Blog Content */}
-        <div className="prose max-w-none text-lg leading-8">
-          {blog.content}
-        </div>
+<div
+  className="prose max-w-none text-lg leading-8"
+  dangerouslySetInnerHTML={{ __html: blog.content }}
+/>
 
         {/* Tags */}
         {blog.tags && (
