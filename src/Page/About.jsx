@@ -195,7 +195,7 @@ const About = () => {
             <TeamMemberCard
               name="Zaidul Vasf"
               role="Web Developer"
-              imgSrc="/img/Zaid.jpg"
+              imgSrc="/img/zaidulvasfimg.jpeg"
               socialLinks={[
                 { platform: 'Instagram', url: 'https://www.instagram.com/__zaidulvasf__', icon: '/img/instagram.png' },
                 { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/zaidul-vasf-37a91a230/', icon: '/img/linkedin.png' },

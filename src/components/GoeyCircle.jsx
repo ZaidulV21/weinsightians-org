@@ -4,7 +4,7 @@ import gsap from "gsap";
 const GooeyBlob = ({
   size = 300,
   colors = ["blue", "lightgreen", "pink"],
-  blur = 100,
+  blur = 110,
 }) => {
   const blobRef = useRef(null);
 

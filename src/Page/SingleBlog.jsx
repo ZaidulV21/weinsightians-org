@@ -125,10 +125,11 @@ const SingleBlog = () => {
         <meta name="twitter:description" content={blog.description} />
         <meta name="twitter:image" content={blog.image} />
       </Helmet>
+      <div className="h-full bg-[#ffffff] w-full text-black px-4 md:px-16 p-5">
 
       <Navbar />
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto  py-12">
 
         {/* Back Button */}
         <Link
@@ -275,6 +276,7 @@ const SingleBlog = () => {
           </div>
         )}
 
+      </div>
       </div>
       <Footer />
     </>

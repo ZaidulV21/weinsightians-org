@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import { FiSearch } from "react-icons/fi";
 import { motion } from "framer-motion";
 import Footer from "../components/Footer";
+import ReactQuill from "react-quill";
 
 const Blogs = () => {
   const [blogs, setBlogs] = useState([]);
