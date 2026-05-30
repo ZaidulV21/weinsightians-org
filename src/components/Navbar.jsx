@@ -42,9 +42,9 @@ useEffect(() => {
       >
         {/* Logo */}
         <Link to='/'>
-          <div className='flex place-items-center gap-2 font-bold'>
-            <img className='w-12 weinsightians-img' src='/img/bgWIcon.png' alt="logo" />
-            <p className=' weinsightians text-3xl pt-1'>Weinsightians</p>
+          <div className='w-full'>
+            <img className=' w-[13vw] weinsightians-img' src='/img/we-logo.png' alt="we-insightians logo" />
+            {/* <p className=' weinsightians text-3xl pt-1'>Weinsightians</p> */}
           </div>
         </Link>
 
