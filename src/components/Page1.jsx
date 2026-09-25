@@ -1,15 +1,11 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import Navbar from './Navbar.jsx'
 
 const Page1 = () => {
   return (
     <div className="relative page-1 min-h-screen bg-custom-2 text-black px-4 sm:px-8 md:px-12 lg:px-16 p-3 sm:p-5">
-      <video className='video-bg absolute top-0 left-0 w-full h-full object-cover -z-10' src="we.mp4" autoPlay muted playsInline loop></video>
+      <video className='video-bg absolute top-0 left-0 w-full h-full object-cover -z-10' src="/we.mp4" autoPlay muted playsInline loop></video>
       
-      {/* Navbar */}
-      <Navbar />
-
       {/* Animated Heading */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}

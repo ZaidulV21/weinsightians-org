@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import Navbar from "./components/Navbar";
 
 // Public Pages
 import Home from "./Page/Home";
@@ -22,24 +23,31 @@ import EditBlog from "./Page/admin/EditBlog";
 // Protected Route
 import ProtectedRoute from "./components/ProtectedRoute";
 
+const PublicLayout = ({ children }) => (
+  <>
+    <Navbar />
+    <main>{children}</main>
+  </>
+);
+
 export default function App() {
   return (
     <div className="bg-white min-h-screen">
       <Routes>
         {/* ================= PUBLIC ROUTES ================= */}
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/sitemap" element={<Sitemap />} />
-        <Route path="/blogs" element={<Blogs />} />
-        <Route path="/blog/:slug" element={<SingleBlog />} />
+        <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
+        <Route path="/home" element={<PublicLayout><Home /></PublicLayout>} />
+        <Route path="/services" element={<PublicLayout><Services /></PublicLayout>} />
+        <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
+        <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
+        <Route path="/privacy" element={<PublicLayout><Privacy /></PublicLayout>} />
+        <Route path="/sitemap" element={<PublicLayout><Sitemap /></PublicLayout>} />
+        <Route path="/blogs" element={<PublicLayout><Blogs /></PublicLayout>} />
+        <Route path="/blog/:slug" element={<PublicLayout><SingleBlog /></PublicLayout>} />
 
         {/* ================= ADMIN ROUTES ================= */}
 
-        {/* Login */}
+        {/* Login (public) */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* Dashboard */}
@@ -54,7 +62,7 @@ export default function App() {
 
         {/* Create Blog */}
         <Route
-          path="/admin/create-blog"
+          path="/admin/create"
           element={
             <ProtectedRoute>
               <CreateBlog />
@@ -64,7 +72,7 @@ export default function App() {
 
         {/* Edit Blog */}
         <Route
-          path="/admin/edit-blog/:slug"
+          path="/admin/edit/:slug"
           element={
             <ProtectedRoute>
               <EditBlog />
@@ -74,11 +82,6 @@ export default function App() {
 
         {/* ================= FALLBACK ================= */}
         <Route path="*" element={<Navigate to="/" />} />
-
-        <Route path="/admin" element={<Dashboard />} />
-        <Route path="/admin/create" element={<CreateBlog />} />
-        <Route path="/admin/edit/:slug" element={<EditBlog />} />
-        <Route path="/login" element={<AdminLogin />} />
       </Routes>
     </div>
   );

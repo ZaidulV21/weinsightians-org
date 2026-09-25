@@ -6,6 +6,9 @@ import { FiMoon, FiSun } from "react-icons/fi";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(() =>
+    typeof window !== 'undefined' && window.scrollY > 8
+  );
 
 const [darkMode, setDarkMode] = useState(
   localStorage.getItem("theme") === "dark"
@@ -27,6 +30,47 @@ useEffect(() => {
     document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    let frameId;
+
+    const updateScrollState = () => {
+      frameId = undefined;
+      setIsScrolled(window.scrollY > 8);
+    };
+
+    const handleScroll = () => {
+      if (frameId === undefined) {
+        frameId = window.requestAnimationFrame(updateScrollState);
+      }
+    };
+
+    updateScrollState();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (frameId !== undefined) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
+  }, []);
+
+  const navbarStyle = {
+    backgroundColor: isScrolled
+      ? 'rgba(248, 248, 248, 0.72)'
+      : 'rgba(228, 228, 228, 0.755)',
+    backdropFilter: isScrolled
+      ? 'blur(14px) saturate(125%)'
+      : 'blur(25px) saturate(200%)',
+    WebkitBackdropFilter: isScrolled
+      ? 'blur(14px) saturate(125%)'
+      : 'blur(25px) saturate(200%)',
+    border: `1px solid ${isScrolled ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.125)'}`,
+    boxShadow: isScrolled ? '0 8px 28px rgba(15, 23, 42, 0.12)' : 'none',
+    transition:
+      'background-color 300ms ease, backdrop-filter 300ms ease, -webkit-backdrop-filter 300ms ease, border 300ms ease, box-shadow 300ms ease',
+  };
+
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -38,8 +82,8 @@ useEffect(() => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
         id='glass-morph'
-        className="z-[999] flex  items-center justify-between font-medium  overflow-hidden p-5 w-full h-20 rounded-lg"
-      >
+        style={navbarStyle}
+className="sticky top-0 w-full z-40 flex items-center justify-between font-medium overflow-hidden px-5 sm:px-8 md:px-12 lg:px-16 h-20"      >
         {/* Logo */}
         <Link to='/'>
           <div className='w-full'>
@@ -101,7 +145,7 @@ useEffect(() => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className=" inset-0 bg-black bg-opacity-50 z-40"
+            className="fixed inset-0 bg-black bg-opacity-50 z-30"
             onClick={closeMenu}
           />
         )}

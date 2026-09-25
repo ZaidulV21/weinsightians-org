@@ -1,113 +1,106 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import Navbar from './Navbar';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import OurServices2 from './OurServices2.jsx';
 import Footer from './Footer.jsx';
 import PricingSection from './PricingSection.jsx';
 
 const ServicePage1 = () => {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
-    <>
-      {/* Section 1 */}
-      <div className='h-screen px-4 md:px-16 p-5 relative overflow-hidden'>
-        <Navbar />
-
-        {/* Background Video */}
-
+    <div className="w-full bg-services">
+      <section
+        aria-labelledby="services-hero-title"
+        className="relative isolate flex min-h-[clamp(34rem,100svh,48rem)] w-full flex-col justify-between overflow-hidden px-4 py-12 sm:px-8 sm:py-16 lg:px-16 lg:py-20"
+      >
         <video
-          className='video-bg absolute top-0 left-0 w-full h-full object-cover -z-10'
-          src="we.mp4"
+          className="absolute inset-0 -z-10 h-full w-full object-cover"
+          src="/we.mp4"
           autoPlay
           muted
           playsInline
           loop
+          preload="metadata"
+          aria-hidden="true"
+          tabIndex="-1"
         ></video>
 
-        {/* Main Heading */}
         <motion.div
-          className='absolute top-48'
-          initial={{ opacity: 0, y: 40 }}
+          className="relative z-10 max-w-5xl"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: 'easeOut' }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <h1 className='text-[#efefef] text-4xl md:text-6xl font-medium font-[larken]'>
-            Empowering Your Vision <br />
-            with Custom Services that <br />
-            Create Real Impact
+          <h1 id="services-hero-title" className="max-w-5xl text-4xl font-medium leading-tight text-[#efefef] sm:text-5xl lg:text-6xl font-[larken]">
+            Empowering Your Vision with Custom Services that Create Real Impact
           </h1>
         </motion.div>
 
-        {/* Subheading & Badge */}
         <motion.div
-          className='absolute bottom-10 flex justify-between w-[90%] md:w-[90%]'
-          initial={{ opacity: 0, y: 40 }}
+          className="relative z-10 mt-12 flex max-w-5xl flex-col gap-8 sm:flex-row sm:items-end sm:justify-between"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 0.5, ease: 'easeOut' }}
+          transition={{ duration: 0.8, delay: shouldReduceMotion ? 0 : 0.4, ease: 'easeOut' }}
         >
-          <h1 className='font-[gilroy] text-sm md:text-base text-white'>
-            WeInsightians is here for the ones who don't just follow trends, they set <br />
-            them. Our services go beyond design, we're talking premium, high-impact <br />
-            branding and web experiences that make your brand unforgettable.
-          </h1>
+          <p className="max-w-2xl text-sm leading-relaxed text-white sm:text-base font-[gilroy]">
+            WeInsightians is here for the ones who don't just follow trends, they set them. Our services bring strategy, design, technology, and growth together to help ambitious brands build a stronger digital presence.
+          </p>
           <motion.img
-            className='h-20 md:h-28'
+            className="h-16 w-auto max-w-[8rem] shrink-0 sm:h-20 lg:h-28"
             src="/img/64bbbf416decd23360ebb88c_get-in-touch-badge.svg"
-            alt="get in touch"
-            loading="lazy"
-            initial={{ rotate: 0 }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+            alt="Get in touch"
+            initial={shouldReduceMotion ? false : { rotate: 0 }}
+            animate={shouldReduceMotion ? { rotate: 0 } : { rotate: 360 }}
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 18, repeat: Infinity, ease: 'linear' }}
           />
         </motion.div>
-      </div>
+      </section>
 
-      {/* Section 2 */}
-      <div className='h-full  w-full px-4 md:px-16 relative'>
-        <motion.div
-          className='flex services-flex mt-20 md:mt-28 justify-between items-center font-[gilroy]'
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          viewport={{ once: true }}
-        >
-          <div className='relative '>
-            <h1 className='mb-5 text-zinc-500'>
-              <span className='text-black'>•</span> Create gibberish history with us 
-            </h1>
-            <h1 className='text-4xl md:text-5xl'>
-              From concept to execution our <br />
-              services are designed to set you apart
-            </h1>
-          </div>
+      <section aria-labelledby="services-intro-title" className="w-full px-4 py-20 sm:px-8 lg:px-16 lg:py-28">
+        <div className="mx-auto max-w-7xl">
+          <motion.div
+            className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between"
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          >
+            <div className="min-w-0 md:max-w-3xl">
+              <p className="mb-5 text-zinc-500">
+                <span aria-hidden="true" className="text-black">•</span> Strategy, design, technology, and growth
+              </p>
+              <h2 id="services-intro-title" className="text-3xl leading-tight sm:text-4xl lg:text-5xl">
+                From first idea to lasting growth, our services cover the full digital journey
+              </h2>
+            </div>
+
+            <div className="shrink-0">
+              <Link
+                to="/contact"
+                className="group inline-flex min-h-11 items-center text-left text-base font-[gilroy] transition-colors hover:text-[#7c5cdd] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7c5cdd] focus-visible:ring-offset-4 sm:text-lg"
+              >
+                <span>Start your project with us today</span>
+                <span aria-hidden="true" className="ml-4 block h-px w-10 bg-zinc-500 transition-all duration-500 group-hover:w-20 group-focus-visible:w-20"></span>
+              </Link>
+            </div>
+          </motion.div>
 
           <motion.div
-            className='relative'
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            viewport={{ once: true }}
-          >
-            <h1>Start your project with us today</h1>
-            <div className='absolute left-0 w-10 md:w-20 h-[2px] bg-zinc-500 transition-all duration-500 hover:w-full'></div>
-          </motion.div>
-        </motion.div>
+            aria-hidden="true"
+            className="mt-16 h-px w-full origin-left bg-zinc-400"
+            initial={shouldReduceMotion ? false : { scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          ></motion.div>
+        </div>
+      </section>
 
-        <motion.div
-          className='w-full mt-20 md:mt-20 h-[2px] bg-zinc-400'
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          viewport={{ once: true }}
-          style={{ transformOrigin: 'left' }}
-        ></motion.div>
-
-        {/* Service Cards */}
-        <OurServices2 />
-      <PricingSection/>
-        {/* Footer */}
-        <Footer />
-      </div>
-    </>
+      <OurServices2 />
+      <PricingSection />
+      <Footer />
+    </div>
   );
 };
 

@@ -1,6 +1,5 @@
 import React from 'react'
 import { Helmet } from 'react-helmet-async';
-import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import Faq from '../components/Faq'
 import Whatsapp from '../components/Whatsapp'
@@ -15,15 +14,14 @@ const Contact = () => {
   <meta name="description" content="Get in touch with We Insightians for web development, branding, and UI/UX design solutions. Let's work together to grow your business!" />
   <meta name="keywords" content="Contact We Insightians, Web Design Consultation, Digital Solutions, Business Inquiry" />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://weinsightians.tech/contact" />
+  <link rel="canonical" href="https://weinsightian.tech/contact" />
   <meta property="og:title" content="Contact We Insightians - Let's Connect" />
   <meta property="og:description" content="Reach out to us for top-tier digital solutions. We specialize in web design, branding, and creative business growth strategies." />
-  <meta property="og:url" content="https://weinsightians.tech/contact" />
+  <meta property="og:url" content="https://weinsightian.tech/contact" />
   <meta property="og:type" content="website" />
 </Helmet>
     <div className=' h-full w-full text-black px-5 md:px-16 p-5'>
       <Whatsapp />
-      <Navbar />
       <motion.div
   initial={{ opacity: 0, y: 50 }}
   whileInView={{ opacity: 1, y: 0 }}

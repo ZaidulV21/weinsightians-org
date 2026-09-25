@@ -17,10 +17,10 @@ const Home = () => {
         <meta name="description" content="We Insightians provides top-tier web development, UI/UX design, and digital solutions to grow your business." />
         <meta name="keywords" content="We Insightians, Web Development, Branding, Digital Solutions, UI/UX Design" />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://weinsightians.tech/" />
+        <link rel="canonical" href="https://weinsightian.tech/" />
         <meta property="og:title" content="We Insightians - Bringing Your Vision to Life" />
         <meta property="og:description" content="We Insightians is a leading digital agency specializing in branding, website design, and business growth strategies." />
-        <meta property="og:url" content="https://weinsightians.tech/" />
+        <meta property="og:url" content="https://weinsightian.tech/" />
         <meta property="og:type" content="website" />
       </Helmet>
     <div className='overflow-hidden'>

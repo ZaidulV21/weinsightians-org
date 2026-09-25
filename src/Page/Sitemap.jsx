@@ -1,11 +1,9 @@
 import React from 'react';
-import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const Sitemap = () => {
   return (
     <div className="h-full w-full text-black px-5 md:px-16 p-5 font-[gilroy]">
-      <Navbar />
       <div className="mt-10">
         <h2 className="text-4xl text-[#6B50A2] md:text-7xl font-bold mb-4">Sitemap</h2>
         <div className="grid mt-10 grid-cols-2 md:grid-cols-4 gap-10">

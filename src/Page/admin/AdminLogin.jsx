@@ -1,6 +1,6 @@
 // src/pages/admin/AdminLogin.jsx
 import { useState } from "react";
-import { adminLogin } from "../../api/authApi";
+import { adminLogin, markAuthenticated } from "../../api/authApi";
 import { useNavigate } from "react-router-dom";
 
 const AdminLogin = () => {
@@ -21,6 +21,7 @@ const AdminLogin = () => {
 
     try {
       await adminLogin(formData);
+      markAuthenticated();
       navigate("/admin/dashboard");
     } catch (err) {
       setError("Invalid email or password");

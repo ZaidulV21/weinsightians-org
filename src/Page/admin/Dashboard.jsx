@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
+import { clearAuthentication } from "../../api/authApi";
 import {
   FiEdit,
   FiTrash2,
@@ -65,7 +66,8 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      navigate("/blogs");
+      clearAuthentication();
+      navigate("/admin/login");
     }
   };
 

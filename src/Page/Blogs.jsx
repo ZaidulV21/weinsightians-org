@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import axiosInstance from "../api/axiosInstance";
-import Navbar from "../components/Navbar";
 import { FiSearch } from "react-icons/fi";
 import Footer from "../components/Footer";
 
@@ -80,7 +79,6 @@ const Blogs = () => {
       </Helmet>
 
       <div className="h-full bg-[#ffffff] w-full text-black px-4 md:px-16 p-5">
-        <Navbar />
         <div className="max-w-6xl mx-auto px-6 py-12">
 
           <div className="flex w-full flex-col sm:flex-row justify-between items-center border-b-2 mb-12">

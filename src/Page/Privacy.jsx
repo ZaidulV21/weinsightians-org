@@ -1,11 +1,9 @@
 import React from 'react';
-import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const Privacy = () => {
   return (
     <div className="h-full w-full text-black px-5 md:px-16 p-5 font-[gilroy]">
-      <Navbar />
       <div className="mt-10">
         <h2 className="text-3xl md:text-5xl text-center font-bold mb-4 text-[#6B50A2] ">Our commitment to protecting your <br /> privacy</h2>
         <h3 className='text-lg text-center font-thin mb-4'>Learn more about how WeInsightians collects and uses data and your rights as a WeInsightians user.</h3>
