@@ -33,17 +33,24 @@ function ProjectCard({ card, i }) {
   const videoRef = useRef(null);
   const [open, setOpen] = useState(false);
 
-  const handleEnter = () => {
+  const toggleOpen = () => {
+    if (open) {
+      setOpen(false);
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
+      return;
+    }
+
     setOpen(true);
     videoRef.current?.play();
   };
 
-  const handleLeave = () => {
-    setOpen(false);
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
+  const handleKeyDown = (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    toggleOpen();
   };
 
   return (
@@ -52,8 +59,11 @@ function ProjectCard({ card, i }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: i * 0.12 }}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
+      role="button"
+      tabIndex={0}
+      aria-expanded={open}
+      onClick={toggleOpen}
+      onKeyDown={handleKeyDown}
       className="group w-full border-b border-black/10 last:border-b-0 cursor-pointer"
     >
       {/* ── Header row ── */}
@@ -130,7 +140,7 @@ function ProjectCard({ card, i }) {
         </div>
       </div>
 
-      {/* ── Video — expands on hover, full video visible, no cropping ── */}
+      {/* ── Video — expands on click, full video visible, no cropping ── */}
       <div
         className="w-full overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{ maxHeight: open ? "70vw" : "0px", opacity: open ? 1 : 0 }}
@@ -180,14 +190,14 @@ const Page3 = () => {
         </div>
       </motion.div>
 
-      {/* ── "Hover to preview" hint ── */}
+      {/* ── "Click to preview" hint ── */}
       <motion.p
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.3 }}
         className="font-[Gilroy] text-[10px] tracking-[0.2em] uppercase text-black/30 font-semibold mb-2 text-right hidden sm:block"
       >
-        Hover to preview
+        Click to preview
       </motion.p>
 
       {/* ── Project cards ── */}

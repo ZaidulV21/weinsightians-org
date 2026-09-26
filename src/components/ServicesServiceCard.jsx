@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import Button from './Button.jsx';
 
 const ServicesServiceCard = ({ service, index }) => {
   const shouldReduceMotion = useReducedMotion();
@@ -14,13 +14,13 @@ const ServicesServiceCard = ({ service, index }) => {
 
   return (
     <motion.article
-      id={`service-${service.id}`}
+      id={service.slug}
       aria-labelledby={`service-${service.id}-title`}
       initial={initial}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.7, delay: shouldReduceMotion ? 0 : index * 0.1 }}
-      className={`group flex min-w-0 flex-col gap-8 lg:items-center lg:gap-12 ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}
+      className={`group flex min-w-0 scroll-mt-24 flex-col gap-8 lg:items-center lg:gap-12 ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}
     >
       <div className={`min-w-0 flex-1 overflow-hidden rounded-2xl bg-zinc-100 ${imageFailed ? 'aspect-[4/3]' : ''}`}>
         <img
@@ -63,13 +63,9 @@ const ServicesServiceCard = ({ service, index }) => {
           transition={{ duration: 0.6, delay: shouldReduceMotion ? 0 : 0.45 + index * 0.1 }}
           className="mt-6"
         >
-          <Link
-            to="/contact"
-            aria-label={`Get started with ${service.title}`}
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#7c5cdd] px-8 py-3 font-semibold text-white shadow-lg transition duration-300 hover:scale-105 hover:bg-[#5a3dbd] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7c5cdd] focus-visible:ring-offset-2 active:scale-95 motion-reduce:transform-none"
-          >
+          <Button to="/contact" arrow aria-label={`Get started with ${service.title}`}>
             Get Started
-          </Link>
+          </Button>
         </motion.div>
       </div>
     </motion.article>

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
+import Button from './Button.jsx';
 
 const plans = [
   {
@@ -215,20 +216,12 @@ const PricingPlans = () => {
               ))}
             </ul>
 
-            <motion.button
+            <Button
               onClick={() => (window.location.href = "tel:+918081657756")}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`w-full py-3 rounded-xl font-semibold transition-all
-                ${
-                  plan.highlight
-                    ? "bg-white text-black"
-                    : "bg-[#7c5cdd] text-white"
-                }
-              `}
+              className="w-full"
             >
               Call Now
-            </motion.button>
+            </Button>
           </motion.div>
         ))}
       </div>

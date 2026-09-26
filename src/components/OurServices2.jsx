@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { services } from '../data/services';
 import ServicesServiceCard from './ServicesServiceCard.jsx';
 
 const OurServices2 = () => {
   const shouldReduceMotion = useReducedMotion();
+  const location = useLocation();
+
+  useEffect(() => {
+    const targetId = decodeURIComponent(location.hash.slice(1));
+    if (!targetId) return undefined;
+
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: shouldReduceMotion ? 'auto' : 'smooth', block: 'start' });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [location.hash, shouldReduceMotion]);
 
   return (
     <section id="services" aria-labelledby="services-heading" className="w-full overflow-x-clip bg-gradient-to-b px-4 py-20 sm:px-6 lg:px-8">

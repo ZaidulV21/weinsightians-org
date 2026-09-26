@@ -23,6 +23,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import Button from './Button.jsx';
 
 const Page5 = () => {
   return (
@@ -40,10 +41,18 @@ const Page5 = () => {
       <div className='flex flex-col md:flex-row justify-between mt-10 md:mt-28'>
         <h1 className='w-full md:w-1/2 font-[Gilroy]'>"At We Insightians, we don’t just build websites—we craft digital experiences..."</h1>
         <div className='flex mt-4 md:mt-0'>
-          <a href='/contact' className='px-8 py-3 h-12 text-[#231746] font-semibold border-2 bg-white hover:bg-[#a380ed] transition-all duration-300 rounded-full'>Contact Us</a>
-          <div className='h-12 w-12 rounded-full flex items-center justify-center p-2 border-2 transition-all duration-300 hover:rotate-45 ml-4'>
-            <img src='/right-arrow-black.png' alt='' />
-          </div>
+          <Button href='/contact' arrow>
+            Contact Us
+          </Button>
+          <Button
+            href='/contact'
+            variant='secondary'
+            size='icon'
+            className='ml-4 hover:rotate-45'
+            aria-label='Contact us'
+          >
+            <img src='/right-arrow-black.png' alt='' className='h-full w-full transition-all duration-300 group-hover:invert' />
+          </Button>
         </div>
       </div>
     </motion.div>

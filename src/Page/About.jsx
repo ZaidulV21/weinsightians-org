@@ -181,8 +181,8 @@ const About = () => {
           <div className='flex overflow-x-auto gap-24 md:gap-20 md:justify-center items-center mt-20 '>
             <TeamMemberCard
               name="Abhishek Kushwaha"
-              role="Ads Expert"
-              imgSrc="/img/Abhishek.jpg"
+              role="Operational Head"
+              imgSrc="/img/abhishekimg.jpeg"
               socialLinks={[
                 { platform: 'Instagram', url: 'https://www.instagram.com/its.me_void', icon: '/img/instagram.png' },
                 { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/contactabhikushwaha/', icon: '/img/linkedin.png' },
@@ -191,7 +191,7 @@ const About = () => {
             />
             <TeamMemberCard
               name="Zaidul Vasf"
-              role="Web Developer"
+              role="Technical Head"
               imgSrc="/img/zaidulvasfimgs.jpeg"
               socialLinks={[
                 { platform: 'Instagram', url: 'https://www.instagram.com/__zaidulvasf__', icon: '/img/instagram.png' },
@@ -200,13 +200,13 @@ const About = () => {
               ]}
             />
               <TeamMemberCard
-                name="Akshat Jaiswal"
-                role="Full Stack Developer"
-                imgSrc="/img/Akshat.png"
+                name="Saurabh Kushwaha"
+                role="Creative Head"
+                imgSrc="/img/saurabhimg.jpeg"
                 socialLinks={[
-                  { platform: 'Instagram', url: 'https://www.instagram.com/akshhat___/', icon: '/img/instagram.png' },
-                  { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/akshatjaiswal4841', icon: '/img/linkedin.png' },
-                  { platform: 'Facebook', url: 'https://www.facebook.com/akshat.jaiswal.96592', icon: '/img/facebook.png' }
+                  { platform: 'Instagram', url: 'https://www.instagram.com/saurabh_7.17?stkn=cWhzZHBsd283ZGV0', icon: '/img/instagram.png' },
+                  { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/saurabh-kushwaha-13ba00257?utm_source=share_via&utm_content=profile&utm_medium=member_android', icon: '/img/linkedin.png' },
+                  { platform: 'Facebook', url: 'https://www.facebook.com/share/1BpdEYdZZM/', icon: '/img/facebook.png' }
                 ]}
               />
           </div>

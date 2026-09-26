@@ -1,37 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { services } from '../data/services';
 import ServiceCard from './ServiceCard';
 import GooeyBlob from './GoeyCircle';
+import Button from './Button.jsx';
 
 const Page2 = () => {
-  const services = [
-    {
-      title: "E-Commerce",
-      description: "From product listings to secure checkout, we build fully-featured online stores that convert."
-    },
-    {
-      title: "UI/UX Design",
-      description: "Intuitive and visually engaging interfaces focused on improving user experience and retention."
-    },
-    {
-      title: "Custom Websites",
-      description: "We design and develop fast, responsive, and custom-coded websites tailored to your brand identity."
-    },
-    {
-      title: "SEO & Marketing",
-      description: "Drive more traffic with smart SEO strategies and marketing techniques that bring real results."
-    },
-    
-    {
-      title: "Website Support",
-      description: "Ongoing website maintenance, updates, and technical support to keep your site running smoothly."
-    },
-    {
-      title: "Social Media Marketing",
-      description: "We manage and grow your brand’s presence on platforms like Instagram, Facebook, LinkedIn, and X through content strategies, campaigns, and community engagement."
-    }
-  ];
-
   return (
     <motion.div
       className='min-h-[110vh] w-full tab-page-2-main-box flex flex-col md:flex-row px-4 sm:px-8 md:px-12 lg:px-16'
@@ -56,10 +30,18 @@ const Page2 = () => {
             Welcome to WeInsightians, a Lucknow-based web development agency. We create stunning, high-performing websites...
           </h2>
           <div className='flex gap-2 mt-5'>
-            <a href='/about' className='font-[gilroy] px-6 py-2 text-[#231746] mt-4  rounded-full border-2 bg-white hover:bg-[#a380ed] hover:text-white transition-all duration-500'>Learn More</a>
-            <a href='/about' className='h-10 w-10 rounded-full flex items-center mt-4 justify-center hover:bg-[#a380ed] border-2 hover:rotate-45 transition-all duration-500'>
-              <img src="/right-arrow-black.png" alt="arrow" />
-            </a>
+            <Button href='/about' arrow className='mt-4'>
+              Learn More
+            </Button>
+            <Button
+              href='/about'
+              variant='secondary'
+              size='iconSm'
+              className='mt-4 hover:rotate-45'
+              aria-label='Learn more about us'
+            >
+              <img src="/right-arrow-black.png" alt="" className="h-full w-full transition-all duration-300 group-hover:invert" />
+            </Button>
           </div>
         </div>
 
@@ -69,12 +51,12 @@ const Page2 = () => {
             <div className="bg-[#e7e7e735] h-full rounded-sm relative">
               {/* Buttons */}
               <div className="absolute top-3 right-3 flex flex-col sm:flex-row gap-2">
-                <a href='/services' className="border-2 border-zinc-500 px-4 py-2 rounded-full text-sm font-medium text-[#231746] hover:bg-[#a380ed] hover:text-white transition duration-300">
+                <Button href='/services' variant='secondary' size='sm'>
                   Our Services
-                </a>
-                <button className="border-2 border-zinc-500 px-4 py-2 rounded-full text-sm font-medium text-[#231746] hover:bg-[#a380ed] hover:text-white transition duration-300">
+                </Button>
+                <Button variant='secondary' size='sm'>
                   2024
-                </button>
+                </Button>
               </div>
 
               {/* Arrow Icon */}
@@ -90,9 +72,9 @@ const Page2 = () => {
                 <h2 className="text-sm md:text-2xl font-[gilroy] mt-2">
                   Empowering our agency's growth, and with great power comes great responsibility.
                 </h2>
-                <button className="mt-6 px-6 py-3 text-[#231746] border-zinc-400 border-2 text-sm hover:text-white font-semibold bg-transparent rounded-full hover:bg-[#a380ed] transition duration-300">
-                  <a href="/contact">Get Started Now</a>
-                </button>
+                <Button href="/contact" arrow className="mt-6">
+                  Get Started Now
+                </Button>
               </div>
             </div>
           </div>
@@ -119,21 +101,23 @@ const Page2 = () => {
           </div>
         </div>
         {/* Service Cards Scroll */}
-        <div className="w-full sm:mt-40 services-sections max-h-[49rem] overflow-y-auto flex flex-col gap-5 scroll-smooth">
+        <div className="services-sections flex w-full flex-col gap-5 scroll-smooth sm:mt-40 md:h-[90vh] md:gap-2 md:overflow-y-auto md:rounded-[1.75rem] md:bg-zinc-100/50 md:p-2 md:ring-1 md:ring-zinc-200/60">
           {services.map((service, idx) => (
             <motion.div
-              key={idx}
+              key={service.slug}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1, duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <ServiceCard
-                title={`${service.title} 🡦`}
-                description={service.description}
-              />
+              <ServiceCard service={service} index={idx} />
             </motion.div>
           ))}
+          <div className="pointer-events-none sticky bottom-0 -mx-2 hidden justify-center bg-gradient-to-t from-zinc-100 via-zinc-100/90 to-transparent pb-1 pt-5 md:flex">
+            <span className="rounded-full border border-zinc-300 bg-white px-3 py-1 font-[gilroy] text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-zinc-500">
+              Scroll
+            </span>
+          </div>
         </div>
       </motion.div>
     </motion.div>

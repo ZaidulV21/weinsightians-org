@@ -1,35 +1,41 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
-const ServiceCard = ({ title, description, icon }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleDescription = () => {
-    setIsOpen(!isOpen);
-  };
+const ServiceCard = ({ service, index }) => {
+  const shouldReduceMotion = useReducedMotion();
+  const serviceNumber = String(index + 1).padStart(2, '0');
+  const summary = service.description.split('. ')[0];
 
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      className='bg-[#d0e3ff86] flex flex-col md:flex-row gap-5 px-6 py-6 rounded-2xl shadow-md cursor-pointer transition-all duration-300'
-      onClick={toggleDescription}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.45, delay: shouldReduceMotion ? 0 : Math.min(index * 0.05, 0.3) }}
+      whileHover={shouldReduceMotion ? undefined : { y: -2 }}
+      className="group min-w-0"
     >
-      {/* Title + Icon */}
-      <div className='w-full md:w-2/3 flex items-center gap-3'>
-        {icon && <img src={icon} alt="icon" className="w-6 h-6" />}
-        <button className="bg-white py-3 px-4 rounded-full text-sm font-bold tracking-wide font-[gilroy] text-[#110e1a] transition duration-300 hover:bg-[#a380ed] hover:text-white">
-          {title}
-        </button>
-      </div>
-
-      {/* Description */}
-      <div className='w-full md:w-3/3 text-sm font-[gilroy]'>
-        {/* Always visible on md+ screens, toggle on small */}
-<p
-  className={`transition-all duration-300 text-sm sm:text-base md:text-lg leading-snug font-[gilroy] ${isOpen || window.innerWidth >= 768 ? 'opacity-100 max-h-[300px]' : 'opacity-0 max-h-0 overflow-hidden'}`}
->          {description}
-        </p>
-      </div>
+      <Link
+        to={`/services#${service.slug}`}
+        className="flex items-start gap-3 rounded-2xl bg-[#d0e3ff86] px-4 py-4 shadow-md transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-[#c3dbff99] hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7c5cdd] focus-visible:ring-offset-2 motion-reduce:transform-none sm:gap-4 sm:px-5"
+      >
+        <span className="w-7 shrink-0 font-[gilroy] text-sm font-bold tabular-nums text-[#231746]/60 sm:w-8">{serviceNumber}</span>
+        <span className="min-w-0 flex-1">
+          <span className="flex items-start justify-between gap-3">
+            <span className="font-[gilroy] text-lg font-bold leading-tight text-[#110e1a] transition-colors duration-300 group-hover:text-[#5a3dbd] sm:text-xl">
+              {service.title}
+            </span>
+            <span
+              aria-hidden="true"
+              className="shrink-0 font-[gilroy] text-xl leading-none text-[#110e1a] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            >
+              ↗
+            </span>
+          </span>
+          <span className="mt-1 line-clamp-2 font-[gilroy] text-sm leading-relaxed text-[#231746]/80 sm:text-base">{summary}</span>
+        </span>
+      </Link>
     </motion.div>
   );
 };

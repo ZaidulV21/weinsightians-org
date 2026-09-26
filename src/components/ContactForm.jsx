@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Button from './Button.jsx';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -160,9 +161,9 @@ const ContactForm = () => {
 
           {error && <p className="text-red-500">{error}</p>}
 
-          <button className="mt-6 bg-zinc-900 text-white py-2 rounded transition-all duration-500 hover:bg-zinc-700">
+          <Button className="mt-6" arrow>
             Let’s get started!
-          </button>
+          </Button>
         </form>
       )}
     </div>
