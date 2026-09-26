@@ -1,11 +1,144 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from 'framer-motion';
 import { services } from '../data/services';
 import ServiceCard from './ServiceCard';
 import GooeyBlob from './GoeyCircle';
 import Button from './Button.jsx';
+import { ServiceReelContext, useMediaQuery } from './serviceReelContext';
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const padNumber = (value) => String(Math.max(value, 0)).padStart(2, '0');
+const REEL_MASK =
+  'linear-gradient(to bottom, transparent 0%, #000 15%, #000 85%, transparent 100%)';
+
+const ReelItem = ({ progress, spot, animate, children }) => {
+  const t = spot ? spot.t : 0.5;
+  const w = spot ? spot.w : 0.5;
+  const focusRange = [t - w, t, t + w];
+
+  const y = useTransform(progress, focusRange, [12, 0, -12]);
+  const opacity = useTransform(progress, focusRange, [0.55, 1, 0.55]);
+  const scale = useTransform(progress, focusRange, [0.985, 1, 0.985]);
+
+  return (
+    <motion.div
+      className="will-change-transform"
+      style={animate ? { y, opacity, scale } : undefined}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+const ReelIndicator = ({ progress, activeIndex, total }) => {
+  const fill = useTransform(progress, [0, 1], [0.05, 1]);
+
+  return (
+    <div
+      aria-hidden="true"
+      className="hidden w-7 shrink-0 flex-col items-center gap-3 pt-1 md:flex"
+    >
+      <span className="font-[gilroy] text-sm font-bold tabular-nums leading-none text-[#231746]">
+        {padNumber(activeIndex + 1)}
+      </span>
+      <span className="relative w-px flex-1 overflow-hidden rounded-full bg-[#231746]/10">
+        <motion.span
+          className="absolute inset-0 origin-top bg-[#5a3dbd]/55"
+          style={{ scaleY: fill }}
+        />
+      </span>
+      <span className="font-[gilroy] text-[0.65rem] font-semibold tabular-nums leading-none text-[#231746]/35">
+        {padNumber(total)}
+      </span>
+    </div>
+  );
+};
 
 const Page2 = () => {
+  const shouldReduceMotion = useReducedMotion();
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const reelActive = isDesktop && !shouldReduceMotion;
+
+  const reelRef = useRef(null);
+  const trackRef = useRef(null);
+  const [layout, setLayout] = useState({ travel: 1, spots: [] });
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const { scrollY } = useScroll({ container: reelRef });
+  const reelProgress = useTransform(scrollY, [0, layout.travel], [0, 1]);
+
+  useEffect(() => {
+    if (!isDesktop) return undefined;
+
+    const reel = reelRef.current;
+    const track = trackRef.current;
+    if (!reel || !track) return undefined;
+
+    const measure = () => {
+      const reelHeight = reel.clientHeight;
+      const travel = Math.max(track.scrollHeight - reelHeight, 1);
+      const items = Array.from(track.children);
+
+      const spots = items.map((item, index) => {
+        const previous = items[index - 1];
+        const step = previous
+          ? item.offsetTop - previous.offsetTop
+          : item.offsetHeight;
+        const w = clamp(step / travel, 0.06, 0.2);
+        const centred = (item.offsetTop - (reelHeight - item.offsetHeight) / 2) / travel;
+        return { t: clamp(centred, 0, 1), w };
+      });
+
+      setLayout({ travel, spots });
+    };
+
+    measure();
+    const frame = requestAnimationFrame(measure);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(measure).catch(() => {});
+    }
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(track);
+    observer.observe(reel);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [isDesktop, services.length]);
+
+  useMotionValueEvent(reelProgress, 'change', (value) => {
+    if (!reelActive) return;
+
+    let closest = 0;
+    let closestDistance = Infinity;
+    layout.spots.forEach((spot, index) => {
+      const distance = Math.abs(value - spot.t);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closest = index;
+      }
+    });
+
+    setActiveIndex((current) => (current === closest ? current : closest));
+  }, [layout.spots, reelActive]);
+
+  const reel = useMemo(
+    () => ({
+      active: reelActive,
+      activeIndex: reelActive ? activeIndex : -1,
+      total: services.length,
+    }),
+    [reelActive, activeIndex],
+  );
+
   return (
     <motion.div
       className='min-h-[110vh] w-full tab-page-2-main-box flex flex-col md:flex-row px-4 sm:px-8 md:px-12 lg:px-16'
@@ -83,42 +216,64 @@ const Page2 = () => {
 
       {/* Right Side */}
       <motion.div
-        className='h-full w-full md:w-1/2'
+        className='relative flex w-full flex-col md:w-1/2'
         variants={{
-          hidden: { opacity: 0, x: 100 },
-          visible: { opacity: 1, x: 0 },
+          hidden: { opacity: 0, y: 28 },
+          visible: { opacity: 1, y: 0 },
         }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-        <div className='relative w-full h-1/3 pt-10 transforming-heading'>
-          <div className='font-[Gilroy] font-bold text-5xl flex gap-5 justify-end'>
-            <h1 className='uppercase '>Transforming</h1>
-       <div> <GooeyBlob/></div>
-            <img className='h-10' src="/circle-design.png" alt="circle" />
+        <ServiceReelContext.Provider value={reel}>
+          <div className='flex w-full flex-1 flex-col justify-center gap-8 py-8 sm:py-10 md:py-0 lg:gap-10'>
+            <div className='transforming-heading relative w-full'>
+              <div className='flex items-center justify-end gap-5 font-[Gilroy] text-5xl font-bold'>
+                <h1 className='uppercase'>Transforming</h1>
+                <div>
+                  <GooeyBlob />
+                </div>
+                <img className='h-10' src="/circle-design.png" alt="" />
+              </div>
+              <div className='mt-3 flex justify-end font-[gilroy] text-4xl font-bold uppercase'>
+                <h2>ideas into visually <br /> stunning realities.</h2>
+              </div>
+            </div>
+
+            <div className='flex w-full items-stretch  justify-end gap-4'>
+              <div
+                ref={reelRef}
+                role='region'
+                aria-label='Our services'
+                tabIndex={reelActive ? 0 : undefined}
+                style={
+                  reelActive
+                    ? { WebkitMaskImage: REEL_MASK, maskImage: REEL_MASK }
+                    : undefined
+                }
+                className='service-reel relative z-10 w-full  min-w-0 rounded-[1.75rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5a3dbd]/40 md:h-[clamp(15rem,34vh,19rem)] md:overflow-x-hidden md:overflow-y-auto md:border md:border-[#231746]/[0.07] md:bg-white/70 md:p-2 lg:h-[90vh]'
+              >
+                <div ref={trackRef} className='relative flex  flex-col gap-4 md:gap-2.5 lg:gap-3'>
+                  {services.map((service, idx) => (
+                    <ReelItem
+                      key={service.slug}
+                      progress={reelProgress}
+                      spot={layout.spots[idx]}
+                      animate={reelActive}
+                    >
+                      <ServiceCard service={service} index={idx} />
+                    </ReelItem>
+                  ))}
+                </div>
+              </div>
+              {reelActive && (
+                <ReelIndicator
+                  progress={reelProgress}
+                  activeIndex={activeIndex}
+                  total={services.length}
+                />
+              )}
+            </div>
           </div>
-          <div className='font-bold font-[gilroy] uppercase text-4xl flex justify-end'>
-            <h2>ideas into visually <br /> stunning realities.</h2>
-          </div>
-        </div>
-        {/* Service Cards Scroll */}
-        <div className="services-sections flex w-full flex-col gap-5 scroll-smooth sm:mt-40 md:h-[90vh] md:gap-2 md:overflow-y-auto md:rounded-[1.75rem] md:bg-zinc-100/50 md:p-2 md:ring-1 md:ring-zinc-200/60">
-          {services.map((service, idx) => (
-            <motion.div
-              key={service.slug}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1, duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <ServiceCard service={service} index={idx} />
-            </motion.div>
-          ))}
-          <div className="pointer-events-none sticky bottom-0 -mx-2 hidden justify-center bg-gradient-to-t from-zinc-100 via-zinc-100/90 to-transparent pb-1 pt-5 md:flex">
-            <span className="rounded-full border border-zinc-300 bg-white px-3 py-1 font-[gilroy] text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-zinc-500">
-              Scroll
-            </span>
-          </div>
-        </div>
+        </ServiceReelContext.Provider>
       </motion.div>
     </motion.div>
   );
