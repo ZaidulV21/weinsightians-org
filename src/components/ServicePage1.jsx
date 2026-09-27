@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useEffect, useMemo, useState } from 'react';
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import OurServices2 from './OurServices2.jsx';
 import Footer from './Footer.jsx';
@@ -15,50 +15,199 @@ const HERO_GRID = {
 const HERO_NOISE =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E\")";
 
-const HERO_NODES = [
-  { id: 'design', label: 'Design', glyph: 'crosshair', spot: 'left-0 top-[9%]', point: '17,20', lift: 8, duration: 7.5, delay: 0.1, tilt: 'rotate-3' },
-  { id: 'development', label: 'Development', glyph: 'code', spot: 'right-0 top-[5%]', point: '83,16', lift: 10, duration: 8.5, delay: 0.9, tilt: '-rotate-3' },
-  { id: 'branding', label: 'Branding', glyph: 'diamond', spot: 'right-[2%] top-[43%]', point: '89,52', lift: 7, duration: 7, delay: 0.4, tilt: 'rotate-2' },
-  { id: 'growth', label: 'Growth', glyph: 'trend', spot: 'right-[7%] bottom-[5%]', point: '77,87', lift: 9, duration: 9, delay: 1.3, tilt: '-rotate-2' },
-  { id: 'ai', label: 'AI', glyph: 'chip', spot: 'left-[2%] bottom-[9%]', point: '20,82', lift: 8, duration: 8, delay: 0.6, tilt: 'rotate-3' },
+/* ------------------------------------------------------------------ *
+ * WI SERVICE CORE — the right-side visual.
+ * The Home hero is the full company ecosystem; this is the focused
+ * capability system: one INSIGHT core, six SERVICES, two quiet orbits.
+ * Same palette, glyphs and easing as the Home hero, far less of it.
+ * ------------------------------------------------------------------ */
+
+const CORE_POINT = { x: 50, y: 50 };
+
+/* Six representative capabilities on one clean hexagon. The complete
+ * service list stays in services.js and OurServices2 — this hero only
+ * shows what still reads in a second. */
+const CORE_NODES = [
+  { id: 'web-design', label: 'Web Design', glyph: 'window', angle: 270, lift: 5, duration: 9.4, delay: 0.2 },
+  { id: 'web-development', label: 'Web Dev', glyph: 'code', angle: 330, lift: 6, duration: 10.6, delay: 0.85 },
+  { id: 'ai', label: 'AI Solutions', glyph: 'network', angle: 30, lift: 5, duration: 11.4, delay: 1.5 },
+  { id: 'seo', label: 'SEO & Marketing', glyph: 'search', angle: 90, lift: 6, duration: 10.2, delay: 0.55 },
+  { id: 'ecommerce', label: 'E-commerce', glyph: 'bag', angle: 150, lift: 5, duration: 9.8, delay: 1.15 },
+  { id: 'ui-ux', label: 'UI/UX', glyph: 'layers', angle: 210, lift: 5, duration: 9, delay: 0.35 },
 ];
+
+/* Below sm the ring tightens, so a phone gets a compact capability stack
+ * rather than a shrunken diagram. */
+const CORE_SCALE = {
+  compact: {
+    radius: 31,
+    inner: 21,
+    tile: 'h-9 w-9 rounded-[0.95rem]',
+    icon: 'h-[15px] w-[15px]',
+    label: 'text-[7px] tracking-[0.14em]',
+    core: 'h-[34%] w-[34%]',
+  },
+  regular: {
+    radius: 35,
+    inner: 22.5,
+    tile: 'h-10 w-10 rounded-[1.05rem]',
+    icon: 'h-[17px] w-[17px]',
+    label: 'text-[8px] tracking-[0.15em]',
+    core: 'h-[38%] w-[38%]',
+  },
+};
+
+/* Three translucent plates read as one layered glass pedestal under the core.
+ * Kept tight so they frame the orb rather than becoming a slab. */
+const CORE_PLATES = [
+  { depth: 0, tilt: 57, spin: -14, shift: 9 },
+  { depth: 18, tilt: 55, spin: -7, shift: 0 },
+  { depth: 36, tilt: 53, spin: 0, shift: -9 },
+];
+
+/* Two slow signals, not a swarm. */
+const CORE_FLOWS = [
+  { from: 'web-development', color: '#67e8f9', duration: 14 },
+  { from: 'seo', color: '#a380ed', duration: 19 },
+];
+
+const CORE_GLOW =
+  'radial-gradient(closest-side, rgba(163,128,237,0.30), rgba(79,139,255,0.14) 54%, rgba(103,232,249,0) 76%)';
+
+const CORE_ORB =
+  'radial-gradient(circle at 33% 27%, #ffffff 0%, #f1eafd 17%, #cdb8f6 43%, #a380ed 66%, #6d4fd6 85%, #4f8bff 100%)';
+
+const WIDE_QUERY = '(min-width: 640px)';
+
+const polarPoint = (radius, angle) => {
+  const rad = (angle * Math.PI) / 180;
+  return { x: CORE_POINT.x + radius * Math.cos(rad), y: CORE_POINT.y + radius * Math.sin(rad) };
+};
+
+const cubicAt = (t, a, b, c, d) => {
+  const u = 1 - t;
+  return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * d;
+};
+
+const LINK_SAMPLES = 24;
+
+/* A gentle curve from a node into the core — present, never loud. */
+const createCoreLink = (point, bow = 0.16) => {
+  const dx = CORE_POINT.x - point.x;
+  const dy = CORE_POINT.y - point.y;
+  const length = Math.hypot(dx, dy) || 1;
+  const bend = length * bow;
+  const ox = (-dy / length) * bend;
+  const oy = (dx / length) * bend;
+  const c1 = { x: point.x + dx * 0.4 + ox, y: point.y + dy * 0.4 + oy };
+  const c2 = { x: point.x + dx * 0.82 + ox * 0.28, y: point.y + dy * 0.82 + oy * 0.28 };
+
+  const xs = [];
+  const ys = [];
+  for (let step = 0; step <= LINK_SAMPLES; step += 1) {
+    const t = step / LINK_SAMPLES;
+    xs.push(cubicAt(t, point.x, c1.x, c2.x, CORE_POINT.x));
+    ys.push(cubicAt(t, point.y, c1.y, c2.y, CORE_POINT.y));
+  }
+
+  return {
+    d: `M${point.x.toFixed(2)} ${point.y.toFixed(2)} C ${c1.x.toFixed(2)} ${c1.y.toFixed(2)}, ${c2.x.toFixed(2)} ${c2.y.toFixed(2)}, ${CORE_POINT.x} ${CORE_POINT.y}`,
+    track: { xs, ys },
+  };
+};
+
+const buildCoreLayout = (scale) =>
+  CORE_NODES.map((node, index) => {
+    const point = polarPoint(scale.radius, node.angle);
+    return { ...node, index, point, ...createCoreLink(point) };
+  });
+
+const indexById = (layout) =>
+  layout.reduce((accumulator, node) => {
+    accumulator[node.id] = node;
+    return accumulator;
+  }, {});
 
 const floatLoop = (lift, duration, delay) => ({
   y: [0, -lift, 0],
   transition: { duration, delay, repeat: Infinity, ease: 'easeInOut' },
 });
 
-const HeroGlyph = ({ name, className = '' }) => {
+const useWideCore = () => {
+  const [wide, setWide] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(WIDE_QUERY).matches,
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia(WIDE_QUERY);
+    const sync = (event) => setWide(event.matches);
+    query.addEventListener('change', sync);
+    setWide(query.matches);
+    return () => query.removeEventListener('change', sync);
+  }, []);
+
+  return wide;
+};
+
+/* Same 24-unit glyph language as the Home hero, so the two cores read as one
+ * brand system. */
+const CoreGlyph = ({ name, className = '', strokeWidth = 1.15 }) => {
   const shared = {
-    className: `h-4 w-4 ${className}`,
-    viewBox: '0 0 12 12',
+    className,
+    viewBox: '0 0 24 24',
     fill: 'none',
     stroke: 'currentColor',
-    strokeWidth: 1.1,
+    strokeWidth,
     strokeLinecap: 'round',
     strokeLinejoin: 'round',
     'aria-hidden': 'true',
   };
 
   const shapes = {
-    crosshair: (
+    window: (
       <>
-        <circle cx="6" cy="6" r="3.5" />
-        <path d="M6 1.4v1.9M6 8.7v1.9M1.4 6h1.9M8.7 6h1.9" />
+        <rect x="3" y="4.5" width="18" height="15" rx="2.6" />
+        <path d="M3 9.2h18" />
+        <path d="M5.7 6.85h.01M8.1 6.85h.01M10.5 6.85h.01" strokeWidth="1.6" />
+        <path d="M13.1 11.7 12.1 16.5l1.6-.9 1.3 2 .95-.62-1.3-2 2.35-.28z" />
       </>
     ),
-    code: <path d="M4.6 3.4 2.2 6l2.4 2.6M7.4 3.4 9.8 6l-2.4 2.6" />,
-    diamond: <path d="M6 1.6 10.4 6 6 10.4 1.6 6Z" />,
-    trend: (
+    code: (
       <>
-        <path d="M2.2 9.4 5.2 6.2l2.1 2.1L9.8 4" />
-        <path d="M7.3 4h2.5v2.5" />
+        <path d="M8.6 8.2 4.9 12l3.7 3.8" />
+        <path d="M15.4 8.2 19.1 12l-3.7 3.8" />
+        <path d="M13.4 6.4 10.6 17.6" />
       </>
     ),
-    chip: (
+    bag: (
       <>
-        <rect x="3.1" y="3.1" width="5.8" height="5.8" rx="1.2" />
-        <path d="M5 1.5v1.6M7 1.5v1.6M5 8.9v1.6M7 8.9v1.6M1.5 5h1.6M1.5 7h1.6M8.9 5h1.6M8.9 7h1.6" />
+        <path d="M4.9 8.4h14.2l-1 10.3a2 2 0 0 1-2 1.8H7.9a2 2 0 0 1-2-1.8z" />
+        <path d="M9 8.4V7a3 3 0 0 1 6 0v1.4" />
+      </>
+    ),
+    layers: (
+      <>
+        <rect x="3.2" y="3.2" width="12.6" height="4.4" rx="1.6" />
+        <rect x="3.2" y="9.2" width="12.6" height="4.4" rx="1.6" />
+        <path d="M15.4 13.4 14.5 19.4l1.9-1.1 1.15 2.1.95-.52-1.15-2.1 2.25-.3z" />
+      </>
+    ),
+    search: (
+      <>
+        <circle cx="10.3" cy="10.3" r="6.5" />
+        <path d="M15.1 15.1 20.4 20.4" />
+        <path d="M7.3 12.4 9.5 9.8l1.9 1.8 2.6-3.4" />
+        <path d="M11.6 8.2h2.4v2.4" />
+      </>
+    ),
+    network: (
+      <>
+        <circle cx="5.4" cy="6.2" r="1.9" />
+        <circle cx="5.4" cy="17.8" r="1.9" />
+        <circle cx="18.6" cy="6.2" r="1.9" />
+        <circle cx="18.6" cy="17.8" r="1.9" />
+        <circle cx="12" cy="12" r="1.9" />
+        <path d="M7.05 7.5 10.4 10.55M16.95 7.5 13.6 10.55M7.05 16.5l3.35-3.35M16.95 16.5 13.6 13.15" />
       </>
     ),
   };
@@ -68,85 +217,304 @@ const HeroGlyph = ({ name, className = '' }) => {
 
 const HeroCenterpiece = ({ shouldReduceMotion }) => {
   const still = shouldReduceMotion;
+  const wide = useWideCore();
+  const scale = wide ? CORE_SCALE.regular : CORE_SCALE.compact;
+
+  const layout = useMemo(() => buildCoreLayout(scale), [wide]);
+  const byId = useMemo(() => indexById(layout), [layout]);
+
+  const [hoverId, setHoverId] = useState(null);
+  const [activeId, setActiveId] = useState(null);
+  const litId = activeId || hoverId;
+
+  /* Pointer response is deliberately small: a lean, not a drag. */
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const smoothX = useSpring(pointerX, { stiffness: 70, damping: 24, mass: 0.5 });
+  const smoothY = useSpring(pointerY, { stiffness: 70, damping: 24, mass: 0.5 });
+
+  const coreTilt = {
+    rotateX: useTransform(smoothY, [-1, 1], [3.4, -3.4]),
+    rotateY: useTransform(smoothX, [-1, 1], [-3.4, 3.4]),
+  };
+  const plateTilt = { rotateZ: useTransform(smoothX, [-1, 1], [-2.2, 2.2]) };
+  const orbitTilt = { rotate: useTransform(smoothX, [-1, 1], [-1.8, 1.8]) };
+  const linkDrift = {
+    x: useTransform(smoothX, [-1, 1], [-1.6, 1.6]),
+    y: useTransform(smoothY, [-1, 1], [-1.2, 1.2]),
+  };
+  const glowX = useTransform(smoothX, [-1, 1], [-9, 9]);
+  const glowY = useTransform(smoothY, [-1, 1], [-7, 7]);
+
+  /* Six fixed hooks, so the parallax depth can differ per node. */
+  const nodeParallax = layout.map((node) => {
+    const reach = 2 + (node.index % 3) * 1.4;
+    return {
+      x: useTransform(smoothX, [-1, 1], [reach, -reach]),
+      y: useTransform(smoothY, [-1, 1], [reach * 0.7, -reach * 0.7]),
+    };
+  });
+
+  const trackPointer = (event) => {
+    if (still || event.pointerType !== 'mouse') return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    pointerX.set(((event.clientX - rect.left) / rect.width) * 2 - 1);
+    pointerY.set(((event.clientY - rect.top) / rect.height) * 2 - 1);
+  };
+
+  const settlePointer = () => {
+    pointerX.set(0);
+    pointerY.set(0);
+  };
+
+  const coreBreath = still
+    ? { scale: litId ? 1.05 : 1, transition: { duration: 0.5, ease: 'easeOut' } }
+    : {
+        scale: litId ? [1, 1.05, 1] : [0.99, 1.012, 0.99],
+        y: [0, -3, 0],
+        transition: {
+          scale: { duration: litId ? 7 : 13, repeat: Infinity, ease: 'easeInOut' },
+          y: { duration: 8.5, repeat: Infinity, ease: 'easeInOut' },
+        },
+      };
+
+  const glowBreath = still
+    ? { opacity: litId ? 1 : 0.8, transition: { duration: 0.5 } }
+    : {
+        opacity: litId ? [0.9, 1, 0.9] : [0.7, 0.95, 0.7],
+        transition: { duration: 12, repeat: Infinity, ease: 'easeInOut' },
+      };
 
   return (
-    <div className="relative mx-auto aspect-square w-full max-w-[21rem] sm:max-w-[26rem] lg:max-w-[32rem]">
-      <div aria-hidden="true" className="absolute inset-[7%] rounded-full border border-dashed border-[#a380ed]/25" />
-      <div aria-hidden="true" className="absolute inset-[22%] rounded-full border border-[#4f8bff]/20" />
-
-      <motion.div
+    <div
+      className="relative mx-auto aspect-square w-full max-w-[21rem] sm:max-w-[26rem] lg:max-w-[32rem]"
+      onPointerMove={trackPointer}
+      onPointerLeave={settlePointer}
+      onClick={() => setActiveId(null)}
+    >
+      <div
         aria-hidden="true"
-        className="absolute inset-[7%] rounded-full border border-dashed border-[#7c5cdd]/35"
-        animate={still ? {} : { rotate: 360, transition: { duration: 90, repeat: Infinity, ease: 'linear' } }}
+        className="absolute inset-x-[15%] bottom-[7%] h-8 rounded-[50%] bg-[radial-gradient(closest-side,rgba(35,23,70,0.18),transparent)] blur-lg"
       />
 
-      <svg aria-hidden="true" className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" fill="none">
-        {HERO_NODES.map((node) => (
-          <path
-            key={node.id}
-            d={`M50 50 L${node.point.split(',')[0]} ${node.point.split(',')[1]}`}
-            stroke="rgba(90, 61, 189, 0.26)"
-            strokeWidth="0.35"
-            strokeDasharray="1.4 2.4"
-            strokeLinecap="round"
-          />
-        ))}
-      </svg>
-
-      <motion.div
-        className="absolute left-1/2 top-1/2 w-28 -translate-x-1/2 -translate-y-1/2 sm:w-36"
-        animate={still ? {} : floatLoop(7, 7.5, 0.2)}
+      {/* One quiet outer orbit, one inner one. Nothing else competing. */}
+      <motion.svg
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-10 h-full w-full"
+        viewBox="0 0 100 100"
+        fill="none"
+        style={{ ...orbitTilt, transformOrigin: '50% 50%' }}
       >
-        <div className="relative aspect-square rounded-[1.6rem] border border-white/70 bg-gradient-to-br from-[#a380ed]/45 via-[#7c5cdd]/25 to-[#4f8bff]/40 shadow-[0_34px_70px_-28px_rgba(35,23,70,0.55)] backdrop-blur-md sm:rounded-[1.9rem]">
-          <div aria-hidden="true" className="absolute inset-0 grid grid-cols-3 place-items-center rounded-[inherit] p-5">
-            {Array.from({ length: 9 }).map((_, index) => (
-              <span
-                key={index}
-                className={`h-1.5 w-1.5 rounded-full ${index === 4 ? 'bg-[#67e8f9]' : 'bg-white/70'}`}
-              />
-            ))}
-          </div>
-        </div>
-      </motion.div>
+        <motion.circle
+          cx="50"
+          cy="50"
+          r={scale.radius}
+          stroke="rgba(90,61,189,0.24)"
+          strokeWidth="0.25"
+          strokeDasharray="1.6 3.4"
+          strokeLinecap="round"
+          style={{ transformBox: 'view-box', originX: '50px', originY: '50px' }}
+          animate={still ? {} : { rotate: 360, transition: { duration: 150, repeat: Infinity, ease: 'linear' } }}
+        />
+        <motion.circle
+          cx="50"
+          cy="50"
+          r={scale.inner}
+          stroke="rgba(79,139,255,0.18)"
+          strokeWidth="0.22"
+          style={{ transformBox: 'view-box', originX: '50px', originY: '50px' }}
+          animate={still ? {} : { rotate: -360, transition: { duration: 110, repeat: Infinity, ease: 'linear' } }}
+        />
+        <circle cx="50" cy={50 - scale.inner} r="0.5" fill="rgba(103,232,249,0.7)" />
+        <circle cx={50 + scale.inner} cy="50" r="0.5" fill="rgba(163,128,237,0.6)" />
+      </motion.svg>
 
-      {HERO_NODES.map((node) => (
+      {/* Layered translucent plates: depth without weight. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-[36%] w-[36%] -translate-x-1/2 -translate-y-1/2"
+        style={{ perspective: '560px' }}
+      >
         <motion.div
-          key={node.id}
-          className={`absolute ${node.spot} flex flex-col items-center gap-2`}
-          animate={still ? {} : floatLoop(node.lift, node.duration, node.delay)}
+          className="relative h-full w-full"
+          style={{ ...plateTilt, transformStyle: 'preserve-3d' }}
+          animate={still ? {} : floatLoop(4, 11, 0.3)}
         >
-          <span
-            className={`grid h-12 w-12 place-items-center rounded-2xl border border-white/80 bg-white/75 text-[#5a3dbd] shadow-[0_16px_40px_-16px_rgba(35,23,70,0.45)] backdrop-blur-md sm:h-14 sm:w-14 ${node.tilt}`}
-          >
-            <HeroGlyph name={node.glyph} />
-          </span>
-          <span className="font-[gilroy] text-[9px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-            {node.label}
-          </span>
+          {CORE_PLATES.map((plate) => (
+            <div
+              key={plate.depth}
+              className="absolute left-1/2 top-1/2 h-full w-full rounded-[1.6rem] border border-white/75 bg-[linear-gradient(150deg,rgba(255,255,255,0.86),rgba(255,255,255,0.3))] shadow-[0_24px_46px_-26px_rgba(35,23,70,0.5)] backdrop-blur-[2px]"
+              style={{
+                transform: `translate(-50%, -50%) rotateX(${plate.tilt}deg) rotateZ(${plate.spin}deg) translateY(${plate.shift}px) translateZ(${plate.depth}px)`,
+              }}
+            />
+          ))}
         </motion.div>
-      ))}
+      </div>
 
-      <motion.div
+      {/* Services into insight. Thin, dashed, barely moving. */}
+      <motion.svg
         aria-hidden="true"
-        className="absolute right-[16%] top-[30%] hidden rounded-lg border border-black/5 bg-white/70 px-2 py-1.5 shadow-[0_10px_30px_-14px_rgba(35,23,70,0.4)] backdrop-blur-md sm:block"
-        animate={still ? {} : floatLoop(11, 9.5, 0.5)}
+        className="pointer-events-none absolute inset-0 z-30 h-full w-full"
+        viewBox="0 0 100 100"
+        fill="none"
+        style={linkDrift}
       >
-        <span className="flex items-center gap-1">
-          <i className="h-1.5 w-1.5 rounded-full bg-[#a380ed]" />
-          <i className="h-1.5 w-1.5 rounded-full bg-[#4f8bff]" />
-          <i className="h-1.5 w-1.5 rounded-full bg-zinc-300" />
-        </span>
-      </motion.div>
+        <defs>
+          <linearGradient id="service-core-link" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#a380ed" />
+            <stop offset="0.55" stopColor="#5a3dbd" />
+            <stop offset="1" stopColor="#67e8f9" />
+          </linearGradient>
+        </defs>
 
-      <motion.div
-        aria-hidden="true"
-        className="absolute bottom-[18%] left-[8%] hidden h-12 w-16 items-end gap-1.5 rounded-xl border border-black/5 bg-white/70 px-2.5 py-2 shadow-[0_10px_30px_-14px_rgba(35,23,70,0.4)] backdrop-blur-md sm:flex"
-        animate={still ? {} : floatLoop(9, 10.5, 1.6)}
+        {layout.map((node, index) => {
+          const isLit = litId === node.id;
+          return (
+            <motion.path
+              key={node.id}
+              d={node.d}
+              stroke={isLit ? 'url(#service-core-link)' : 'rgba(90,61,189,0.24)'}
+              strokeWidth={isLit ? 0.6 : 0.3}
+              strokeDasharray={isLit ? '1.6 1.7' : '0.9 2.6'}
+              strokeLinecap="round"
+              initial={still ? false : { opacity: 0 }}
+              animate={{ opacity: litId && !isLit ? 0.45 : 1 }}
+              transition={{
+                duration: 0.7,
+                delay: still ? 0 : (litId ? 0 : 0.3 + index * 0.09),
+                ease: 'easeOut',
+              }}
+            />
+          );
+        })}
+
+        {CORE_FLOWS.map((flow) => {
+          const track = byId[flow.from].track;
+          return (
+            <motion.g
+              key={flow.from}
+              animate={still ? { x: track.xs[0], y: track.ys[0] } : { x: track.xs, y: track.ys }}
+              transition={still ? {} : { duration: flow.duration, repeat: Infinity, ease: 'linear' }}
+            >
+              <circle r="0.55" fill={flow.color} />
+            </motion.g>
+          );
+        })}
+      </motion.svg>
+
+      {/* The insight core: a small orb with a quiet WI mark. */}
+      <div
+        className={`absolute left-1/2 top-1/2 z-40 ${scale.core} -translate-x-1/2 -translate-y-1/2`}
       >
-        <i className="h-3 w-1.5 rounded-sm bg-[#a380ed]/70" />
-        <i className="h-6 w-1.5 rounded-sm bg-[#4f8bff]/70" />
-        <i className="h-4 w-1.5 rounded-sm bg-[#67e8f9]/70" />
-      </motion.div>
+        <motion.div className="relative h-full w-full" style={{ ...coreTilt, perspective: '760px' }}>
+          <motion.span
+            aria-hidden="true"
+            className="absolute -inset-8 rounded-full"
+            style={{ background: CORE_GLOW, x: glowX, y: glowY }}
+            animate={glowBreath}
+          />
+
+          <motion.div
+            className="absolute inset-0"
+            initial={still ? false : { opacity: 0, scale: 0.84 }}
+            animate={coreBreath}
+          >
+            <div className="absolute left-1/2 top-1/2 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2">
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: CORE_ORB,
+                  boxShadow:
+                    'inset 0 0 22px rgba(255,255,255,0.72), inset -6px -8px 20px rgba(79,92,190,0.26), 0 22px 40px -18px rgba(35,23,70,0.55)',
+                }}
+              />
+              <span aria-hidden="true" className="absolute inset-0 rounded-full border border-white/70" />
+              <span
+                aria-hidden="true"
+                className="absolute left-[21%] top-[15%] h-5 w-5 rounded-full bg-white/85 blur-[2px]"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute bottom-[22%] right-[15%] h-3 w-3 rounded-full bg-white/40 blur-[2px]"
+              />
+
+              <svg aria-hidden="true" className="absolute inset-0 h-full w-full" viewBox="0 0 24 24" fill="none">
+                <g
+                  stroke="#ffffff"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity="0.72"
+                >
+                  <path d="M4 8.6 6.4 15.6 8.7 10.3 11 15.6 13.4 8.6" />
+                  <path d="M17.4 8.6v7M15.9 8.6h3M15.9 15.6h3" />
+                </g>
+              </svg>
+            </div>
+
+            {/* the one bright point that says "insight" */}
+            <span
+              aria-hidden="true"
+              className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 translate-x-[3px] rounded-full bg-[#67e8f9] shadow-[0_0_12px_3px_rgba(103,232,249,0.5)]"
+            />
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* The services themselves. Hover or tap lights one up. */}
+      {layout.map((node, index) => {
+        const isLit = litId === node.id;
+        const dimmed = Boolean(litId) && !isLit;
+
+        return (
+          <div
+            key={node.id}
+            className="absolute z-50 flex flex-col items-center"
+            style={{ left: `${node.point.x}%`, top: `${node.point.y}%`, transform: 'translate(-50%, -50%)' }}
+            onPointerEnter={() => setHoverId(node.id)}
+            onPointerLeave={() => setHoverId(null)}
+            onFocus={() => setHoverId(node.id)}
+            onBlur={() => setHoverId(null)}
+          >
+            <motion.div
+              className="flex flex-col items-center"
+              style={nodeParallax[index]}
+              animate={still ? {} : floatLoop(node.lift, node.duration, node.delay)}
+            >
+              <motion.button
+                type="button"
+                aria-label={node.label}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setActiveId((current) => (current === node.id ? null : node.id));
+                }}
+                className={`grid ${scale.tile} place-items-center border bg-[linear-gradient(150deg,rgba(255,255,255,0.97),rgba(255,255,255,0.62))] backdrop-blur-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#a380ed]/70 shadow-[0_14px_30px_-18px_rgba(35,23,70,0.5)] ${
+                  isLit
+                    ? 'border-[#a380ed]/70 text-[#4a2fa8] ring-2 ring-[#a380ed]/30'
+                    : 'border-white/85 text-[#5a3dbd]'
+                }`}
+                initial={still ? false : { opacity: 0, scale: 0.7 }}
+                animate={{ opacity: dimmed ? 0.55 : 1, scale: isLit ? 1.09 : 1 }}
+                whileTap={still ? undefined : { scale: 0.95 }}
+                transition={{ duration: 0.45, delay: still ? 0 : 0.2 + index * 0.08, ease: 'easeOut' }}
+              >
+                <CoreGlyph name={node.glyph} className={scale.icon} strokeWidth={isLit ? 1.45 : 1.15} />
+              </motion.button>
+
+              <span
+                className={`mt-1.5 whitespace-nowrap font-[gilroy] font-semibold uppercase transition-colors duration-300 ${scale.label} ${
+                  isLit ? 'text-[#4a2fa8]' : 'text-zinc-600'
+                }`}
+              >
+                {node.label}
+              </span>
+            </motion.div>
+          </div>
+        );
+      })}
     </div>
   );
 };

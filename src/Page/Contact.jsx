@@ -28,8 +28,7 @@ const Contact = () => {
   transition={{ duration: 0.6 }}
   viewport={{ once: true }}
 >
-      <div className=' get-in-touch relative mt-2 md:mt-4 h-[45vh] md:h-[45vh] rounded-3xl overflow-hidden'>
-      {/* <video className='h-full w-full object-cover brightness-[50%]' src="/video/moon.mp4" autoPlay loop muted></video> */}
+      <div className=' get-in-touch relative mt-2 md:mt-4 h-[45vh] md:h-[30vh] rounded-3xl overflow-hidden'>
         <div className=' absolute bottom-0 left-0 p-4'>
           <h1 className='text-4xl md:text-6xl uppercase font-[Gilroy] font-bold mb-4 text-gray-800'>Get in Touch</h1>
           <hr className='border- border-[#adadad] my-4' />

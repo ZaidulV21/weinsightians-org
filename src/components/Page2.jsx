@@ -225,7 +225,7 @@ const Page2 = () => {
         >
         <ServiceReelContext.Provider value={reel}>
           <div className='flex w-full flex-1 flex-col justify-center gap-8 py-8 sm:py-10 md:py-0 lg:gap-10'>
-            <div className='transforming-heading relative w-full'>
+            <div className='transforming-heading relative w-full  lg:my-10'>
               <div className='flex items-center justify-end gap-5 font-[Gilroy] text-5xl font-bold'>
                 <h1 className='uppercase'>Transforming</h1>
                 <div>
@@ -238,7 +238,7 @@ const Page2 = () => {
               </div>
             </div>
 
-            <div className='flex w-full items-stretch  justify-end gap-4'>
+            <div className='flex w-full items-stretch lg:pt-12  justify-end gap-4'>
               <div
                 ref={reelRef}
                 role='region'
