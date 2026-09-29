@@ -24,7 +24,7 @@ const Footer = () => {
                 <div className='w-full md:w-1/2 flex flex-col md:flex-row justify-between'>
                     {/** Column 1 */}
                     <motion.div className='w-full mt-5 md:mt-0 md:w-1/3 font-[gilroy]' whileHover={{ y: -2 }}>
-                        <h3 className='font-semibold text-2xl'>Home</h3>
+                        <h2 className='font-semibold text-2xl'>Home</h2>
                         <ul className='text-base mt-3'>
                             <li className='hover:pl-4 transition-all duration-300'><NavLink to="/about">About Us</NavLink></li>
                             <li className='hover:pl-4 transition-all duration-300'><NavLink to="/">Our Work</NavLink></li>
@@ -35,10 +35,10 @@ const Footer = () => {
 
                     {/** Column 2 */}
                     <motion.div className='w-full mt-5 md:mt-0 md:w-1/3 font-[gilroy]' whileHover={{ y: -2 }}>
-                        <h3 className='font-semibold text-2xl'>Features</h3>
+                        <h2 className='font-semibold text-2xl'>Features</h2>
                         <ul className='text-base mt-3'>
                             <li className='hover:pl-4 transition-all duration-300'><NavLink to="/">Get Started</NavLink></li>
-                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/blog">Blog</NavLink></li>
+                            <li className='hover:pl-4 transition-all duration-300'><NavLink to="/blogs">Blog</NavLink></li>
                             <li className='hover:pl-4 transition-all duration-300'><NavLink to="/privacy">Privacy Policy</NavLink></li>
                             <li className='hover:pl-4 transition-all duration-300'><NavLink to="/sitemap">Sitemap</NavLink></li>
                         </ul>
@@ -46,7 +46,7 @@ const Footer = () => {
 
                     {/** Column 3 */}
                     <motion.div className='w-full mt-5 md:mt-0 md:w-1/3 font-[gilroy]' whileHover={{ y: -2 }}>
-                        <h3 className='font-semibold text-2xl'>Social Media</h3>
+                        <h2 className='font-semibold text-2xl'>Social Media</h2>
                         <ul className='text-base mt-3'>
                             <li className='hover:pl-4 transition-all duration-300'><a href="https://instagram.com/weinsightians" target="_blank" rel="noopener noreferrer">Instagram</a></li>
                             <li className='hover:pl-4 transition-all duration-300'><a href="https://www.facebook.com/profile.php?id=61552381883595" target="_blank" rel="noopener noreferrer">Facebook</a></li>
@@ -63,7 +63,7 @@ const Footer = () => {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 viewport={{ once: true }}
             >
-                <a href="#"><p className='text-sm text-gray-400'>© 2024 WeInsightians. All Rights Reserved.</p></a>
+                <p className='text-sm text-gray-400'>© 2024 WeInsightians. All Rights Reserved.</p>
             </motion.div>
         </motion.div>
     );

@@ -177,12 +177,14 @@ const Page3 = () => {
       >
         <div className="flex w-[75vw] relative items-center justify-between">
           <div className="font-[Gilroy] mt-5 w-full md:w-1/2">
-            <h1 className="text-2xl font-bold">See Our Work</h1>
-            <h2 className="text-5xl md:text-7xl mt-3">Awesome</h2>
-            <div className="flex gap-3 items-center">
-              <img className="h-10 md:h-12" src="/circle-design.png" alt="" />
-              <h1 className="text-5xl md:text-7xl">Projects</h1>
-            </div>
+            <p className="text-2xl font-bold">See Our Work</p>
+            <h2 className="text-5xl md:text-7xl mt-3">
+              Awesome
+              <span className="flex gap-3 items-center">
+                <img className="h-10 md:h-12" src="/circle-design.png" alt="" />
+                Projects
+              </span>
+            </h2>
           </div>
           <div>
             <GoeyCircle />

@@ -199,10 +199,10 @@ height: 45vh;
   .transforming-heading img{
     height: 8vw;
   }
-  .transforming-heading h1{
+  .transforming-heading h2{
     font-size: 9vw;
   }
-  .transforming-heading h2{
+  .transforming-heading p{
 font-size: 1.55rem;
   }
   .page-1 h1 {

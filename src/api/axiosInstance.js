@@ -5,6 +5,4 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-console.log("BASE URL:", import.meta.env.VITE_API_URL); // 👈 add this
-
 export default axiosInstance;

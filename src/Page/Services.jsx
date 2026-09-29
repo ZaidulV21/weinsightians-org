@@ -6,15 +6,22 @@ const Services = () => {
   return (
     <>
       <Helmet>
-        <title>Our Services - We Insightians | Web Development & Branding</title>
-        <meta name="description" content="Explore our expert services at We Insightians, including web development, UI/UX design, branding, and digital marketing strategies." />
-        <meta name="keywords" content="Web Development, Branding, UI/UX Design, Digital Marketing, We Insightians Services" />
+        <title>Web Design &amp; Development Services | We Insightians</title>
+        <meta
+          name="description"
+          content="Nine services from one team: web design, web development, e-commerce, UI/UX, branding, SEO, social media, AI and performance marketing. See what each one includes."
+        />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://weinsightian.tech/services" />
-        <meta property="og:title" content="Services - We Insightians | Digital Growth Solutions" />
-        <meta property="og:description" content="From website design to branding and marketing, our services help your business stand out in the digital world." />
+        <meta property="og:title" content="Web Design &amp; Development Services | We Insightians" />
+        <meta
+          property="og:description"
+          content="From first idea to lasting growth, our services cover the full digital journey — design, technology and marketing together."
+        />
         <meta property="og:url" content="https://weinsightian.tech/services" />
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="We Insightians" />
+        <meta name="twitter:card" content="summary_large_image" />
       </Helmet>
       <ServicePage1 />
     </>

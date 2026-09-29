@@ -10,15 +10,22 @@ import { motion } from 'framer-motion';
 const Contact = () => {
   return (
   <><Helmet>
-  <title>Contact Us - We Insightians | Let's Build Something Great</title>
-  <meta name="description" content="Get in touch with We Insightians for web development, branding, and UI/UX design solutions. Let's work together to grow your business!" />
-  <meta name="keywords" content="Contact We Insightians, Web Design Consultation, Digital Solutions, Business Inquiry" />
+  <title>Contact We Insightians | Let&rsquo;s Build Something Worth Experiencing</title>
+  <meta
+    name="description"
+    content="Tell We Insightians about your project. Email us, call +91 73099 75088, or visit us in Matiyari, Lucknow. We reply to every enquiry and we are happy to answer questions first."
+  />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://weinsightian.tech/contact" />
-  <meta property="og:title" content="Contact We Insightians - Let's Connect" />
-  <meta property="og:description" content="Reach out to us for top-tier digital solutions. We specialize in web design, branding, and creative business growth strategies." />
+  <meta property="og:title" content="Contact We Insightians | Let&rsquo;s Build Something Worth Experiencing" />
+  <meta
+    property="og:description"
+    content="Reach out to us for web design, development and branding. We are here to help with anything you need."
+  />
   <meta property="og:url" content="https://weinsightian.tech/contact" />
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="We Insightians" />
+  <meta name="twitter:card" content="summary_large_image" />
 </Helmet>
     <div className=' h-full w-full text-black px-5 md:px-16 p-5'>
       <Whatsapp />
@@ -51,32 +58,32 @@ const Contact = () => {
           <div className='ml-14 font-[gilroy]'>
             <div className='relative'>
               <img className='border-2 rounded-lg p-1 w-10 absolute right-[28vw]' src="/img/chat.png" alt="" />
-              <h1 className='mt-5 text-lg font-bold'>Email us</h1>
-              <h1 className=''>Our friendly team is here to help you</h1>
-              <h1 className='font-bold mt-3 hover:text-gray-700 transition-all duration-500'>
+              <h2 className='mt-5 text-lg font-bold'>Email us</h2>
+              <p className=''>Our friendly team is here to help you</p>
+              <p className='font-bold mt-3 hover:text-gray-700 transition-all duration-500'>
                 <a href="mailto:mailtoweinsightians@gmail.com">mailtoweinsightians@gmail.com</a>
-              </h1>
+              </p>
             </div>
             <div className='relative '>
               <img className='border-2 rounded-lg p-1 w-10 absolute right-[28vw]' src="/img/location.png" alt="" />
-              <h1 className='mt-5 text-lg font-bold'>Visit us</h1>
-              <h1 className=''>Come say hello to our office HQ.</h1>
-              <a href="https://maps.app.goo.gl/TdXPwrSrYNBB1oKs5"><h1 className='font-bold mt-3 hover:text-gray-700 transition-all duration-500'> Matiyari Lucknow</h1></a>
+              <h2 className='mt-5 text-lg font-bold'>Visit us</h2>
+              <p className=''>Come say hello to our office HQ.</p>
+              <a href="https://maps.app.goo.gl/TdXPwrSrYNBB1oKs5"><p className='font-bold mt-3 hover:text-gray-700 transition-all duration-500'> Matiyari Lucknow</p></a>
             </div>
             <div className='relative '>
               <img className='border-2 rounded-lg p-1 w-10 absolute right-[28vw]' src="/img/call.png" alt="" />
-              <h1 className='mt-5 text-lg font-bold'>Talk to us</h1>
-              <h1 className=''>Mon to Fri 8AM-9PM.</h1>
+              <h2 className='mt-5 text-lg font-bold'>Talk to us</h2>
+              <p className=''>Mon to Fri 8AM-9PM.</p>
               <a href="tel:+917309975088" className='font-bold mt-3 hover:text-gray-700 transition-all duration-500'>+91 73099 75088</a>
             </div>
           </div>
           {/* social Links  */}
           <div className='flex gap-2 ml-5 mb-5'>
-          <a href="https://wa.me/+918081657756"><img className='w-10' src="/img/whatsapp.png" alt="whatsapp" /></a>
-          <a href=""><img className='w-10' src="/img/facebook.png" alt="facebook" /></a>
-          <a href=""><img className='w-10' src="/img/twitter.png" alt="twitter" /></a>
-          <a href="https://www.instagram.com/weinsightians"><img className='w-10' src="/img/instagram.png" alt="instagram" /></a>
-          <a href="https://www.linkedin.com/company/we-insightians/"><img className='w-10' src="/img/linkedin.png" alt="link" /></a>
+          <a href="https://wa.me/+918081657756" aria-label="Chat with us on WhatsApp"><img className='w-10' src="/img/whatsapp.png" alt="" /></a>
+          <a href="https://www.facebook.com/profile.php?id=61552381883595" target="_blank" rel="noopener noreferrer" aria-label="We Insightians on Facebook"><img className='w-10' src="/img/facebook.png" alt="" /></a>
+          <a href="https://twitter.com/weinsightians" target="_blank" rel="noopener noreferrer" aria-label="We Insightians on X"><img className='w-10' src="/img/twitter.png" alt="" /></a>
+          <a href="https://www.instagram.com/weinsightians" target="_blank" rel="noopener noreferrer" aria-label="We Insightians on Instagram"><img className='w-10' src="/img/instagram.png" alt="" /></a>
+          <a href="https://www.linkedin.com/company/we-insightians/" target="_blank" rel="noopener noreferrer" aria-label="We Insightians on LinkedIn"><img className='w-10' src="/img/linkedin.png" alt="" /></a>
           </div>
         </div>
         {/* right form  */}

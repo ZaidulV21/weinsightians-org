@@ -34,18 +34,18 @@ const Page5 = () => {
       className='px-4 md:px-16'
     >
       <div className='text-5xl md:text-7xl uppercase font-[Gilroy]'>
-        <h1 className='text-2xl md:text-4xl'>Transform Your Vision into Reality with</h1>
-        <h1 className='flex flex-col md:flex-row gap-2'>Our Insights <img className='w-20 md:w-32' src='/circle-design.png' alt='' /> Your Success</h1>
+        <h2 className='text-2xl md:text-4xl'>Transform Your Vision into Reality with</h2>
+        <h2 className='flex flex-col md:flex-row gap-2'>Our Insights <img className='w-20 md:w-32' src='/circle-design.png' alt='' /> Your Success</h2>
       </div>
 
       <div className='flex flex-col md:flex-row justify-between mt-10 md:mt-28'>
-        <h1 className='w-full md:w-1/2 font-[Gilroy]'>"At We Insightians, we don’t just build websites—we craft digital experiences..."</h1>
+        <p className='w-full md:w-1/2 font-[Gilroy]'>"At We Insightians, we don’t just build websites—we craft digital experiences..."</p>
         <div className='flex mt-4 md:mt-0'>
-          <Button href='/contact' arrow>
+          <Button to='/contact' arrow>
             Contact Us
           </Button>
           <Button
-            href='/contact'
+            to='/contact'
             variant='secondary'
             size='icon'
             className='ml-4 hover:rotate-45'

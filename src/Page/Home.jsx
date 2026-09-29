@@ -9,19 +9,34 @@ import Footer from "../components/Footer"
 import Whatsapp from '../components/Whatsapp';
 import PricingPlans from '../components/PricingSection';
 
-const Home = () => {
+/* noindex is opt-in so the legacy /home duplicate can reuse this component
+ * without overriding its robots tag. Relying on <Helmet> nesting order is
+ * fragile: whichever <Helmet> mounts last wins, and Home's own tag is a child. */
+const Home = ({ noindex = false }) => {
   return (
     <div>
       <Helmet>
-        <title>We Insightians - Expert Web Development & Branding</title>
-        <meta name="description" content="We Insightians provides top-tier web development, UI/UX design, and digital solutions to grow your business." />
-        <meta name="keywords" content="We Insightians, Web Development, Branding, Digital Solutions, UI/UX Design" />
-        <meta name="robots" content="index, follow" />
+        <title>We Insightians | Web Design, Development &amp; Digital Solutions</title>
+        <meta
+          name="description"
+          content="We Insightians is a digital agency in Lucknow building websites, brands and digital products. Web design, development, UI/UX, SEO and marketing under one roof."
+        />
+        <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
         <link rel="canonical" href="https://weinsightian.tech/" />
-        <meta property="og:title" content="We Insightians - Bringing Your Vision to Life" />
-        <meta property="og:description" content="We Insightians is a leading digital agency specializing in branding, website design, and business growth strategies." />
+        <meta property="og:title" content="We Insightians | Web Design, Development &amp; Digital Solutions" />
+        <meta
+          property="og:description"
+          content="We design and build digital experiences that help ambitious businesses look better, perform better and grow."
+        />
         <meta property="og:url" content="https://weinsightian.tech/" />
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="We Insightians" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="We Insightians | Web Design, Development &amp; Digital Solutions" />
+        <meta
+          name="twitter:description"
+          content="We design and build digital experiences that help ambitious businesses look better, perform better and grow."
+        />
       </Helmet>
     <div className='overflow-hidden'>
       <Whatsapp/>

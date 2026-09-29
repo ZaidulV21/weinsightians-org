@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import axiosInstance from "../api/axiosInstance";
 import Footer from "../components/Footer";
+import NotFound from "./NotFound";
 import { FiArrowLeft } from "react-icons/fi";
 
 // ==========================================
@@ -15,32 +16,65 @@ const optimizeImage = (url, width = 1200) => {
   return url.replace("/upload/", `/upload/w_${width},f_auto,q_auto/`);
 };
 
+/* Blog bodies are authored in React-Quill, so a description can be missing or
+ * be an empty HTML fragment. Search engines skip a meta description that is
+ * blank or too long, so normalise it once and reuse it everywhere. */
+const toPlainText = (html) => (html || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+
+const truncate = (text, max = 158) => {
+  if (!text) return "";
+  if (text.length <= max) return text;
+  return `${text.slice(0, text.lastIndexOf(" ", max)).trim()}…`;
+};
+
 const SingleBlog = () => {
   const { slug } = useParams();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [relatedBlogs, setRelatedBlogs] = useState([]);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchBlog = async () => {
       try {
         const { data } = await axiosInstance.get(`/blogs/${slug}`);
+        if (cancelled) return;
         setBlog(data.blog);
-
-        // Fetch related blogs (all except current)
-        const allBlogs = await axiosInstance.get("/blogs");
-        const filtered = allBlogs.data.blogs
-          .filter((b) => b.slug !== slug)
-          .slice(0, 3);
-        setRelatedBlogs(filtered);
+        setNotFound(false);
       } catch (error) {
-        console.log(error);
+        if (cancelled) return;
+        // A 404 from the API means this slug does not exist. Render the real
+        // Not Found page instead of an empty article shell, so a dead URL
+        // can never look like a live, indexable post.
+        if (error?.response?.status === 404) {
+          setNotFound(true);
+        } else {
+          console.error("Failed to load blog:", error);
+        }
+        setBlog(null);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
+      }
+
+      // Related posts are an enhancement, not the article itself. A failure
+      // here must never discard an article that loaded fine, so it is fetched
+      // separately and simply left empty on error.
+      try {
+        const { data: all } = await axiosInstance.get("/blogs");
+        if (cancelled) return;
+        setRelatedBlogs((all.blogs || []).filter((b) => b.slug !== slug).slice(0, 3));
+      } catch (error) {
+        console.error("Failed to load related blogs:", error);
       }
     };
 
     fetchBlog();
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
   // Calculate read time — strip HTML tags first for accurate word count
@@ -52,12 +86,20 @@ const SingleBlog = () => {
   };
 
   // ==========================================
+  // NOT FOUND STATE
+  // A real 404 page, no redirect back to the blog list or the homepage.
+  // ==========================================
+  if (notFound) return <NotFound />;
+
+  // ==========================================
   // LOADING STATE
   // ==========================================
   if (loading)
     return (
       <>
-        <Helmet><title>Loading... | Weinsightians</title></Helmet>
+        <Helmet>
+          <meta name="robots" content="noindex, follow" />
+        </Helmet>
         <div className="max-w-4xl mx-auto px-6 py-12 animate-pulse space-y-6">
           <div className="h-6 bg-gray-200 rounded w-1/4" />
           <div className="w-full h-72 bg-gray-200 rounded-2xl" />
@@ -73,42 +115,66 @@ const SingleBlog = () => {
     );
 
   // ==========================================
-  // NOT FOUND STATE
+  // ERROR STATE
+  // The API is reachable but the post is missing (or the request failed for a
+  // reason other than 404). Noindex, and never a bare "Blog not found." line.
   // ==========================================
   if (!blog)
     return (
       <>
         <Helmet>
-          <title>Blog Not Found | Weinsightians</title>
-          <meta name="robots" content="noindex" />
+          <title>Article unavailable | We Insightians</title>
+          <meta name="description" content="This article could not be loaded right now. Browse all articles on the We Insightians blog instead." />
+          <meta name="robots" content="noindex, follow" />
+          <meta property="og:title" content="Article unavailable | We Insightians" />
+          <meta property="og:type" content="website" />
         </Helmet>
-        <div className="text-center py-20 text-xl font-semibold">
-          Blog not found.
+        <div className="h-full bg-[#ffffff] w-full text-black px-4 md:px-16 p-5">
+          <div className="max-w-4xl mx-auto py-20 text-center font-[gilroy]">
+            <h1 className="text-4xl md:text-5xl font-[Larken] font-bold">Article unavailable</h1>
+            <p className="mt-4 text-gray-600">
+              We could not load this article. It may have been moved or renamed.
+            </p>
+            <Link
+              to="/blogs"
+              className="mt-8 inline-block font-semibold text-indigo-600 hover:underline"
+            >
+              Back to all articles
+            </Link>
+          </div>
         </div>
+        <Footer />
       </>
     );
+
+  // The canonical must be the URL actually being served, so it is built from
+  // the route param rather than the slug stored on the document.
+  const canonical = `https://weinsightian.tech/blog/${slug}`;
+  const description = truncate(toPlainText(blog.description)) ||
+    truncate(toPlainText(blog.content)) ||
+    `${blog.title} — an article from the We Insightians team.`;
 
   return (
     <>
       {/* SEO META TAGS */}
       <Helmet>
-        <title>{blog.title} | Weinsightians</title>
-        <meta name="description" content={blog.description?.replace(/<[^>]*>/g, "")} />
+        <title>{blog.title} | We Insightians</title>
+        <meta name="description" content={description} />
         <meta name="robots" content="index, follow" />
-        <meta name="author" content={blog.author} />
-        <link rel="canonical" href={`https://weinsightian.tech/blog/${blog.slug}`} />
+        {blog.author ? <meta name="author" content={blog.author} /> : null}
+        <link rel="canonical" href={canonical} />
         <meta property="og:type" content="article" />
         <meta property="og:title" content={blog.title} />
-        <meta property="og:description" content={blog.description?.replace(/<[^>]*>/g, "")} />
-        <meta property="og:image" content={optimizeImage(blog.image, 1200)} />
-        <meta property="og:url" content={`https://weinsightian.tech/blog/${blog.slug}`} />
-        <meta property="og:site_name" content="Weinsightians" />
-        <meta property="article:published_time" content={blog.createdAt} />
-        <meta property="article:author" content={blog.author} />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:description" content={description} />
+        {blog.image ? <meta property="og:image" content={optimizeImage(blog.image, 1200)} /> : null}
+        <meta property="og:url" content={canonical} />
+        <meta property="og:site_name" content="We Insightians" />
+        {blog.createdAt ? <meta property="article:published_time" content={blog.createdAt} /> : null}
+        {blog.author ? <meta property="article:author" content={blog.author} /> : null}
+        <meta name="twitter:card" content={blog.image ? 'summary_large_image' : 'summary'} />
         <meta name="twitter:title" content={blog.title} />
-        <meta name="twitter:description" content={blog.description?.replace(/<[^>]*>/g, "")} />
-        <meta name="twitter:image" content={optimizeImage(blog.image, 1200)} />
+        <meta name="twitter:description" content={description} />
+        {blog.image ? <meta name="twitter:image" content={optimizeImage(blog.image, 1200)} /> : null}
       </Helmet>
 
       <div className="h-full bg-[#ffffff] w-full text-black px-4 md:px-16 p-5">
@@ -174,7 +240,7 @@ const SingleBlog = () => {
             <h3 className="text-xl font-semibold mb-4">Share this article</h3>
             <div className="flex gap-4">
               <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(blog.title)}&url=${encodeURIComponent(`https://weinsightian.tech/blog/${blog.slug}`)}`}
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(blog.title)}&url=${encodeURIComponent(`https://weinsightian.tech/blog/${slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
@@ -182,7 +248,7 @@ const SingleBlog = () => {
                 Twitter
               </a>
               <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://weinsightian.tech/blog/${blog.slug}`)}`}
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://weinsightian.tech/blog/${slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
@@ -190,7 +256,7 @@ const SingleBlog = () => {
                 Facebook
               </a>
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(`${blog.title} - https://weinsightian.tech/blog/${blog.slug}`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`${blog.title} - https://weinsightian.tech/blog/${slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"

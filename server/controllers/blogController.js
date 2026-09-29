@@ -76,7 +76,7 @@ export const getAllBlogs = async (req, res) => {
 // ==========================================
 // Finds a blog using its URL-friendly slug instead of MongoDB _id
 // This makes URLs cleaner e.g. /blogs/my-first-post
-export const getBlog = async (req, res) => {
+export const getBlog = async (req, res, next) => {
   try {
     const { slug } = req.params;
 
@@ -88,6 +88,13 @@ export const getBlog = async (req, res) => {
 
     res.status(StatusCodes.OK).json({ blog });
   } catch (error) {
+    // Expected errors (e.g. unknown slug) already carry a statusCode. Hand them
+    // to the central error handler so the API replies with a real 404 instead
+    // of reporting an unknown slug as a server failure.
+    if (error.statusCode) {
+      return next(error);
+    }
+
     console.error("❌ getBlog error:", error.message);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,

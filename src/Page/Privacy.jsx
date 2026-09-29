@@ -179,10 +179,6 @@ const Privacy = () => {
           name="description"
           content="How We Insightians collects, uses, and protects information when you visit our website or contact us, and the rights you have over that information."
         />
-        <meta
-          name="keywords"
-          content="Privacy Policy, We Insightians, Data Protection, Personal Information"
-        />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://weinsightian.tech/privacy" />
         <meta property="og:title" content="Privacy Policy - We Insightians" />
@@ -192,6 +188,8 @@ const Privacy = () => {
         />
         <meta property="og:url" content="https://weinsightian.tech/privacy" />
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="We Insightians" />
+        <meta name="twitter:card" content="summary" />
       </Helmet>
 
       <div className="flex min-h-screen w-full flex-col bg-white px-5 font-[gilroy] text-[#242424] md:px-10 lg:px-16">

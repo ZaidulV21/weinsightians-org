@@ -38,7 +38,7 @@ const Faq = () => {
   return (
     <div className='flex  pt-8 items-center justify-center font-[gilroy]'>
     <div className="my-16 px-0 md:px-8 w-full md:w-2/3">
-      <h2 className="text-3xl font-bold mb-10 text-start">FREQUENTLY ASKED QUESTIONS</h2>
+      <h2 id="faq" className="text-3xl font-bold mb-10 text-start scroll-mt-28">FREQUENTLY ASKED QUESTIONS</h2>
       <div className="space-y-4">
         {faqData.map((faq, index) => (
           <div key={index} className="border-b border-gray-300 pb-10">

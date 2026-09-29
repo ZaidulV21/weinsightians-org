@@ -62,20 +62,27 @@ const Blogs = () => {
     <>
       {/* SEO META TAGS */}
       <Helmet>
-        <title>Blogs | Weinsightians</title>
+        <title>Blog | Insights on Design, Development &amp; Digital Growth</title>
         <meta
           name="description"
-          content="Read our latest insights, articles, and expert opinions on trending topics. Stay informed with Weinsightians."
+          content="Articles and practical insights from the We Insightians team on web design, development, branding, SEO and running a business online."
         />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://weinsightian.tech/blogs" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="Blogs | Weinsightians" />
-        <meta property="og:description" content="Read our latest insights, articles, and expert opinions on trending topics." />
+        <meta property="og:title" content="Blog | Insights on Design, Development &amp; Digital Growth" />
+        <meta
+          property="og:description"
+          content="Read our latest insights and practical guides on building a stronger presence online."
+        />
         <meta property="og:url" content="https://weinsightian.tech/blogs" />
+        <meta property="og:site_name" content="We Insightians" />
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Blogs | Weinsightians" />
-        <meta name="twitter:description" content="Read our latest insights, articles, and expert opinions on trending topics." />
+        <meta name="twitter:title" content="Blog | Insights on Design, Development &amp; Digital Growth" />
+        <meta
+          name="twitter:description"
+          content="Read our latest insights and practical guides on building a stronger presence online."
+        />
       </Helmet>
 
       <div className="h-full bg-[#ffffff] w-full text-black px-4 md:px-16 p-5">
@@ -101,13 +108,6 @@ const Blogs = () => {
                 </div>
               </div>
             </div>
-
-            <Link
-              to="/admin/login"
-              className="block w-max mb-10 px-6 py-3 bg-transparent text-gray-700 border border-gray-300 rounded-full hover:bg-indigo-200 hover:text-black transition"
-            >
-              Create New Blog
-            </Link>
           </div>
 
           {/* Blog Grid */}

@@ -20,11 +20,11 @@ const Page4 = () => {
         transition={{ duration: 0.6 }}
         className='w-full h-1/3 flex flex-col justify-center items-center space-y-2'
       >
-        <h1 className='text-2xl md:text-xl font-semibold'>See from our client</h1>
-        <h1 className='text-5xl md:text-6xl font-semibold font-[Gilroy]'>What our</h1>
-        <h1 className='text-5xl md:text-6xl font-semibold font-[Gilroy] flex'>
+        <h2 className='text-2xl md:text-xl font-semibold'>See from our client</h2>
+        <h2 className='text-5xl md:text-6xl font-semibold font-[Gilroy]'>What our</h2>
+        <h2 className='text-5xl md:text-6xl font-semibold font-[Gilroy] flex'>
           <img className='h-[11vw] md:h-[4vw] hidden md:inline' src='/circle-design.png' alt='' /> Clients say
-        </h1>
+        </h2>
       </motion.div>
 
       <motion.div

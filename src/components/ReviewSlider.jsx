@@ -161,7 +161,7 @@ export default function App() {
 
                 {/* User Info */}
                 <div className="mt-8">
-                  <h2
+                  <h3
                     className="
                       text-lg
                       font-semibold
@@ -170,7 +170,7 @@ export default function App() {
                     "
                   >
                     {review.title}
-                  </h2>
+                  </h3>
 
                   <p className="mt-1 text-sm text-gray-400">
                     {review.job}

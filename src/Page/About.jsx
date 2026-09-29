@@ -24,15 +24,22 @@ const About = () => {
       transition={{ type: "spring", stiffness: 200 }}
     >
       <div className='card1'>
-        <img className="transition-all duration-500 hover:-scale-1" src={imgSrc} alt="team member" />
+        <img className="transition-all duration-500 hover:-scale-1" src={imgSrc} alt={`${name}, ${role} at We Insightians`} />
       </div>
       <div className='card2 p-5'>
         <h3 className='text-xl font-bold font-[gilroy] text-[#a380ed]'>{name}</h3>
         <p className='text-gray-800 font-[gilroy] text-base'>{role}</p>
         <div className='flex mt-8'>
           {socialLinks.map((link, index) => (
-            <a key={index} href={link.url} target="_blank" rel="noopener noreferrer" className='mr-4'>
-              <img src={link.icon} alt={`${link.platform} Icon`} className='h-8 w-8' />
+            <a
+              key={index}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className='mr-4'
+              aria-label={`${name} on ${link.platform}`}
+            >
+              <img src={link.icon} alt="" className='h-8 w-8' />
             </a>
           ))}
         </div>
@@ -43,15 +50,22 @@ const About = () => {
   return (
     <>
       <Helmet>
-        <title>About Us - We Insightians | Leading Web Development & Branding Agency</title>
-        <meta name="description" content="Learn more about We Insightians, a top-rated web development and branding agency. Our team specializes in innovative digital solutions." />
-        <meta name="keywords" content="About We Insightians, Web Design Agency, Digital Branding, UI/UX Experts, Business Solutions" />
+        <title>About We Insightians | The Team Behind the Work</title>
+        <meta
+          name="description"
+          content="We Insightians started in a college dorm room with three people and one goal: help local businesses in Lucknow build a real presence online. Here is our story and our team."
+        />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://weinsightian.tech/about" />
-        <meta property="og:title" content="About We Insightians - Your Digital Growth Partner" />
-        <meta property="og:description" content="Discover how We Insightians can transform your business with high-quality web development, UI/UX design, and branding solutions." />
+        <meta property="og:title" content="About We Insightians | The Team Behind the Work" />
+        <meta
+          property="og:description"
+          content="We are not just developers — we are storytellers, designers and digital growth partners dedicated to helping businesses thrive online."
+        />
         <meta property="og:url" content="https://weinsightian.tech/about" />
         <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="We Insightians" />
+        <meta name="twitter:card" content="summary_large_image" />
       </Helmet>
 
       <div className='h-full bg-[#ffffff] w-full text-black px-4 md:px-16 p-5'>
@@ -66,9 +80,9 @@ const About = () => {
             <h1 className="text-4xl md:text-6xl font-extrabold text-[#242424] leading-tight font-[larken]">
               Get to Know Us
             </h1>
-            <h2 className="text-xl md:text-3xl mt-2 font-[heligthon] text-[#a380ed]">
+            <p className="text-xl md:text-3xl mt-2 font-[heligthon] text-[#a380ed]">
               The Team Behind WeInsightians
-            </h2>
+            </p>
             <p className="mt-6 text-base md:text-lg text-gray-700 font-[gilroy]">
               We’re not just developers — we’re storytellers, designers, and digital growth partners dedicated to helping businesses thrive online.
             </p>
@@ -76,7 +90,7 @@ const About = () => {
           <div className="md:w-1/2 relative mb-10 md:mb-0">
             <img
               src="https://img.freepik.com/free-vector/business-team-discussing-ideas-startup_74855-4380.jpg?ga=GA1.1.438993286.1747203228&semt=ais_hybrid&w=740"
-              alt="Team Illustration"
+              alt={`Illustration of the We Insightians team discussing ideas`}
               className="rounded-lg w-full object-cover "
             />
             {/* <video src="https://videos.pexels.com/video-files/6804109/6804109-sd_960_506_25fps.mp4"   alt="Team Illustration"
@@ -99,7 +113,7 @@ const About = () => {
           {/* Follow Us */}
           <div className='w-full md:w-1/3 relative'>
             <div className='absolute bottom-10 w-full mr-14 font-[gilroy]'>
-              <h1 className="text-xl md:text-2xl font-bold ">Follow Us</h1>
+              <h2 className="text-xl md:text-2xl font-bold ">Follow Us</h2>
               <a href="https://instagram.com/weinsightians">
                 <div className='flex mt-5 justify-between text-sm md:text-base'>
                   <p>Instagram</p>
@@ -153,7 +167,7 @@ const About = () => {
           viewport={{ once: true }}
         >
           <div className="absolute inset-0 p-5 overflow-y-auto bg-opacity-50 rounded-3xl">
-            <h1 className="text-[2.5rem] mt-0 md:mt-10 md:text-7xl uppercase font-[larken] font-bold mb-4">Our Story</h1>
+            <h2 className="text-[2.5rem] mt-0 md:mt-10 md:text-7xl uppercase font-[larken] font-bold mb-4">Our Story</h2>
             <hr className="border-t border-gray-400 my-4" />
                <div className="text-sm md:text-base font-[gilroy] pt-8">
               <p>
@@ -177,7 +191,7 @@ const About = () => {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <h1 className='text-center text-5xl md:text-9xl font-[heligthon]'>Meet Our Team</h1>
+          <h2 className='text-center text-5xl md:text-9xl font-[heligthon]'>Meet Our Team</h2>
           <div className='flex overflow-x-auto gap-24 md:gap-20 md:justify-center items-center mt-20 '>
             <TeamMemberCard
               name="Abhishek Kushwaha"

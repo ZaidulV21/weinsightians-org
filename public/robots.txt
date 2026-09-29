@@ -1,0 +1,32 @@
+# robots.txt - We Insightians
+# Canonical domain: https://weinsightian.tech (non-www, https)
+#
+# Policy: allow crawling of all public content and all build assets.
+# Only the private admin area is restricted. This file is a crawl
+# configuration, not an access control mechanism.
+
+# ---------------------------------------------------------------
+# All crawlers (Googlebot, Bingbot, and every other crawler)
+# ---------------------------------------------------------------
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+# ---------------------------------------------------------------
+# OpenAI
+# ---------------------------------------------------------------
+# OAI-SearchBot powers ChatGPT search. Allowed so the site can be
+# discovered and cited in OpenAI search answers.
+User-agent: OAI-SearchBot
+Allow: /
+
+# GPTBot is OpenAI's training crawler. Allowed for now; no training
+# opt-out has been requested. Controlled separately from
+# OAI-SearchBot so the two can be decided independently later.
+User-agent: GPTBot
+Allow: /
+
+# ---------------------------------------------------------------
+# Sitemap
+# ---------------------------------------------------------------
+Sitemap: https://weinsightian.tech/sitemap.xml
