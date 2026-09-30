@@ -133,6 +133,14 @@ const floatLoop = (lift, duration, delay) => ({
   transition: { duration, delay, repeat: Infinity, ease: 'easeInOut' },
 });
 
+/* One node's parallax range, as a pair of transforms. Kept as its own hook so
+ * the two useTransform calls inside it sit at the top level of a hook rather
+ * than inside a map callback. See the note where it is used. */
+const useNodeParallax = (x, y, reach) => ({
+  x: useTransform(x, [-1, 1], [reach, -reach]),
+  y: useTransform(y, [-1, 1], [reach * 0.7, -reach * 0.7]),
+});
+
 const useWideCore = () => {
   const [wide, setWide] = useState(
     () => typeof window !== 'undefined' && window.matchMedia(WIDE_QUERY).matches,
@@ -246,14 +254,26 @@ const HeroCenterpiece = ({ shouldReduceMotion }) => {
   const glowX = useTransform(smoothX, [-1, 1], [-9, 9]);
   const glowY = useTransform(smoothY, [-1, 1], [-7, 7]);
 
-  /* Six fixed hooks, so the parallax depth can differ per node. */
-  const nodeParallax = layout.map((node) => {
-    const reach = 2 + (node.index % 3) * 1.4;
-    return {
-      x: useTransform(smoothX, [-1, 1], [reach, -reach]),
-      y: useTransform(smoothY, [-1, 1], [reach * 0.7, -reach * 0.7]),
-    };
-  });
+  /* Per-node parallax depth, with the hook calls at the top level.
+   *
+   * The previous version built this inside `layout.map(...)`, which called
+   * useTransform from inside a callback. React only allows hooks at the top
+   * level of a component or a custom hook: it tracks them by call order, so a
+   * hook that runs conditionally or inside a loop can leave a component calling
+   * a different hook than it did last render, and React throws. Here the array
+   * length depends on `layout`, which depends on the viewport, so the count
+   * genuinely could change between renders.
+   *
+   * `reach` only ever takes three values, because it cycles on `index % 3`:
+   * 2, 3.4, 4.8 for the six nodes. So three fixed pairs of transforms are
+   * created here and each node is pointed at one of them, which produces the
+   * exact same x/y ranges per node as before.
+   */
+  const reachA = useNodeParallax(smoothX, smoothY, 2);
+  const reachB = useNodeParallax(smoothX, smoothY, 3.4);
+  const reachC = useNodeParallax(smoothX, smoothY, 4.8);
+  const reaches = [reachA, reachB, reachC];
+  const nodeParallax = layout.map((node) => reaches[node.index % 3]);
 
   const trackPointer = (event) => {
     if (still || event.pointerType !== 'mouse') return;

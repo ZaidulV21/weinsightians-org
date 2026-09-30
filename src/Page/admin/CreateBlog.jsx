@@ -1,284 +1,529 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FiAlertCircle, FiArrowLeft, FiCheckCircle, FiEye } from "react-icons/fi";
 import { createBlog } from "../../api/blogApi";
-import { FiArrowLeft, FiUpload } from "react-icons/fi";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import AdminShell from "../../components/admin/AdminShell";
+import ConfirmDialog from "../../components/admin/ConfirmDialog";
+import FeaturedImageUploader from "../../components/admin/FeaturedImageUploader";
+import PublishControls from "../../components/admin/PublishControls";
+import TextField from "../../components/admin/TextField";
+import ContentEditor from "../../components/editor/ContentEditor";
+import {
+  BLOG_STATUS,
+  LIMITS,
+  firstInvalidField,
+  normaliseText,
+  slugifyPreview,
+  validateBlogForm,
+  visibleLength,
+} from "../../utils/blogForm";
 
 // ==========================================
-// QUILL TOOLBAR CONFIGURATION
-// Defines which formatting options appear
+// CREATE BLOG
 // ==========================================
-const quillModules = {
-  toolbar: [
-    [{ header: [1, 2, 3, 4, false] }],
-    [{ font: [] }],
-    ["bold", "italic", "underline", "strike"],
-    [{ color: [] }, { background: [] }],
-    [{ list: "ordered" }, { list: "bullet" }],
-    [{ indent: "-1" }, { indent: "+1" }],
-    [{ align: [] }],
-    ["blockquote", "code-block"],
-    ["link"],
-    ["clean"],
-  ],
-};
+// What the server already does, so this screen never has to guess:
+//
+//   POST /api/v1/blogs  (authenticated, admin, rate limited)
+//     - the slug is generated from the title, and made unique with a numeric
+//       suffix if the address is taken, so two posts with the same title can
+//       never collide
+//     - the body is sanitized before it is stored; this screen never renders it
+//     - `status` is the server's own draft/published value, and `publishedAt` is
+//       stamped only for a published post
+//     - title, description, author and content are all required on every post
+//
+// Which means a duplicate slug is resolved by the server rather than reported as
+// an error, the only status values are the two below, and there is no client-side
+// work here that could make a post public without the server's agreement.
 
-const quillFormats = [
-  "header", "font",
-  "bold", "italic", "underline", "strike",
-  "color", "background",
-  "list", "bullet", "indent",
-  "align",
-  "blockquote", "code-block",
-  "link",
-];
+const EMPTY_FORM = { title: "", description: "", author: "", content: "" };
+
+// A user who has typed nothing has nothing to lose. A user who has typed a word
+// does, so that is what decides whether the browser warning appears.
+const isMeaningful = ({ title, description, author, content }) =>
+  Boolean(
+    normaliseText(title) ||
+      normaliseText(description) ||
+      normaliseText(author) ||
+      visibleLength(content)
+  );
 
 const CreateBlog = () => {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    author: "",
-  });
+  // ==========================================
+  // FORM STATE
+  // One object, one setter. Nothing is duplicated into a second store and
+  // nothing is persisted: reloading the page is meant to lose a draft that was
+  // never saved.
+  // ==========================================
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
-  // A post can be written as a draft first. Drafts are invisible to the public
-  // API and to search engines until they are published.
-  const [status, setStatus] = useState("published");
+  // Draft is the starting point, not published. A post should become public
+  // because someone chose that, never because a form was opened and submitted.
+  const [status, setStatus] = useState(BLOG_STATUS.DRAFT);
 
-  const [content, setContent] = useState("");        // Quill rich text content (HTML)
-  const [imageFile, setImageFile] = useState(null);  // Selected image file
-  const [imagePreview, setImagePreview] = useState(null); // Image preview URL
-  const [submitting, setSubmitting] = useState(false); // Loading state
-  const [error, setError] = useState(null);           // Error message
+  const [errors, setErrors] = useState({});
+  const [touchedSubmit, setTouchedSubmit] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitIntent, setSubmitIntent] = useState(null); // "draft" | "published"
+  const [failure, setFailure] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [leaving, setLeaving] = useState(false);
 
-  // Handle text input changes
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // The submit lock lives in a ref as well as in state. State alone is not enough:
+  // two clicks arriving before React re-renders would both read the same stale
+  // `submitting === false` and create the post twice. A ref is written
+  // synchronously, so the second one is turned away on the spot.
+  const submitLock = useRef(false);
 
-  // Handle image selection with size validation
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // The pause after a successful save exists so the confirmation can be read.
+  // The timer is held in a ref so that leaving during that pause — which the
+  // author is free to do, because the post is already saved and nothing is at
+  // risk — cancels the pending redirect instead of firing it into a component
+  // that is no longer on screen.
+  const redirectTimer = useRef(null);
 
-    // Reject files over 5MB — prevents silent failures on mobile
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Image too large. Please choose an image under 5MB.");
-      return;
-    }
-
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-    setError(null);
+  // Field refs, so a failed submit can move the caret to the first problem.
+  const fieldRefs = {
+    title: useRef(null),
+    description: useRef(null),
+    author: useRef(null),
+    content: useRef(null),
   };
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError(null);
+  // ==========================================
+  // DERIVED
+  // ==========================================
+  const slug = useMemo(() => slugifyPreview(form.title), [form.title]);
 
-    // Validate content is not empty
-    if (!content || content === "<p><br></p>") {
-      setError("Content cannot be empty.");
-      setSubmitting(false);
-      return;
+  // Read from the field values rather than from the error map, so the checklist
+  // is honest from the first keystroke instead of only after a failed submit.
+  const checklist = useMemo(
+    () => [
+      {
+        id: "title",
+        label: "Title",
+        done: normaliseText(form.title).length >= LIMITS.title.min,
+      },
+      {
+        id: "description",
+        label: "Description",
+        done: normaliseText(form.description).length >= LIMITS.description.min,
+      },
+      {
+        id: "author",
+        label: "Author",
+        done: normaliseText(form.author).length >= LIMITS.author.min,
+      },
+      {
+        id: "content",
+        label: "Content",
+        done: visibleLength(form.content) >= LIMITS.content.min,
+      },
+      { id: "image", label: "Featured image", done: Boolean(imageFile), optional: true },
+    ],
+    [form, imageFile]
+  );
+
+  // ==========================================
+  // UNSAVED WORK
+  //
+  // Two different problems, handled two different ways:
+  //
+  //   Refreshing or closing the tab  -> beforeunload. Works with any router.
+  //   Clicking a link in the sidebar -> handled by the shell's guardNavigation
+  //     prop, because this app uses <BrowserRouter> and React Router's useBlocker
+  //     needs a data router (createBrowserRouter). Moving the whole app to one
+  //     is a separate change, not something to smuggle into a create form.
+  // ==========================================
+  const dirty = !success && (isMeaningful(form) || Boolean(imageFile));
+
+  useEffect(() => {
+    if (!dirty) return undefined;
+
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      // Chrome shows its own wording when this is set; the string is only used by
+      // older browsers.
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [dirty]);
+
+  // A scheduled redirect belongs to this screen. If the screen goes away first,
+  // the redirect is dropped rather than executed on an unmounted component.
+  useEffect(
+    () => () => {
+      if (redirectTimer.current) {
+        clearTimeout(redirectTimer.current);
+        redirectTimer.current = null;
+      }
+    },
+    []
+  );
+
+  // ==========================================
+  // FIELD HANDLERS
+  // ==========================================
+  const updateField = useCallback(
+    (field, value) => {
+      setForm((previous) => ({ ...previous, [field]: value }));
+
+      // After a first failed submit, fields are re-checked as they are fixed
+      // rather than making the author submit again to find out. The whole form is
+      // revalidated because the rule is a pure function of the values.
+      if (touchedSubmit) {
+        setErrors(validateBlogForm({ ...form, [field]: value }));
+      }
+    },
+    [form, touchedSubmit]
+  );
+
+  const handleImageSelect = (file) => {
+    // Replacing a chosen file releases the previous preview rather than leaking
+    // both for the life of the page.
+    setImagePreview((previous) => {
+      if (previous) URL.revokeObjectURL(previous);
+      return URL.createObjectURL(file);
+    });
+    setImageFile(file);
+  };
+
+  const handleImageClear = () => {
+    setImagePreview((previous) => {
+      if (previous) URL.revokeObjectURL(previous);
+      return null;
+    });
+    setImageFile(null);
+  };
+
+  // ==========================================
+  // VALIDATION
+  // ==========================================
+  const runValidation = useCallback(() => {
+    const found = validateBlogForm(form);
+    setErrors(found);
+    return found;
+  }, [form]);
+
+  /**
+   * Turns a failed request into a sentence an author can act on.
+   *
+   * The server's own messages are safe to show: its error handler is written so a
+   * client only ever receives a message the server chose, never a driver error, a
+   * stack trace or a path. Anything unrecognised falls through to a generic
+   * sentence rather than echoing an exception.
+   */
+  const describeFailure = (error) => {
+    const status = error?.response?.status;
+    const serverMessage = error?.response?.data?.msg || error?.response?.data?.message;
+
+    if (typeof serverMessage === "string" && serverMessage.trim()) {
+      return serverMessage;
     }
 
-    try {
-      const form = new FormData();
-      form.append("title", formData.title);
-      form.append("description", formData.description);
-      form.append("author", formData.author);
+    if (!error?.response) {
+      return "The post could not be saved because the server could not be reached. Check your connection and try again — nothing was lost.";
+    }
 
-      // content is HTML string from Quill e.g. "<h1>Hello</h1><p>World</p>"
-      form.append("content", content);
+    if (status === 401) {
+      return "Your session has ended. Sign in again to save this post.";
+    }
 
-      form.append("status", status);
+    if (status === 403) {
+      return "This account is not allowed to publish posts.";
+    }
 
-      // Only append image if one was selected — never append null
-      if (imageFile) {
-        form.append("image", imageFile);
+    if (status === 413) {
+      return "That image is larger than the 5 MB limit. Choose a smaller one and try again.";
+    }
+
+    if (status === 429) {
+      return "Too many attempts. Wait a moment and try again.";
+    }
+
+    if (status >= 500) {
+      return "The server could not save this post. Nothing was lost — try again in a moment.";
+    }
+
+    return "The post could not be saved. Nothing was lost — please review the fields and try again.";
+  };
+
+  // ==========================================
+  // SUBMIT
+  // ==========================================
+  const handleSave = async (nextStatus) => {
+    // The single gate against a double submit. Enter in a text field, the
+    // Publish button and Save as draft all arrive here.
+    if (submitLock.current) return;
+
+    submitLock.current = true;
+    setSubmitting(true);
+    setSubmitIntent(nextStatus);
+    setTouchedSubmit(true);
+    setFailure(null);
+
+    const found = runValidation();
+
+    if (Object.keys(found).length > 0) {
+      submitLock.current = false;
+      setSubmitting(false);
+      setSubmitIntent(null);
+
+      const first = firstInvalidField(found);
+      // Quill's surface is a contenteditable div, so it is focused directly
+      // rather than through a ref lookup like a real input.
+      if (first === "content") {
+        fieldRefs.content.current?.getEditor()?.focus();
+      } else {
+        fieldRefs[first]?.current?.focus();
       }
 
-      await createBlog(form);
-      navigate("/admin/dashboard");
+      return;
+    }
 
-    } catch (err) {
-      const message = err?.response?.data?.message || err?.message || "Something went wrong";
-      setError(`Failed to save: ${message}`);
-      console.error("Create blog error:", err);
-    } finally {
+    // Everything is trimmed and whitespace-collapsed before it is sent, so
+    // "  How   AI  " is stored as "How AI" and does not fail a length check on
+    // padding no reader would see. Nothing is ever truncated.
+    const payload = new FormData();
+    payload.append("title", normaliseText(form.title));
+    payload.append("description", normaliseText(form.description));
+    payload.append("author", normaliseText(form.author));
+    payload.append("content", form.content);
+    payload.append("status", nextStatus);
+
+    if (imageFile) payload.append("image", imageFile);
+
+    try {
+      await createBlog(payload);
+
+      const created = nextStatus === BLOG_STATUS.PUBLISHED;
+      setSuccess(
+        created
+          ? `Published “${normaliseText(form.title)}”. It is live on the blog now.`
+          : `Saved “${normaliseText(form.title)}” as a draft. Only you can see it until you publish it.`
+      );
+
+      // The dashboard reads the list itself when it mounts, so there is no cache
+      // to clear and no state to hand over. A moment of visible confirmation is
+      // better than a page that changes before the author can read it.
+      redirectTimer.current = setTimeout(() => {
+        redirectTimer.current = null;
+        navigate("/admin/dashboard", { replace: true });
+      }, 1200);
+    } catch (error) {
+      setFailure(describeFailure(error));
+
+      // The lock is released so the author can correct the problem and try
+      // again. The form is deliberately left exactly as it was.
+      submitLock.current = false;
       setSubmitting(false);
+      setSubmitIntent(null);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-3xl mx-auto">
+  // Enter inside a text field submits the form with whatever status is selected
+  // in the sidebar, which is Draft unless the author changed it.
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+    handleSave(status);
+  };
 
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Link to="/admin/dashboard" className="text-gray-500 hover:text-indigo-600 transition">
-            <FiArrowLeft size={22} />
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-800">Create Blog</h1>
-        </div>
+  // ==========================================
+  // NOTICES
+  // ==========================================
+  const notice = success ? (
+    <div
+      role="status"
+      className="mb-5 flex items-start gap-2.5 rounded-xl border border-[#cfe4d8] bg-[#eef6f1] px-4 py-3 text-[#1f6b45]"
+    >
+      <FiCheckCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+      <p className="text-[13.5px] leading-relaxed">{success}</p>
+    </div>
+  ) : null;
 
-        {/* Error Message */}
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
-            {error}
-          </div>
-        )}
+  const errorNotice = failure ? (
+    <div
+      role="alert"
+      className="mb-5 flex items-start gap-2.5 rounded-xl border border-[#ecd7d9] bg-[#fdf4f5] px-4 py-3 text-[#a32b3b]"
+    >
+      <FiAlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-8 space-y-6">
+      <div className="min-w-0 flex-1">
+        <p className="text-[13.5px] leading-relaxed">{failure}</p>
 
-          {/* Image Upload */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Blog Image
-            </label>
-
-            {imagePreview && (
-              <div className="mb-3">
-                <p className="text-xs text-gray-400 mb-1">Preview:</p>
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-56 object-cover rounded-xl border"
-                />
-              </div>
-            )}
-
-            <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 transition">
-              <FiUpload className="text-gray-400 text-2xl mb-2" />
-              <span className="text-sm text-gray-500">
-                {imageFile ? imageFile.name : "Click to upload image (optional, max 5MB)"}
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-            </label>
-          </div>
-
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Title <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="title"
-              placeholder="Enter blog title"
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Description <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="description"
-              placeholder="Short description of the blog"
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            />
-          </div>
-
-          {/* Author */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Author <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="author"
-              placeholder="Author name"
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            />
-          </div>
-
-          {/* Content — React Quill Editor */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Content <span className="text-red-500">*</span>
-            </label>
-            <div className="rounded-lg overflow-hidden border border-gray-200">
-              <ReactQuill
-                theme="snow"
-                value={content}
-                onChange={setContent}
-                modules={quillModules}
-                formats={quillFormats}
-                placeholder="Write your blog content here..."
-                className="bg-white"
-                style={{ minHeight: "300px" }}
-              />
-            </div>
-          </div>
-
-          {/* Publish or save as draft */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              Visibility
-            </label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input
-                  type="radio"
-                  name="status"
-                  value="published"
-                  checked={status === "published"}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="accent-indigo-600"
-                />
-                Publish now
-              </label>
-              <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input
-                  type="radio"
-                  name="status"
-                  value="draft"
-                  checked={status === "draft"}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="accent-indigo-600"
-                />
-                Save as draft
-              </label>
-            </div>
-            <p className="text-xs text-gray-400 mt-1">
-              {status === "draft"
-                ? "Drafts are only visible in the admin panel until you publish them."
-                : "The post becomes readable on the public blog immediately."}
-            </p>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-[#231746] hover:bg-indigo-900 disabled:bg-indigo-300 text-white font-semibold py-3 rounded-lg transition"
-          >
-            {submitting
-              ? "Saving..."
-              : status === "draft"
-              ? "Save as Draft"
-              : "Publish"}
-          </button>
-
-        </form>
+        <button
+          type="button"
+          onClick={() => setFailure(null)}
+          className="mt-1.5 text-[12.5px] font-semibold underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a32b3b]"
+        >
+          Dismiss
+        </button>
       </div>
     </div>
+  ) : null;
+
+  // ==========================================
+  // RENDER
+  // ==========================================
+  return (
+    <AdminShell
+      title="Create Blog"
+      subtitle="Write the post, then choose whether it goes live now or stays a draft."
+      guardNavigation={dirty}
+      action={
+        <button
+          type="button"
+          onClick={() => handleSave(BLOG_STATUS.PUBLISHED)}
+          disabled={submitting}
+          className="inline-flex items-center gap-2 rounded-lg bg-[#231746] px-4 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#2f2160] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#231746] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#cfc9e2]"
+        >
+          {submitIntent === BLOG_STATUS.PUBLISHED && submitting ? (
+            <>
+              <span
+                className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                aria-hidden="true"
+              />
+              Publishing…
+            </>
+          ) : (
+            <>
+              <FiEye className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Publish Blog</span>
+              <span className="sm:hidden">Publish</span>
+            </>
+          )}
+        </button>
+      }
+    >
+      {/* Back to the blog list. With nothing typed there is nothing to lose, so it
+          goes straight there; with unsaved work it asks first. */}
+      <button
+        type="button"
+        onClick={() => {
+          if (!dirty) navigate("/admin/dashboard", { replace: true });
+          else setLeaving(true);
+        }}
+        disabled={submitting}
+        className="mb-5 inline-flex items-center gap-1.5 rounded-md text-[13.5px] font-semibold text-[#534277] transition-colors hover:text-[#231746] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#231746] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <FiArrowLeft className="h-4 w-4" aria-hidden="true" />
+        Back to blogs
+      </button>
+
+      {notice}
+      {errorNotice}
+
+      <form id="create-blog-form" onSubmit={handleFormSubmit} noValidate>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start xl:gap-7">
+          {/* ==========================================
+              MAIN COLUMN
+              ========================================== */}
+          <div className="min-w-0 space-y-6 rounded-xl border border-[#e8e6f1] bg-white p-5 sm:p-6">
+            <TextField
+              name="title"
+              label="Title"
+              required
+              value={form.title}
+              onChange={(event) => updateField("title", event.target.value)}
+              error={errors.title}
+              placeholder="How AI Is Changing Web Design"
+              limit={LIMITS.title.max}
+              ref={fieldRefs.title}
+              hint="The post's headline, and the source of its address."
+            />
+
+            <TextField
+              as="textarea"
+              name="description"
+              label="Description"
+              required
+              rows={3}
+              value={form.description}
+              onChange={(event) => updateField("description", event.target.value)}
+              error={errors.description}
+              placeholder="One or two sentences summarising the article."
+              limit={LIMITS.description.max}
+              hint={`Shown in listings and used as the summary. Between ${LIMITS.description.min} and ${LIMITS.description.max} characters.`}
+            />
+
+            <div className="border-t border-[#f0eef7] pt-6">
+              <ContentEditor
+                value={form.content}
+                onChange={(value) => updateField("content", value)}
+                error={errors.content}
+                disabled={submitting}
+                editorRef={fieldRefs.content}
+              />
+            </div>
+          </div>
+
+          {/* ==========================================
+              SIDEBAR
+              ========================================== */}
+          <aside className="min-w-0 space-y-6 xl:sticky xl:top-6">
+            <div className="rounded-xl border border-[#e8e6f1] bg-white p-5">
+              <PublishControls
+                status={status}
+                onStatusChange={setStatus}
+                checklist={checklist}
+                slug={slug}
+                busy={submitting}
+                disabled={submitting}
+                onSaveDraft={() => handleSave(BLOG_STATUS.DRAFT)}
+              />
+            </div>
+
+            <div className="rounded-xl border border-[#e8e6f1] bg-white p-5">
+              <FeaturedImageUploader
+                file={imageFile}
+                preview={imagePreview}
+                onSelect={handleImageSelect}
+                onClear={handleImageClear}
+                disabled={submitting}
+              />
+            </div>
+
+            <div className="rounded-xl border border-[#e8e6f1] bg-white p-5">
+              <TextField
+                name="author"
+                label="Author"
+                required
+                value={form.author}
+                onChange={(event) => updateField("author", event.target.value)}
+                error={errors.author}
+                placeholder="Name shown on the post"
+                limit={LIMITS.author.max}
+                hint={`The byline. Between ${LIMITS.author.min} and ${LIMITS.author.max} characters.`}
+                ref={fieldRefs.author}
+              />
+            </div>
+          </aside>
+        </div>
+      </form>
+
+      {/* ==========================================
+          DISCARD CONFIRMATION
+          ========================================== */}
+      <ConfirmDialog
+        open={leaving}
+        title="Leave without saving?"
+        description="This post has not been saved yet. Leaving now discards everything you have typed."
+        confirmLabel="Discard and leave"
+        cancelLabel="Keep editing"
+        destructive
+        onConfirm={() => {
+          setLeaving(false);
+          navigate("/admin/dashboard", { replace: true });
+        }}
+        onCancel={() => setLeaving(false)}
+      />
+    </AdminShell>
   );
 };
 

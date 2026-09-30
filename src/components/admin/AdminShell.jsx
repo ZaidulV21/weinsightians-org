@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiGrid, FiFileText, FiPlus, FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { adminLogout, clearAuthentication } from "../../api/authApi";
 import { lockScroll, unlockScroll } from "../../utils/scrollLock";
+import ConfirmDialog from "./ConfirmDialog";
 
 /**
  * The admin workspace shell.
@@ -13,6 +14,10 @@ import { lockScroll, unlockScroll } from "../../utils/scrollLock";
  *
  * The logo is a dark wordmark on a transparent background, so both the sidebar
  * and the mobile bar keep it on a light surface.
+ *
+ * `guardNavigation` is optional. An editor holding unsaved content sets it, and
+ * the nav links ask before throwing that work away instead of following straight
+ * out of the page. The dashboard leaves it unset and is unaffected.
  */
 
 const NAV_ITEMS = [
@@ -28,15 +33,26 @@ const navClasses = (active) =>
     ? "bg-[#f1effa] text-[#231746] font-semibold"
     : "text-[#5d5675] hover:bg-[#f7f6fb] hover:text-[#231746]";
 
-const AdminShell = ({ title, subtitle, action, children }) => {
+const AdminShell = ({ title, subtitle, action, guardNavigation, children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [pendingNav, setPendingNav] = useState(null); // asked to confirm leaving
   const location = useLocation();
   const navigate = useNavigate();
   const drawerRef = useRef(null);
   const toggleRef = useRef(null);
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
+
+  // Confirm-then-go for a nav link. Without `guardNavigation` this is just
+  // navigate, so the dashboard behaves exactly as it did before this prop existed.
+  const handleNavClick = (event, to) => {
+    if (!guardNavigation) return;
+
+    event.preventDefault();
+    closeDrawer();
+    setPendingNav(to);
+  };
 
   // A viewport change from phone to desktop leaves the drawer mounted but hidden,
   // which would keep the page scroll-locked.
@@ -103,8 +119,11 @@ const AdminShell = ({ title, subtitle, action, children }) => {
   // Uses the B1 logout endpoint. The cookie is cleared by the server, and
   // tokenVersion makes the old session worthless; the local marker is only
   // cleared afterwards so this screen stops trusting it.
+  //
+  // Signing out discards an unsaved post like any other exit, so it asks first
+  // when the screen has something to lose.
   // ==========================================
-  const handleLogout = async () => {
+  const performLogout = async () => {
     setSigningOut(true);
     try {
       await adminLogout();
@@ -116,6 +135,26 @@ const AdminShell = ({ title, subtitle, action, children }) => {
       setSigningOut(false);
       navigate("/admin/login", { replace: true });
     }
+  };
+
+  const handleLogout = () => {
+    if (guardNavigation) {
+      setPendingNav("/admin/login");
+      return;
+    }
+    performLogout();
+  };
+
+  // Finishes an exit the screen asked about first.
+  const confirmNav = () => {
+    if (!pendingNav) return;
+    const target = pendingNav;
+    setPendingNav(null);
+
+    // Signing out still has to reach the logout endpoint; every other target is
+    // just a page.
+    if (target === "/admin/login") performLogout();
+    else navigate(target);
   };
 
   const isActive = (item) => {
@@ -135,7 +174,7 @@ const AdminShell = ({ title, subtitle, action, children }) => {
           <Link
             key={item.label}
             to={item.to}
-            onClick={closeDrawer}
+            onClick={(event) => handleNavClick(event, item.to)}
             aria-current={active ? "page" : undefined}
             className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#231746] focus-visible:ring-offset-2 ${navClasses(active)}`}
           >
@@ -278,6 +317,21 @@ const AdminShell = ({ title, subtitle, action, children }) => {
           </main>
         </div>
       </div>
+
+      {/* Leaving with unsaved work: only rendered when the screen asked to be
+          consulted, so the dashboard never sees this. */}
+      {guardNavigation ? (
+        <ConfirmDialog
+          open={Boolean(pendingNav)}
+          title="Leave without saving?"
+          description="This post has not been saved yet. Leaving now discards everything you have typed."
+          confirmLabel="Discard and leave"
+          cancelLabel="Keep editing"
+          destructive
+          onConfirm={confirmNav}
+          onCancel={() => setPendingNav(null)}
+        />
+      ) : null}
     </div>
   );
 };

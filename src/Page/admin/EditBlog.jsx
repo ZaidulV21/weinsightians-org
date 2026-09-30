@@ -4,35 +4,7 @@ import { getAdminBlogBySlug, updateBlog } from "../../api/blogApi";
 import { FiArrowLeft, FiUpload } from "react-icons/fi";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-
-// ==========================================
-// QUILL TOOLBAR CONFIGURATION
-// Same toolbar as CreateBlog for consistency
-// ==========================================
-const quillModules = {
-  toolbar: [
-    [{ header: [1, 2, 3, 4, false] }],
-    [{ font: [] }],
-    ["bold", "italic", "underline", "strike"],
-    [{ color: [] }, { background: [] }],
-    [{ list: "ordered" }, { list: "bullet" }],
-    [{ indent: "-1" }, { indent: "+1" }],
-    [{ align: [] }],
-    ["blockquote", "code-block"],
-    ["link"],
-    ["clean"],
-  ],
-};
-
-const quillFormats = [
-  "header", "font",
-  "bold", "italic", "underline", "strike",
-  "color", "background",
-  "list", "bullet", "indent",
-  "align",
-  "blockquote", "code-block",
-  "link",
-];
+import { QUILL_MODULES_EDIT, QUILL_FORMATS_EDIT } from "../../components/editor/editorConfig";
 
 const EditBlog = () => {
   const { slug } = useParams();
@@ -301,8 +273,8 @@ const EditBlog = () => {
                 theme="snow"
                 value={content}
                 onChange={setContent}
-                modules={quillModules}
-                formats={quillFormats}
+                modules={QUILL_MODULES_EDIT}
+                formats={QUILL_FORMATS_EDIT}
                 placeholder="Write your blog content here..."
                 className="bg-white"
                 style={{ minHeight: "300px" }}
