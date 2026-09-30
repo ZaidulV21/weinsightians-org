@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axiosInstance from "../../api/axiosInstance";
-import { clearAuthentication } from "../../api/authApi";
+import { deleteBlog, getAdminBlogs, setBlogStatus } from "../../api/blogApi";
+import { adminLogout, clearAuthentication } from "../../api/authApi";
 import {
   FiEdit,
   FiTrash2,
@@ -10,12 +10,25 @@ import {
   FiLogOut,
   FiMenu,
   FiX,
+  FiEye,
+  FiEyeOff,
 } from "react-icons/fi";
+
+// Posts written before the status field existed are published, so an absent
+// status means published here too. The server applies the same rule.
+const isDraft = (blog) => blog.status === "draft";
+
+// A post can only go live once it has content, otherwise the public page would
+// render an empty article.
+const canPublish = (blog) =>
+  blog.title?.trim() && blog.description?.trim() && blog.content?.trim();
 
 const Dashboard = () => {
   const [blogs, setBlogs] = useState([]);
+  const [counts, setCounts] = useState({ total: 0, published: 0, drafts: 0 });
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null); // track which blog is being deleted
+  const [updatingId, setUpdatingId] = useState(null); // track which blog is being published
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar toggle
   const navigate = useNavigate();
 
@@ -25,8 +38,15 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const { data } = await axiosInstance.get("/blogs");
+        // The admin endpoint, not the public one: drafts are invisible to the
+        // public API by design.
+        const { data } = await getAdminBlogs();
         setBlogs(data.blogs);
+        setCounts({
+          total: data.count,
+          published: data.publishedCount,
+          drafts: data.draftCount,
+        });
       } catch (error) {
         console.error("Failed to fetch blogs:", error);
       } finally {
@@ -37,6 +57,48 @@ const Dashboard = () => {
     fetchBlogs();
   }, []);
 
+  // Recount locally after a delete or a status change so the cards stay
+  // truthful without another round trip.
+  const recount = (list) =>
+    setCounts({
+      total: list.length,
+      published: list.filter((blog) => !isDraft(blog)).length,
+      drafts: list.filter(isDraft).length,
+    });
+
+  // ==========================================
+  // Publish / unpublish
+  // Only the status is sent, so the server leaves the slug and the original
+  // publish date alone.
+  // ==========================================
+  const handleStatusChange = async (blog) => {
+    const nextStatus = isDraft(blog) ? "published" : "draft";
+
+    if (nextStatus === "published" && !canPublish(blog)) {
+      alert(
+        "This post is missing a title, description or content, so it cannot be published yet."
+      );
+      return;
+    }
+
+    setUpdatingId(blog._id);
+    try {
+      await setBlogStatus(blog._id, nextStatus);
+      setBlogs((prev) => {
+        const updated = prev.map((item) =>
+          item._id === blog._id ? { ...item, status: nextStatus } : item
+        );
+        recount(updated);
+        return updated;
+      });
+    } catch (error) {
+      console.error("Failed to change status:", error);
+      alert(error?.response?.data?.msg || "Failed to change the status.");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   // ==========================================
   // Handle blog deletion
   // Uses blog._id for the DELETE /:id route
@@ -46,9 +108,13 @@ const Dashboard = () => {
 
     setDeletingId(id);
     try {
-      await axiosInstance.delete(`/blogs/${id}`);
+      await deleteBlog(id);
       // Remove deleted blog from local state without refetching
-      setBlogs((prev) => prev.filter((blog) => blog._id !== id));
+      setBlogs((prev) => {
+        const remaining = prev.filter((blog) => blog._id !== id);
+        recount(remaining);
+        return remaining;
+      });
     } catch (error) {
       console.error("Failed to delete blog:", error);
       alert("Failed to delete blog. Please try again.");
@@ -62,7 +128,7 @@ const Dashboard = () => {
   // ==========================================
   const handleLogout = async () => {
     try {
-      await axiosInstance.post("/auth/logout");
+      await adminLogout();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -173,17 +239,17 @@ const Dashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white p-5 rounded-xl shadow">
             <p className="text-gray-500 text-sm">Total Blogs</p>
-            <h2 className="text-3xl font-bold mt-1">{blogs.length}</h2>
+            <h2 className="text-3xl font-bold mt-1">{counts.total}</h2>
           </div>
 
           <div className="bg-white p-5 rounded-xl shadow">
             <p className="text-gray-500 text-sm">Published</p>
-            <h2 className="text-3xl font-bold mt-1 text-green-600">{blogs.length}</h2>
+            <h2 className="text-3xl font-bold mt-1 text-green-600">{counts.published}</h2>
           </div>
 
           <div className="bg-white p-5 rounded-xl shadow col-span-2 md:col-span-1">
             <p className="text-gray-500 text-sm">Drafts</p>
-            <h2 className="text-3xl font-bold mt-1 text-gray-400">0</h2>
+            <h2 className="text-3xl font-bold mt-1 text-gray-400">{counts.drafts}</h2>
           </div>
         </div>
 
@@ -225,12 +291,35 @@ const Dashboard = () => {
                       {new Date(blog.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-4 text-center">
-                      <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
-                        Published
-                      </span>
+                      {isDraft(blog) ? (
+                        <span className="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-medium">
+                          Draft
+                        </span>
+                      ) : (
+                        <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-medium">
+                          Published
+                        </span>
+                      )}
                     </td>
                     <td className="p-4">
                       <div className="flex justify-center gap-2">
+                        <button
+                          onClick={() => handleStatusChange(blog)}
+                          disabled={updatingId === blog._id}
+                          title={
+                            isDraft(blog)
+                              ? "Publish this post"
+                              : "Move back to drafts"
+                          }
+                          className="flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-200 transition text-sm disabled:opacity-50"
+                        >
+                          {isDraft(blog) ? <FiEye size={14} /> : <FiEyeOff size={14} />}
+                          {updatingId === blog._id
+                            ? "..."
+                            : isDraft(blog)
+                            ? "Publish"
+                            : "Unpublish"}
+                        </button>
                         {/* ✅ Uses blog.slug — matches EditBlog useParams slug */}
                         <Link
                           to={`/admin/edit/${blog.slug}`}
@@ -291,9 +380,30 @@ const Dashboard = () => {
                   <span>By {blog.author}</span>
                   <span>•</span>
                   <span>{new Date(blog.createdAt).toLocaleDateString()}</span>
-                  <span className="ml-auto bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-xs">
-                    Published
+                  <span
+                    className={
+                      isDraft(blog)
+                        ? "ml-auto bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full text-xs"
+                        : "ml-auto bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-xs"
+                    }
+                  >
+                    {isDraft(blog) ? "Draft" : "Published"}
                   </span>
+                </div>
+
+                <div className="flex gap-2 mb-2">
+                  <button
+                    onClick={() => handleStatusChange(blog)}
+                    disabled={updatingId === blog._id}
+                    className="flex-1 flex items-center justify-center gap-1 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm disabled:opacity-50"
+                  >
+                    {isDraft(blog) ? <FiEye size={14} /> : <FiEyeOff size={14} />}
+                    {updatingId === blog._id
+                      ? "..."
+                      : isDraft(blog)
+                      ? "Publish"
+                      : "Unpublish"}
+                  </button>
                 </div>
 
                 <div className="flex gap-2">

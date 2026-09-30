@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { getSingleBlog, updateBlog } from "../../api/blogApi";
+import { getAdminBlogBySlug, updateBlog } from "../../api/blogApi";
 import { FiArrowLeft, FiUpload } from "react-icons/fi";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -50,6 +50,7 @@ const EditBlog = () => {
   const [imageFile, setImageFile] = useState(null);     // New image file
   const [imagePreview, setImagePreview] = useState(null); // New image preview
   const [existingImage, setExistingImage] = useState(null); // Current image from DB
+  const [status, setStatus] = useState("published");    // draft or published
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -59,11 +60,13 @@ const EditBlog = () => {
   // Fetch existing blog data by SLUG
   // Store _id separately for the PATCH call
   // ==========================================
+  // The admin endpoint, not the public one: a draft answers 404 publicly, and a
+  // draft is exactly the post that most needs editing.
   useEffect(() => {
     const fetchBlog = async () => {
       try {
         setLoading(true);
-        const { data } = await getSingleBlog(slug);
+        const { data } = await getAdminBlogBySlug(slug);
         const blog = data.blog;
 
         // Store MongoDB _id for update call
@@ -81,6 +84,9 @@ const EditBlog = () => {
 
         // Store existing image
         setExistingImage(blog.image || null);
+
+        // Posts saved before the status field existed are published
+        setStatus(blog.status || "published");
 
       } catch (err) {
         setError("Failed to load blog. Please try again.");
@@ -142,6 +148,8 @@ const EditBlog = () => {
 
       // content is HTML string from Quill
       payload.append("content", content);
+
+      payload.append("status", status);
 
       // Only append image if a new one was selected
       if (imageFile) {
@@ -302,13 +310,48 @@ const EditBlog = () => {
             </div>
           </div>
 
+          {/* Publish or move to drafts */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Visibility
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="radio"
+                  name="status"
+                  value="published"
+                  checked={status === "published"}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="accent-indigo-600"
+                />
+                Published
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="radio"
+                  name="status"
+                  value="draft"
+                  checked={status === "draft"}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="accent-indigo-600"
+                />
+                Draft
+              </label>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
+              Editing the title never changes this post&apos;s address, and the
+              original publish date is kept.
+            </p>
+          </div>
+
           {/* Submit Button */}
           <button
             type="submit"
             disabled={submitting}
             className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-semibold py-3 rounded-lg transition"
           >
-            {submitting ? "Updating..." : "Update Blog"}
+            {submitting ? "Saving..." : "Update Blog"}
           </button>
 
         </form>

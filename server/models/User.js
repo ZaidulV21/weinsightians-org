@@ -28,6 +28,14 @@ const UserSchema = new mongoose.Schema({
         enum: ['admin'],
         default: 'admin',
     },
+    // Bumped on logout. Tokens issued before the bump stop verifying, so a
+    // logout really ends the session server-side instead of only asking the
+    // browser to drop its cookie. Documents that predate this field are read as
+    // version 0, which is also what older, already-issued tokens carry.
+    tokenVersion: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const User = mongoose.model('User', UserSchema);

@@ -1,113 +1,46 @@
 // ==========================================
-// IMPORTS
+// SERVER ENTRY POINT
 // ==========================================
+// Configuration is validated before anything starts listening, so a missing or
+// weak secret is a startup failure instead of a runtime surprise. Only the
+// problem is reported — never a secret value.
 
-import dns from "dns";
-import dotenv from "dotenv";
-import express from "express";
-import "express-async-errors";
-import mongoose from "mongoose";
-import morgan from "morgan";
+import dns from 'dns';
+import mongoose from 'mongoose';
 
-import cookieParser from "cookie-parser";
-import cors from "cors";
+// Must stay first: this is what populates process.env from server/.env before any
+// other module is evaluated. See config/loadEnv.js.
+import './config/loadEnv.js';
+import app from './app.js';
+import { getStartupConfigProblems } from './utils/envUtils.js';
 
-import authRoutes from "./routes/authRoutes.js";
-import blogRoutes from "./routes/blogRoutes.js";
-
-import notFoundMiddleware from "./middlewares/notFoundMiddleware.js";
-import errorHandlerMiddleware from "./middlewares/errorHandlerMiddleware.js";
-
-
-// ==========================================
-// DNS CONFIGURATION
-// ==========================================
-
-dns.setServers([
-  "8.8.8.8",
-  "1.1.1.1"
-]);
-
-
-// ==========================================
-// ENVIRONMENT
-// ==========================================
-
-dotenv.config();
-
-console.log("VERSION 2 CORS ACTIVE");
-
-
-// ==========================================
-// APP INITIALIZATION
-// ==========================================
-
-const app = express();
-
-
-// ==========================================
-// MIDDLEWARE
-// ==========================================
-
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
-
-app.use(express.json());
-
-app.use(cookieParser());
-
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://weinsightian.tech"
-    ],
-    credentials: true,
-  })
-);
-
-
-// ==========================================
-// ROUTES
-// ==========================================
-
-app.get("/api/v1", (req, res) => {
-  res.json({ message: "Blogs API is running 🚀" });
-});
-
-app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/blogs", blogRoutes);
-
-
-// ==========================================
-// ERROR HANDLING
-// ==========================================
-
-app.use(notFoundMiddleware);
-app.use(errorHandlerMiddleware);
-
-
-// ==========================================
-// DATABASE CONNECTION & SERVER START
-// ==========================================
+// Some networks cannot resolve MongoDB SRV records through the system resolver.
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 const PORT = process.env.PORT || 6200;
 
 const startServer = async () => {
+  const problems = getStartupConfigProblems();
+  if (problems.length > 0) {
+    console.error('❌ Invalid server configuration:');
+    problems.forEach((problem) => console.error(`   - ${problem}`));
+    process.exit(1);
+  }
+
   try {
     await mongoose.connect(process.env.MONGO_URL);
 
-    console.log("✅ MongoDB connected successfully");
+    console.log('✅ MongoDB connected successfully');
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
-
   } catch (error) {
-    console.error("❌ Failed to start server:", error);
+    console.error('❌ Failed to start server:', error.message);
     process.exit(1);
   }
 };
 
 startServer();
+
+export default app;

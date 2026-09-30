@@ -43,6 +43,10 @@ const CreateBlog = () => {
     author: "",
   });
 
+  // A post can be written as a draft first. Drafts are invisible to the public
+  // API and to search engines until they are published.
+  const [status, setStatus] = useState("published");
+
   const [content, setContent] = useState("");        // Quill rich text content (HTML)
   const [imageFile, setImageFile] = useState(null);  // Selected image file
   const [imagePreview, setImagePreview] = useState(null); // Image preview URL
@@ -91,6 +95,8 @@ const CreateBlog = () => {
       // content is HTML string from Quill e.g. "<h1>Hello</h1><p>World</p>"
       form.append("content", content);
 
+      form.append("status", status);
+
       // Only append image if one was selected — never append null
       if (imageFile) {
         form.append("image", imageFile);
@@ -101,7 +107,7 @@ const CreateBlog = () => {
 
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || "Something went wrong";
-      setError(`Failed to publish: ${message}`);
+      setError(`Failed to save: ${message}`);
       console.error("Create blog error:", err);
     } finally {
       setSubmitting(false);
@@ -221,13 +227,53 @@ const CreateBlog = () => {
             </div>
           </div>
 
+          {/* Publish or save as draft */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Visibility
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="radio"
+                  name="status"
+                  value="published"
+                  checked={status === "published"}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="accent-indigo-600"
+                />
+                Publish now
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="radio"
+                  name="status"
+                  value="draft"
+                  checked={status === "draft"}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="accent-indigo-600"
+                />
+                Save as draft
+              </label>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
+              {status === "draft"
+                ? "Drafts are only visible in the admin panel until you publish them."
+                : "The post becomes readable on the public blog immediately."}
+            </p>
+          </div>
+
           {/* Submit Button */}
           <button
             type="submit"
             disabled={submitting}
             className="w-full bg-[#231746] hover:bg-indigo-900 disabled:bg-indigo-300 text-white font-semibold py-3 rounded-lg transition"
           >
-            {submitting ? "Publishing..." : "Publish"}
+            {submitting
+              ? "Saving..."
+              : status === "draft"
+              ? "Save as Draft"
+              : "Publish"}
           </button>
 
         </form>
