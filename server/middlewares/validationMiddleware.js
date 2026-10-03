@@ -257,8 +257,11 @@ export const validateLoginInput = validate([
       }
       return true;
     })
-    .customSanitizer((value) => value.trim().toLowerCase())
+    // bail() has to sit above the sanitizer: express-validator runs sanitizers
+    // even after an earlier check failed, so a missing email would reach
+    // value.trim() as undefined and throw a TypeError that surfaces as a 500.
     .bail()
+    .customSanitizer((value) => value.trim().toLowerCase())
     .isEmail()
     .withMessage('Please provide a valid email'),
   body('password')

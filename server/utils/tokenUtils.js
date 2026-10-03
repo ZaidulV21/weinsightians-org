@@ -39,27 +39,44 @@ export const getAuthTokenFromCookies = (req) => {
 // ==========================================
 // HttpOnly  — JavaScript cannot read the token, so an XSS bug in the admin UI
 //             cannot exfiltrate the session.
-// Secure    — HTTPS only in production. http://localhost dev still works
-//             because browsers treat localhost as a secure context.
-// SameSite  — 'none' is mandatory here: the panel and the API are different
-//             sites (not just different ports), and SameSite=Lax/Strict would
-//             stop the cookie from being sent on cross-site XHR at all. It is
-//             NOT a CSRF control here — see middlewares/csrfProtection.js.
+// Secure    — HTTPS only. Derived from the actual connection, not from NODE_ENV
+//             alone, so a deployed service that is missing NODE_ENV still gets a
+//             valid cookie. See shouldUseSecureCookie below.
+// SameSite  — 'none' over HTTPS, which is mandatory when the panel and the API
+//             are different sites (not just different ports): SameSite=Lax/Strict
+//             would stop the cookie being sent on cross-site XHR at all. On a
+//             plain-http local server it falls back to 'lax', which is still
+//             sufficient there because localhost is same-site. It is NOT a CSRF
+//             control — see middlewares/csrfProtection.js.
 // path '/'  — required with SameSite=None so the cookie is sent to every route.
 
 const AUTH_COOKIE_NAME = 'token';
 
-const buildCookieOptions = (expires) => ({
-  httpOnly: true,
-  secure: isProduction(),
-  sameSite: 'none',
-  path: '/',
-  expires,
-});
+// A SameSite=None cookie without Secure is discarded by the browser with no
+// console error, which presents as "the login request succeeded, then /auth/me
+// returned 401". So Secure is not left to depend on an environment string alone:
+// Render terminates TLS and forwards X-Forwarded-Proto, and the app trusts one
+// proxy hop, so req.secure already answers this correctly in production even if
+// the service has no NODE_ENV set. NODE_ENV stays as the fallback for callers
+// that have no request (the tests) and for a TLS terminator that forwards no
+// protocol header.
+const shouldUseSecureCookie = (req) => isProduction() || Boolean(req?.secure);
+
+const buildCookieOptions = (expires, req) => {
+  const secure = shouldUseSecureCookie(req);
+  return {
+    httpOnly: true,
+    secure,
+    // Decided together with secure so the invalid combination is unreachable.
+    sameSite: secure ? 'none' : 'lax',
+    path: '/',
+    expires,
+  };
+};
 
 export const AUTH_COOKIE_MAX_AGE_MS = 8 * 60 * 60 * 1000; // 8h, matches DEFAULT_JWT_EXPIRES_IN
 
-export const attachCookiesToResponse = (res, user) => {
+export const attachCookiesToResponse = (res, user, req) => {
   const token = createJWT({
     userId: String(user._id),
     role: user.role,
@@ -67,11 +84,15 @@ export const attachCookiesToResponse = (res, user) => {
     tokenVersion: user.tokenVersion ?? 0,
   });
 
-  res.cookie(AUTH_COOKIE_NAME, token, buildCookieOptions(new Date(Date.now() + AUTH_COOKIE_MAX_AGE_MS)));
+  res.cookie(
+    AUTH_COOKIE_NAME,
+    token,
+    buildCookieOptions(new Date(Date.now() + AUTH_COOKIE_MAX_AGE_MS), req)
+  );
 };
 
 // Overwrites the auth cookie with an already-expired one. The options must match
 // the ones used when setting the cookie or the browser keeps the original.
-export const clearAuthCookie = (res) => {
-  res.clearCookie(AUTH_COOKIE_NAME, buildCookieOptions(new Date(0)));
+export const clearAuthCookie = (res, req) => {
+  res.clearCookie(AUTH_COOKIE_NAME, buildCookieOptions(new Date(0), req));
 };

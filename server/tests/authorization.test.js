@@ -300,9 +300,14 @@ test('login sets a hardened HttpOnly cookie', async () => {
   const original = User.findOne;
   User.findOne = () => chain({ _id: ADMIN_ID, name: 'Admin', email: 'admin@example.com', role: 'admin', password: passwordHash });
 
+  // A browser discards SameSite=None unless Secure is also present, so the two
+  // are asserted together. X-Forwarded-Proto mirrors Render, which terminates TLS
+  // and forwards the protocol; the app trusts one proxy hop.
+
   try {
     const res = await request(app)
       .post('/api/v1/auth/login')
+      .set('X-Forwarded-Proto', 'https')
       .send({ email: 'Admin@Example.com', password: ADMIN_PASSWORD });
 
     assert.equal(res.status, 200);
@@ -310,10 +315,19 @@ test('login sets a hardened HttpOnly cookie', async () => {
     assert.match(cookie, /^token=/);
     assert.match(cookie, /HttpOnly/i);
     assert.match(cookie, /SameSite=None/i);
+    assert.match(cookie, /Secure/i);
     assert.match(cookie, /Path=\//i);
-    // Secure is deliberately absent here: it is switched on for NODE_ENV=production
-    // (asserted in auth.test.js) so http://localhost keeps working in dev.
-    assert.ok(!/;\s*Secure/i.test(cookie), 'no Secure flag outside production');
+
+    // Plain http (local dev) cannot carry Secure, so the cookie stays Lax. That
+    // is still sufficient because both halves run on localhost, which is
+    // same-site — unlike the deployed panel and API.
+    const plainRes = await request(app)
+      .post('/api/v1/auth/login')
+      .send({ email: 'Admin@Example.com', password: ADMIN_PASSWORD });
+    const plainCookie = plainRes.headers['set-cookie'].join(';');
+    assert.match(plainCookie, /HttpOnly/i);
+    assert.match(plainCookie, /SameSite=Lax/i);
+    assert.ok(!/;\s*Secure/i.test(plainCookie), 'no Secure flag over plain http');
 
     // The payload is readable only by the server: id, role, session version.
     const token = res.headers['set-cookie'][0].split(';')[0].replace('token=', '');

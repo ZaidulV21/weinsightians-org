@@ -31,9 +31,9 @@ export const login = async (req, res) => {
     throw new UnauthorizedError('Invalid email or password');
   }
 
-  // The token never reaches JavaScript: HttpOnly cookie, Secure in production,
-  // SameSite=None because the panel and the API are different sites.
-  attachCookiesToResponse(res, user);
+  // The token never reaches JavaScript: HttpOnly cookie, Secure over HTTPS,
+  // SameSite=None there because the panel and the API are different sites.
+  attachCookiesToResponse(res, user, req);
 
   res.status(StatusCodes.OK).json({
     msg: 'user logged in',
@@ -53,7 +53,7 @@ export const getMe = async (req, res) => {
   // The token is verified and the account was seen a moment ago, so a missing
   // user here means it was deleted mid-session.
   if (!user) {
-    clearAuthCookie(res);
+    clearAuthCookie(res, req);
     throw new UnauthorizedError('authentication invalid');
   }
 
@@ -81,7 +81,7 @@ export const logout = async (req, res) => {
     console.error('⚠️  Could not invalidate session version:', error?.message || 'unknown error');
   }
 
-  clearAuthCookie(res);
+  clearAuthCookie(res, req);
 
   res.status(StatusCodes.OK).json({
     msg: 'user logged out',
