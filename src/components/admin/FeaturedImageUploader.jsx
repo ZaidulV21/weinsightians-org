@@ -19,7 +19,18 @@ import { IMAGE_RULES, formatBytes, validateImageFile } from "../../utils/blogFor
  *   - Dropping a file is handled on the visible label, not on the hidden input,
  *     because an input the author cannot see cannot receive a drop.
  */
-const FeaturedImageUploader = ({ file, preview, onSelect, onClear, disabled = false }) => {
+const FeaturedImageUploader = ({
+  file,
+  preview,
+  onSelect,
+  onClear,
+  disabled = false,
+  // The edit screen already has a stored image on the server. Showing it as the
+  // starting preview means the author sees the post as readers currently do,
+  // instead of an empty box that looks like the post has no image.
+  existingUrl = null,
+  children = null,
+}) => {
   const reactId = useId();
   const inputId = `${reactId}-input`;
   const hintId = `${reactId}-hint`;
@@ -28,6 +39,11 @@ const FeaturedImageUploader = ({ file, preview, onSelect, onClear, disabled = fa
   const inputRef = useRef(null);
   const [error, setError] = useState(null);
   const [dragging, setDragging] = useState(false);
+
+  // A newly chosen file wins over the stored image; until then the stored URL is
+  // the honest preview.
+  const shown = preview || existingUrl;
+  const isPending = Boolean(preview);
 
   // The preview is an object URL created by the parent, so it has to be released
   // when it changes or the screen unmounts. Skipping this holds the whole file in
@@ -104,23 +120,30 @@ const FeaturedImageUploader = ({ file, preview, onSelect, onClear, disabled = fa
         className="peer sr-only"
       />
 
-      {preview ? (
+      {shown ? (
         <div className="mt-2.5">
           <img
-            src={preview}
+            src={shown}
             alt="Selected featured image preview"
             className="h-40 w-full rounded-xl border border-[#e8e6f1] object-cover"
           />
 
           <p className="mt-2 truncate text-[12.5px] text-[#6b6483]">
-            {file?.name}
-            {file ? ` · ${formatBytes(file.size)}` : ""}
+            {isPending ? (
+              <>
+                {file?.name}
+                {file ? ` · ${formatBytes(file.size)}` : ""}
+                <span className="ml-1.5 font-medium text-[#8c86a1]">(not saved yet)</span>
+              </>
+            ) : (
+              "Current image on this post"
+            )}
           </p>
 
           <div className="mt-2 flex flex-wrap gap-2">
             <label htmlFor={inputId} className={controlClass}>
               <FiUpload className="h-3.5 w-3.5" aria-hidden="true" />
-              Replace image
+              {isPending ? "Replace image" : "Upload a new image"}
             </label>
 
             <button
@@ -133,6 +156,7 @@ const FeaturedImageUploader = ({ file, preview, onSelect, onClear, disabled = fa
               Remove image
             </button>
           </div>
+
         </div>
       ) : (
         <label
@@ -168,6 +192,11 @@ const FeaturedImageUploader = ({ file, preview, onSelect, onClear, disabled = fa
           </span>
         </label>
       )}
+
+      {/* The URL import sits below either state, because it is a second way to
+          reach the same thing and stays available whether or not an image is
+          already chosen. */}
+      {children}
 
       {error ? (
         <p id={errorId} className="mt-2 text-[13px] font-medium text-[#a32b3b]">

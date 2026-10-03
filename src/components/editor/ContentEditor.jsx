@@ -25,6 +25,12 @@ const ContentEditor = ({
   disabled = false,
   describedBy,
   editorRef,
+  // The narrow toolbar by default, which is the right choice for authoring a new
+  // post. The edit screen passes the full Quill surface it has always offered
+  // (QUILL_MODULES_EDIT / QUILL_FORMATS_EDIT); both are allowlisted by the
+  // server's sanitizer, so neither can produce markup that is thrown away.
+  modules = QUILL_MODULES,
+  formats = QUILL_FORMATS,
 }) => {
   const localRef = useRef(null);
   const quillRef = editorRef || localRef;
@@ -92,8 +98,8 @@ const ContentEditor = ({
           theme="snow"
           value={value}
           onChange={onChange}
-          modules={QUILL_MODULES}
-          formats={QUILL_FORMATS}
+          modules={modules}
+          formats={formats}
           placeholder="Write your article here…"
           readOnly={disabled}
           className="bg-white"

@@ -8,12 +8,14 @@ import {
   createBlog,
   updateBlog,
   deleteBlog,
+  importBlogImageFromUrl,
 } from '../controllers/blogController.js';
 import {
   validateBlogCreate,
   validateBlogUpdate,
   validateIdParam,
   validateSlugParam,
+  validateImageUrlImport,
 } from '../middlewares/validationMiddleware.js';
 import { authenticateUser } from '../middlewares/authenticationMiddleware.js';
 import adminRouteMiddleware from '../middlewares/adminRouteMiddleware.js';
@@ -48,6 +50,20 @@ router.get(
   adminRouteMiddleware,
   validateSlugParam,
   getAdminBlogBySlug
+);
+
+// Import a featured image from a URL. A dedicated endpoint rather than an extra
+// field on PATCH /:id, because it does something categorically different: it
+// makes the server fetch a remote resource and store a file. It is rate limited
+// like any other write, and it never touches a blog document — the stored URL is
+// handed back for the editor to stage.
+router.post(
+  '/admin/import-image',
+  authenticateUser,
+  adminRouteMiddleware,
+  mutationRateLimiter,
+  validateImageUrlImport,
+  importBlogImageFromUrl
 );
 
 router.post(

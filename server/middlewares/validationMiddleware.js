@@ -120,6 +120,40 @@ const validate = (chains) => [
   },
 ];
 
+// POST /blogs/admin/import-image
+//
+// Presence and shape only. The URL is not checked here beyond being a plausible
+// http(s) string: parseRemoteImageUrl does the real protocol, port, hostname and
+// address work, and duplicating those rules here would risk the validator and the
+// fetcher disagreeing about what is allowed. Defined here rather than beside the
+// field helpers above because it uses the `validate` runner.
+const MAX_IMAGE_URL_LENGTH = 2048;
+
+export const validateImageUrlImport = validate([
+  body('url')
+    .isString()
+    .withMessage('An image URL is required')
+    .bail()
+    .custom((value) => {
+      if (value.trim().length === 0) {
+        throw new Error('An image URL is required');
+      }
+      if (value.length > MAX_IMAGE_URL_LENGTH) {
+        throw new Error('That URL is too long');
+      }
+      let parsed;
+      try {
+        parsed = new URL(value.trim());
+      } catch {
+        throw new Error('That does not look like a valid URL');
+      }
+      if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+        throw new Error('The image URL must start with http:// or https://');
+      }
+      return true;
+    }),
+]);
+
 // Create: every field the CMS supports is required.
 export const validateBlogCreate = validate([
   plainTextField('title', 'Title', LIMITS.title),

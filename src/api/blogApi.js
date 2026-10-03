@@ -32,6 +32,14 @@ export const updateBlog = (id, data) =>
     headers: { "Content-Type": "multipart/form-data" },
   });
 
+// Import a featured image from a URL.
+//
+// JSON, not multipart, and a dedicated endpoint rather than an extra field on the
+// update: the server downloads the image and stores it, then returns the stored
+// URL. The returned URL is staged in the editor and only sent to the blog when
+// the author saves, so a failed import cannot leave a post pointing at nothing.
+export const importBlogImage = (url) => axiosInstance.post("/blogs/admin/import-image", { url });
+
 // Publish or unpublish without touching the rest of the post. The server keeps
 // the slug and the original publish date either way.
 export const setBlogStatus = (id, status) =>

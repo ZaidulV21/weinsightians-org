@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiAlertCircle, FiArrowLeft, FiCheckCircle, FiEye } from "react-icons/fi";
-import { createBlog } from "../../api/blogApi";
+import { createBlog, importBlogImage } from "../../api/blogApi";
 import AdminShell from "../../components/admin/AdminShell";
 import ConfirmDialog from "../../components/admin/ConfirmDialog";
 import FeaturedImageUploader from "../../components/admin/FeaturedImageUploader";
+import ImageUrlImporter from "../../components/admin/ImageUrlImporter";
 import PublishControls from "../../components/admin/PublishControls";
 import TextField from "../../components/admin/TextField";
 import ContentEditor from "../../components/editor/ContentEditor";
@@ -60,6 +61,9 @@ const CreateBlog = () => {
   const [form, setForm] = useState(EMPTY_FORM);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  // A URL the secure import endpoint has already downloaded and stored for us,
+  // staged like a chosen file and attached to the post only when it is saved.
+  const [importedImage, setImportedImage] = useState(null);
 
   // Draft is the starting point, not published. A post should become public
   // because someone chose that, never because a form was opened and submitted.
@@ -123,9 +127,14 @@ const CreateBlog = () => {
         label: "Content",
         done: visibleLength(form.content) >= LIMITS.content.min,
       },
-      { id: "image", label: "Featured image", done: Boolean(imageFile), optional: true },
+      {
+        id: "image",
+        label: "Featured image",
+        done: Boolean(imageFile || importedImage),
+        optional: true,
+      },
     ],
-    [form, imageFile]
+    [form, imageFile, importedImage]
   );
 
   // ==========================================
@@ -139,7 +148,7 @@ const CreateBlog = () => {
   //     needs a data router (createBrowserRouter). Moving the whole app to one
   //     is a separate change, not something to smuggle into a create form.
   // ==========================================
-  const dirty = !success && (isMeaningful(form) || Boolean(imageFile));
+  const dirty = !success && (isMeaningful(form) || Boolean(imageFile || importedImage));
 
   useEffect(() => {
     if (!dirty) return undefined;
@@ -186,20 +195,45 @@ const CreateBlog = () => {
 
   const handleImageSelect = (file) => {
     // Replacing a chosen file releases the previous preview rather than leaking
-    // both for the life of the page.
+    // both for the life of the page. Selecting a file also supersedes a staged
+    // import: two images staged at once would be ambiguous about which is saved.
     setImagePreview((previous) => {
       if (previous) URL.revokeObjectURL(previous);
       return URL.createObjectURL(file);
     });
     setImageFile(file);
+    setImportedImage(null);
   };
 
+  // Remove is a local staging action only: it clears the staged file/import and
+  // hides the preview. The button is type="button" so it never submits the blog
+  // form and never reloads the page. Nothing is sent to the server here.
   const handleImageClear = () => {
     setImagePreview((previous) => {
       if (previous) URL.revokeObjectURL(previous);
       return null;
     });
     setImageFile(null);
+    setImportedImage(null);
+  };
+
+  // Import stages the stored URL the secure backend returns. The blog itself is
+  // not created here — the staged image is attached only when the author saves.
+  const handleImport = async (url) => {
+    const { data } = await importBlogImage(url);
+    const stored = data.imageUrl;
+
+    if (!stored) {
+      throw new Error("The server did not return a stored image");
+    }
+
+    setImagePreview((previous) => {
+      if (previous) URL.revokeObjectURL(previous);
+      return null;
+    });
+    setImageFile(null);
+    setImportedImage(stored);
+    setFailure(null);
   };
 
   // ==========================================
@@ -297,7 +331,10 @@ const CreateBlog = () => {
     payload.append("content", form.content);
     payload.append("status", nextStatus);
 
+    // A file is sent as a file; an imported image is sent as the stored URL the
+    // import endpoint already returned. The pasted address is never sent.
     if (imageFile) payload.append("image", imageFile);
+    else if (importedImage) payload.append("image", importedImage);
 
     try {
       await createBlog(payload);
@@ -482,11 +519,13 @@ const CreateBlog = () => {
             <div className="rounded-xl border border-[#e8e6f1] bg-white p-5">
               <FeaturedImageUploader
                 file={imageFile}
-                preview={imagePreview}
+                preview={imagePreview || importedImage}
                 onSelect={handleImageSelect}
                 onClear={handleImageClear}
                 disabled={submitting}
-              />
+              >
+                <ImageUrlImporter onImport={handleImport} disabled={submitting} />
+              </FeaturedImageUploader>
             </div>
 
             <div className="rounded-xl border border-[#e8e6f1] bg-white p-5">

@@ -20,6 +20,11 @@ const PublishControls = ({
   busy,
   onSaveDraft,
   disabled = false,
+  // The address note is not hardcoded, because it is not the same on both
+  // screens. Creating a post, the server derives the address from the title.
+  // Editing one, the address already exists and is deliberately not changed —
+  // see EDITABLE_FIELDS in server/controllers/blogController.js.
+  addressNote,
 }) => {
   const options = [
     {
@@ -98,9 +103,8 @@ const PublishControls = ({
               /blog/{slug}
             </p>
             <p className="mt-1.5 text-[12px] leading-relaxed text-[#8c86a1]">
-              Generated from the title by the server, which also guarantees it is
-              unique. If the address is already taken it gets a number added, so
-              this preview may not be the final one.
+              {addressNote ??
+                "Generated from the title by the server, which also guarantees it is unique. If the address is already taken it gets a number added, so this preview may not be the final one."}
             </p>
           </>
         ) : (

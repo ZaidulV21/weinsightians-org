@@ -118,6 +118,44 @@ export const validateImageFile = (file) => {
 };
 
 // ==========================================
+// IMAGE URLS
+// ==========================================
+// A convenience check for the import box, and nothing more. It mirrors
+// parseRemoteImageUrl closely enough to catch a typo before a request is made, and
+// deliberately stops where the real check begins: the server resolves the name and
+// decides what is reachable. A URL that passes here can still be refused, and one
+// refused here would have been refused there anyway.
+
+export const MAX_IMAGE_URL_LENGTH = 2048; // matches the server's own limit
+
+/**
+ * Returns a message safe to show an author, or null when the URL looks plausible.
+ */
+export const validateImageUrl = (value) => {
+  const raw = String(value ?? "").trim();
+
+  if (raw === "") return "Enter an image URL";
+  if (raw.length > MAX_IMAGE_URL_LENGTH) return "That URL is too long";
+
+  let url;
+  try {
+    url = new URL(raw);
+  } catch {
+    return "That does not look like a valid URL";
+  }
+
+  if (url.protocol !== "https:" && url.protocol !== "http:") {
+    return "The image URL must start with http:// or https://";
+  }
+
+  if (url.username || url.password) {
+    return "That URL is not a valid image address";
+  }
+
+  return null;
+};
+
+// ==========================================
 // VALIDATION
 // ==========================================
 
