@@ -13,6 +13,7 @@ import cors from 'cors';
 
 import authRoutes from './routes/authRoutes.js';
 import blogRoutes from './routes/blogRoutes.js';
+import sitemapRoutes from './routes/sitemapRoutes.js';
 import notFoundMiddleware from './middlewares/notFoundMiddleware.js';
 import errorHandlerMiddleware from './middlewares/errorHandlerMiddleware.js';
 import verifyRequestOrigin from './middlewares/csrfProtection.js';
@@ -63,6 +64,10 @@ app.get('/api/v1', (req, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/blogs', blogRoutes);
+// Public XML sitemap, generated from the published blog records on each request.
+// Mounted at the API root because it is not a blog resource and must not sit
+// behind the '/blogs/:slug' pattern.
+app.use('/api/v1', sitemapRoutes);
 
 // ==========================================
 // ERROR HANDLING
