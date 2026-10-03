@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test:blogs": "node --test src/utils/blogList.test.js",
     "preview": "vite preview"
   },
   "dependencies": {
