@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import OurServices2 from './OurServices2.jsx';
-import Footer from './Footer.jsx';
 import PricingSection from './PricingSection.jsx';
 import Button from './Button.jsx';
 
@@ -732,7 +731,6 @@ const ServicePage1 = () => {
 
       <OurServices2 />
       <PricingSection />
-      <Footer />
     </div>
   );
 };

@@ -58,10 +58,7 @@ const Footer = () => {
                             <li className={LINK_ITEM}><a href="https://instagram.com/weinsightians" target="_blank" rel="noopener noreferrer">Instagram</a></li>
                             <li className={LINK_ITEM}><a href="https://www.facebook.com/profile.php?id=61552381883595" target="_blank" rel="noopener noreferrer">Facebook</a></li>
                             <li className={LINK_ITEM}><a href="https://www.linkedin.com/company/we-insightians/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-                             <li >              <NavLink
-                    to={ADMIN_LOGIN_ROUTE}
-                    className='rounded-sm text-xs text-gray-400 underline decoration-gray-300 underline-offset-4 transition-colors duration-300 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 motion-reduce:transition-none'
-                    > Admin Login</NavLink></li>
+
                         </ul>
                     </motion.div>
                 </div>
@@ -76,6 +73,10 @@ const Footer = () => {
                     competing with the customer-facing links above. It navigates to
                     the existing admin login screen — no admin capability, no
                     second login, and nothing is exposed by being linked here. */}
+                                                 <li >              <NavLink
+                    to={ADMIN_LOGIN_ROUTE}
+                    className='rounded-sm text-xs text-gray-400 underline decoration-gray-300 underline-offset-4 transition-colors duration-300 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 motion-reduce:transition-none'
+                    > Admin Login</NavLink></li>
 
             </div>
         </motion.div>

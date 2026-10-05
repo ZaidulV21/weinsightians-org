@@ -520,11 +520,11 @@ const SingleBlog = () => {
               </div>
 
               <MoreInsights posts={related} />
+        <Footer />
             </div>
           </article>
         </div>
 
-        <Footer />
       </div>
     </>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import Footer from '../components/Footer.jsx';
 import ServicePage1 from '../components/ServicePage1';
 
 const Services = () => {
@@ -24,6 +25,9 @@ const Services = () => {
         <meta name="twitter:card" content="summary_large_image" />
       </Helmet>
       <ServicePage1 />
+      <div className='px-10'>
+      <Footer/>
+      </div>
     </>
   );
 };
