@@ -165,23 +165,24 @@ const Page2 = () => {
     [reelActive, activeIndex],
   );
 
+  /* This section used to mount at `opacity: 0` behind a `whileInView` reveal
+   * with `amount: 0.3`. `amount` is the fraction of the element that has to be
+   * inside the viewport, and this section is ~2277px tall on a 375x667 phone —
+   * the most it can ever show is 667/2277 = 0.29, so the trigger could not be
+   * reached and the whole section stayed white for the entire scroll. On other
+   * viewports it fired only once the section nearly filled the screen, so the
+   * content popped in far too late. The section therefore renders in its final
+   * state with no scroll trigger at all: there is no observer, no variant and
+   * no React work tied to scrolling past it, which is both correct and cheaper
+   * than what it replaced. */
   return (
-    <motion.div
+    <div
       className='min-h-[110vh] w-full tab-page-2-main-box flex flex-col md:flex-row px-4 sm:px-8 md:px-12 lg:px-16'
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ staggerChildren: 0.3 }}
     >
 
       {/* Left Side */}
-      <motion.div
+      <div
         className='h-full w-full md:w-1/2'
-        variants={{
-          hidden: { opacity: 0, x: -100 },
-          visible: { opacity: 1, x: 0 },
-        }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
       >
         <div className='w-full abt-heading h-1/3 pt-10'>
           <h2 className='font-bold font-[Gilroy] text-5xl'>About Us</h2>
@@ -238,17 +239,12 @@ const Page2 = () => {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Right Side */}
-      <motion.div
+      <div
         className='relative flex w-full flex-col md:w-1/2'
-        variants={{
-          hidden: { opacity: 0, y: 28 },
-          visible: { opacity: 1, y: 0 },
-        }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
-        >
+      >
         <ServiceReelContext.Provider value={reel}>
           <div className='flex w-full flex-1 flex-col justify-center gap-8 py-8 sm:py-10 md:py-0 lg:gap-10'>
             <div className='transforming-heading relative w-full  lg:my-10'>
@@ -300,8 +296,8 @@ const Page2 = () => {
             </div>
           </div>
         </ServiceReelContext.Provider>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
 
