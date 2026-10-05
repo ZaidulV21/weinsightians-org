@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import GoeyCircle from './GoeyCircle';
 
@@ -33,19 +33,15 @@ function ProjectCard({ card, i }) {
   const videoRef = useRef(null);
   const [open, setOpen] = useState(false);
 
-  const toggleOpen = () => {
-    if (open) {
-      setOpen(false);
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
-      }
-      return;
-    }
+  const toggleOpen = () => setOpen((current) => !current);
 
-    setOpen(true);
-    videoRef.current?.play();
-  };
+  /* The <video> mounts on open, so the play() has to happen after the ref is
+   * attached rather than inside the click handler. Muted + inline autoplay is
+   * allowed everywhere; this is the fallback for a browser that declines. */
+  useEffect(() => {
+    if (!open) return;
+    videoRef.current?.play().catch(() => {});
+  }, [open]);
 
   const handleKeyDown = (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -141,24 +137,33 @@ function ProjectCard({ card, i }) {
       </div>
 
       {/* ── Video — expands on click, full video visible, no cropping ── */}
+      {/* The wrapper stays mounted so the expand transition still runs from
+          0, but the <video> inside it does not. All three case study videos
+          used to sit in the DOM from first paint, so the browser opened a
+          range request for ~11.5MB of media the visitor had not even asked to
+          see yet. A collapsed card has no video on screen, so mounting on
+          open costs nothing visually and saves the whole payload. */}
       <div
         className="w-full overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{ maxHeight: open ? "70vw" : "0px", opacity: open ? 1 : 0 }}
       >
-        <div
-          className="w-full bg-black/5 rounded-2xl overflow-hidden mb-6"
-          style={{ aspectRatio: "16/9" }}
-        >
-          <video
-            ref={videoRef}
-            src={card.video}
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            className="w-full h-full object-contain"
-          />
-        </div>
+        {open && (
+          <div
+            className="w-full bg-black/5 rounded-2xl overflow-hidden mb-6"
+            style={{ aspectRatio: "16/9" }}
+          >
+            <video
+              ref={videoRef}
+              src={card.video}
+              muted
+              loop
+              playsInline
+              autoPlay
+              preload="metadata"
+              className="w-full h-full object-contain"
+            />
+          </div>
+        )}
       </div>
     </motion.article>
   );
@@ -172,6 +177,7 @@ const Page3 = () => {
       <motion.div
         initial={{ y: 40, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
+        viewport={{ once: true }}
         transition={{ duration: 0.8 }}
         className="w-full py-12 flex flex-col md:flex-row justify-between"
       >
@@ -196,6 +202,7 @@ const Page3 = () => {
       <motion.p
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 0.3 }}
         className="font-[Gilroy] text-[10px] tracking-[0.2em] uppercase text-black/30 font-semibold mb-2 text-right hidden sm:block"
       >

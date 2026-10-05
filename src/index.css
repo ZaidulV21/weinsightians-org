@@ -133,6 +133,63 @@
     transform: rotate(360deg);
   }
 }
+
+/* ==========================================
+   HERO MOTION — compositor-only keyframes
+   ==========================================
+   The insight engines on Home and Services float a lot of small pieces:
+   nine service nodes on desktop Home, six on mobile Home, six on Services,
+   plus the orbital rings and frames around them. Driving that many loops
+   through Framer Motion meant every one of them was recomputed on the main
+   thread on every frame, for the whole time the page was open — including
+   long after the hero had scrolled away.
+
+   These loops are pure transform work, so they run as CSS animations
+   instead. The browser hands them to the compositor, they cost nothing on
+   the main thread, and there is no per-frame JavaScript at all.
+
+   `.wis-bob` reads its distance from the `--bob-lift` custom property, so
+   one keyframe serves every node while each element keeps its own amplitude,
+   duration and phase offset.
+   ========================================== */
+
+@keyframes wis-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(calc(var(--bob-lift, 5px) * -1)); }
+}
+
+@keyframes wis-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes wis-spin-reverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+/* The two upright glass panels on the mobile Home stack breathe on both axes
+   at once, so they get their own keyframes rather than a second transform. */
+@keyframes wis-panel-outer {
+  0%, 100% { transform: translateY(0) rotate(-2.5deg); }
+  50% { transform: translateY(-5px) rotate(-1.1deg); }
+}
+
+@keyframes wis-panel-inner {
+  0%, 100% { transform: translateY(0) rotate(2deg); }
+  50% { transform: translateY(6px) rotate(3.3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wis-bob,
+  .wis-spin,
+  .wis-spin-reverse,
+  .wis-panel-outer,
+  .wis-panel-inner {
+    animation: none !important;
+  }
+}
+
 .arrow-img:hover img{
     animation: rotate360 3s linear infinite;
 
@@ -258,4 +315,313 @@ font-size: 1.55rem;
   width: 100%;
   height: 100%;
   border-radius: 50%;
+}
+
+/* ==========================================
+   ARTICLE BODY
+   ==========================================
+   The public article page renders stored, server-sanitized HTML inside
+   .article-content. Tailwind's typography plugin is not installed in this project,
+   so the `prose` classes that used to sit on that wrapper did nothing at all and
+   article text rendered as unstyled paragraphs. These rules are the article's
+   typography.
+
+   They style only elements the server's sanitizer allows
+   (server/utils/sanitizeUtils.js), so there is nothing here that can be reached by
+   markup the sanitizer would have stripped. They are deliberately a plain class
+   rather than a plugin because a plugin would mean adding a dependency to style
+   one page.
+
+   Author-controlled inline styles (colour, alignment, indent, font) survive
+   sanitization by design, so nothing here uses !important: an author's chosen
+   colour must still win over the site default.
+   ========================================== */
+
+.article-content {
+  color: #3d3659;
+  font-family: gilroy, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+@media (min-width: 768px) {
+  .article-content {
+    font-size: 1.125rem;
+  }
+}
+
+/* ---------- paragraphs ---------- */
+
+.article-content > *:first-child {
+  margin-top: 0;
+}
+
+.article-content p {
+  margin: 0 0 1.5em;
+}
+
+.article-content strong,
+.article-content b {
+  color: #231746;
+  font-weight: 700;
+}
+
+.article-content em,
+.article-content i {
+  font-style: italic;
+}
+
+/* ---------- headings ---------- */
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+  color: #231746;
+  font-family: larken, sans-serif;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 2.4em 0 0.7em;
+  text-wrap: balance;
+}
+
+.article-content h1 { font-size: 2rem; }
+.article-content h2 { font-size: 1.625rem; }
+.article-content h3 { font-size: 1.3125rem; }
+.article-content h4 { font-size: 1.125rem; }
+.article-content h5,
+.article-content h6 {
+  font-size: 1rem;
+  color: #534277;
+}
+
+@media (min-width: 768px) {
+  .article-content h1 { font-size: 2.375rem; }
+  .article-content h2 { font-size: 1.875rem; }
+  .article-content h3 { font-size: 1.5rem; }
+}
+
+/* ---------- links ---------- */
+
+/* Identified by colour *and* an underline, so the affordance does not rely on
+   colour alone. */
+.article-content a {
+  color: #5a3dbd;
+  text-decoration: underline;
+  text-decoration-color: #a380ed;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 200ms ease, text-decoration-color 200ms ease;
+}
+
+.article-content a:hover {
+  color: #231746;
+  text-decoration-color: #5a3dbd;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .article-content a {
+    transition: none;
+  }
+}
+
+/* ---------- lists ---------- */
+
+.article-content ul,
+.article-content ol {
+  margin: 0 0 1.5em;
+  padding-left: 1.5em;
+}
+
+.article-content ul { list-style: disc; }
+.article-content ol { list-style: decimal; }
+
+.article-content li {
+  margin-bottom: 0.6em;
+  padding-left: 0.25em;
+}
+
+.article-content li > ul,
+.article-content li > ol {
+  margin: 0.6em 0 0;
+}
+
+.article-content li::marker {
+  color: #8c86a1;
+}
+
+/* ---------- blockquote ---------- */
+
+.article-content blockquote {
+  border-left: 3px solid #a380ed;
+  color: #534277;
+  font-style: italic;
+  margin: 2em 0;
+  padding: 0.25em 0 0.25em 1.5em;
+}
+
+.article-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- code ---------- */
+
+.article-content code {
+  background: #f0eef8;
+  border-radius: 4px;
+  color: #4a2fa8;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875em;
+  padding: 0.15em 0.4em;
+}
+
+/* A long single line scrolls inside its own block instead of widening the page. */
+.article-content pre {
+  background: #1d1533;
+  border-radius: 8px;
+  color: #e8e6f1;
+  margin: 2em 0;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1.25rem 1.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.article-content pre code {
+  background: none;
+  border-radius: 0;
+  color: inherit;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  padding: 0;
+  white-space: pre;
+}
+
+/* Quill code blocks arrive as <pre class="ql-syntax"> with token spans. */
+.article-content pre .token {
+  color: #e8e6f1;
+}
+
+.article-content pre .token.tag,
+.article-content pre .token.selector,
+.article-content pre .token.keyword {
+  color: #c9b6f5;
+}
+
+.article-content pre .token.attr-value,
+.article-content pre .token.string {
+  color: #a8e6c4;
+}
+
+.article-content pre .token.comment {
+  color: #8c86a1;
+}
+
+/* ---------- images ---------- */
+
+/* The editor does not offer inline images, but the sanitizer allows <img>, so
+   pasted or legacy content can contain them. max-width keeps them inside the
+   reading column on a 375px screen. The server already forces loading="lazy". */
+.article-content img {
+  border-radius: 8px;
+  display: block;
+  height: auto;
+  margin: 2em auto;
+  max-width: 100%;
+}
+
+.article-content figure {
+  margin: 2em 0;
+}
+
+.article-content figure img {
+  margin: 0;
+}
+
+.article-content figcaption {
+  color: #6b6483;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  margin-top: 0.75em;
+  text-align: center;
+}
+
+/* ---------- rules + misc ---------- */
+
+.article-content hr {
+  border: 0;
+  border-top: 1px solid #e8e6f1;
+  margin: 3em 0;
+}
+
+.article-content mark {
+  background: #fdf3d8;
+  color: inherit;
+  padding: 0.05em 0.15em;
+}
+
+.article-content small {
+  color: #6b6483;
+  font-size: 0.875em;
+}
+
+/* Quill alignment and indent classes. The sanitizer allows only ql-*, so these
+   selectors cannot be reached by arbitrary class names. */
+.article-content .ql-align-center { text-align: center; }
+.article-content .ql-align-right { text-align: right; }
+.article-content .ql-align-justify { text-align: justify; }
+
+.article-content .ql-indent-1 { padding-left: 3em; }
+.article-content .ql-indent-2 { padding-left: 6em; }
+.article-content .ql-indent-3 { padding-left: 9em; }
+.article-content .ql-indent-4 { padding-left: 12em; }
+.article-content .ql-indent-5 { padding-left: 15em; }
+.article-content .ql-indent-6 { padding-left: 18em; }
+.article-content .ql-indent-7 { padding-left: 21em; }
+.article-content .ql-indent-8 { padding-left: 24em; }
+
+/* Deep-indented lists would push text off a phone screen. */
+@media (max-width: 640px) {
+  .article-content .ql-indent-4,
+  .article-content .ql-indent-5,
+  .article-content .ql-indent-6,
+  .article-content .ql-indent-7,
+  .article-content .ql-indent-8 {
+    padding-left: 3em;
+  }
+
+  .article-content pre {
+    padding: 1rem;
+  }
+}
+
+/* ---------- tables (defensive) ---------- */
+/* Neither toolbar can create a table and the sanitizer's allowlist excludes every
+   table tag, so no stored article can contain one today. These rules exist only so
+   that widening the allowlist later cannot immediately produce an unstyled table
+   that breaks the reading column. */
+.article-content table {
+  border-collapse: collapse;
+  display: block;
+  margin: 2em 0;
+  max-width: 100%;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.article-content th,
+.article-content td {
+  border: 1px solid #e8e6f1;
+  padding: 0.6em 0.9em;
+  text-align: left;
+}
+
+.article-content th {
+  background: #f7f6fb;
+  color: #231746;
+  font-family: larken, sans-serif;
 }

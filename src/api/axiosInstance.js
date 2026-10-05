@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ADMIN_LOGIN_ROUTE } from "../routes";
 
 // The admin session lives in an HttpOnly cookie the browser attaches on its own.
 // The token is never read or stored by JavaScript, so there is nothing here to
@@ -29,8 +30,8 @@ axiosInstance.interceptors.response.use(
 
     if (status === 401 && onAdminPage && !isLoginCall) {
       sessionStorage.removeItem(AUTH_KEY);
-      if (!window.location.pathname.startsWith("/admin/login")) {
-        window.location.assign("/admin/login");
+      if (!window.location.pathname.startsWith(ADMIN_LOGIN_ROUTE)) {
+        window.location.assign(ADMIN_LOGIN_ROUTE);
       }
     }
 

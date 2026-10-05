@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { clearAuthentication, getCurrentAdmin, markAuthenticated } from "../api/authApi";
+import { ADMIN_LOGIN_ROUTE } from "../routes";
 
 // ==========================================
 // SESSION CHECK
@@ -39,7 +40,7 @@ const ProtectedRoute = ({ children }) => {
   }, []);
 
   if (state === "redirecting") {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to={ADMIN_LOGIN_ROUTE} replace />;
   }
 
   if (state === "checking") {

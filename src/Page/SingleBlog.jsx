@@ -1,335 +1,531 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import axiosInstance from "../api/axiosInstance";
+import { FiArrowLeft, FiCheck, FiCopy, FiLinkedin, FiFacebook, FiTwitter } from "react-icons/fi";
+import { FaWhatsapp } from "react-icons/fa";
 import Footer from "../components/Footer";
 import NotFound from "./NotFound";
-import { FiArrowLeft } from "react-icons/fi";
+import { getBlogs, getSingleBlog } from "../api/blogApi";
+import { BRAND_IMAGE, authorName, formatDate, imageAlt, optimizeImage, publishDate } from "../utils/blogList";
+import {
+  SITE_NAME,
+  articleCanonical,
+  articleDescription,
+  articleImage,
+  articleStructuredData,
+  articleTitle,
+  modifiedIso,
+  publishedIso,
+  relatedArticles,
+  toSafeJson,
+} from "../utils/article";
 
-// ==========================================
-// HELPER: Optimize Cloudinary image URL
-// Adds auto format, auto quality, and width
-// to reduce image size by 60-80%
-// ==========================================
-const optimizeImage = (url, width = 1200) => {
-  if (!url) return null;
-  return url.replace("/upload/", `/upload/w_${width},f_auto,q_auto/`);
+/* ==========================================
+   PUBLIC ARTICLE — /blog/:slug
+   ==========================================
+   The article body is stored HTML, sanitized server-side on the way into the
+   database by sanitizeBlogContent() (server/utils/sanitizeUtils.js). That
+   allowlist is the security boundary: it keeps a fixed set of formatting tags,
+   allows only http/https/mailto/tel link schemes, strips script/style/iframe
+   along with their contents, forces rel="noopener noreferrer nofollow" onto
+   links and loading="lazy" onto images.
+
+   The dangerouslySetInnerHTML below therefore renders content that has already
+   been through that filter — the same path the page used before this redesign.
+   It is not weakened, widened or bypassed here, and no new markup is injected
+   through it.
+
+   What this file adds is presentation and per-article SEO: an editorial reading
+   layout, real article metadata, BlogPosting structured data, and honest
+   loading / not-found / error states.
+
+   Nothing here is invented. There is no category, tag, reading-time or author
+   profile in the schema, so none is shown.
+   ========================================== */
+
+/* ==========================================
+   ARTICLE IMAGE
+   ==========================================
+   The stored featured image, or nothing at all. When there is no image the header
+   simply has no picture and keeps its type hierarchy — an empty grey frame would
+   be worse than no frame. A URL that fails to load is dropped the same way, so a
+   dead CDN path can never leave a broken image icon in the header.
+   ========================================== */
+
+const FeaturedImage = ({ blog }) => {
+  const [failed, setFailed] = useState(false);
+  const source = optimizeImage(blog.image, 1400);
+
+  // A new article reusing this component gets its own attempt.
+  useEffect(() => {
+    setFailed(false);
+  }, [source]);
+
+  if (!source || failed) return null;
+
+  return (
+    <figure className="mt-12 lg:mt-16">
+      {/* Fixed 16:9 box plus eager loading: this is the largest paint on the page
+          and sits above the fold, so it should not wait for a lazy-load queue.
+          animate-pulse is disabled under prefers-reduced-motion. */}
+      <div className="aspect-[16/9] w-full overflow-hidden rounded-sm bg-[#f0eef8]">
+        <img
+          src={source}
+          alt={imageAlt(blog)}
+          width={1400}
+          height={788}
+          loading="eager"
+          decoding="sync"
+          onError={() => setFailed(true)}
+          className="h-full w-full object-cover"
+        />
+      </div>
+    </figure>
+  );
 };
 
-/* Blog bodies are authored in React-Quill, so a description can be missing or
- * be an empty HTML fragment. Search engines skip a meta description that is
- * blank or too long, so normalise it once and reuse it everywhere. */
-const toPlainText = (html) => (html || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+/* ==========================================
+   BYLINE
+   ==========================================
+   Author and publication date only. The old page also printed a "min read"
+   figure computed from the body; there is no stored reading time, and a derived
+   one that silently contradicts the real article is exactly the kind of invented
+   metadata this page should not publish, so it has been removed.
+   ========================================== */
 
-const truncate = (text, max = 158) => {
-  if (!text) return "";
-  if (text.length <= max) return text;
-  return `${text.slice(0, text.lastIndexOf(" ", max)).trim()}…`;
+const Byline = ({ blog }) => {
+  const author = authorName(blog);
+  const date = formatDate(publishDate(blog));
+
+  if (!author && !date) return null;
+
+  return (
+    <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[#6b6483]">
+      {author && <span className="font-[larken] text-[#231746]">{author}</span>}
+      {author && date && (
+        <span aria-hidden="true" className="text-[#c9c4dc]">
+          /
+        </span>
+      )}
+      {date && <time dateTime={publishDate(blog)}>{date}</time>}
+    </div>
+  );
 };
+
+/* ==========================================
+   SHARE
+   ==========================================
+   Plain links to each network's own share endpoint, plus a copy-link button. No
+   third-party script, no widget, no iframe: those would add weight and read the
+   page on every visit for something four URLs already do.
+
+   Each control is a single interactive element — the icon is aria-hidden and the
+   label is on the control itself, so there is nothing focusable inside a button
+   or a link.
+   ========================================== */
+
+const SHARE_TARGETS = [
+  {
+    key: "x",
+    label: "Share on X",
+    Icon: FiTwitter,
+    href: ({ url, title }) =>
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`,
+  },
+  {
+    key: "linkedin",
+    label: "Share on LinkedIn",
+    Icon: FiLinkedin,
+    href: ({ url }) =>
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+  },
+  {
+    key: "whatsapp",
+    label: "Share on WhatsApp",
+    Icon: FaWhatsapp,
+    href: ({ url, title }) =>
+      `https://wa.me/?text=${encodeURIComponent(`${title} — ${url}`)}`,
+  },
+  {
+    key: "facebook",
+    label: "Share on Facebook",
+    Icon: FiFacebook,
+    href: ({ url }) =>
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+  },
+];
+
+const ShareSection = ({ url, title }) => {
+  const [copied, setCopied] = useState(false);
+
+  const copy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch {
+      // Clipboard access can be refused (insecure context, permissions). The
+      // address is in the URL bar either way, so this is not worth an alert.
+      setCopied(false);
+    }
+  }, [url]);
+
+  // Reset the confirmation so the button does not claim success forever.
+  useEffect(() => {
+    if (!copied) return undefined;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
+  const shareButton =
+    "inline-flex h-10 w-10 items-center justify-center border border-[#e8e6f1] text-[#534277] transition-colors duration-200 hover:border-[#a380ed] hover:text-[#231746] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5a3dbd] motion-reduce:transition-none";
+
+  return (
+    <section aria-labelledby="share-heading" className="mt-16 border-t border-[#e8e6f1] pt-8">
+      <h2 id="share-heading" className="font-[gilroy] text-xs uppercase tracking-[0.28em] text-[#8c86a1]">
+        Share this article
+      </h2>
+
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <button type="button" onClick={copy} className={shareButton} aria-label="Copy article link">
+          {copied ? (
+            <FiCheck aria-hidden="true" className="h-4 w-4 text-[#5a3dbd]" />
+          ) : (
+            <FiCopy aria-hidden="true" className="h-4 w-4" />
+          )}
+        </button>
+
+        {SHARE_TARGETS.map(({ key, label, Icon, href }) => (
+          <a
+            key={key}
+            href={href({ url, title })}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            className={shareButton}
+          >
+            <Icon aria-hidden="true" className="h-4 w-4" />
+          </a>
+        ))}
+      </div>
+
+      {/* Announced to screen readers, invisible on screen. */}
+      <p aria-live="polite" className="sr-only">
+        {copied ? "Article link copied to clipboard" : ""}
+      </p>
+    </section>
+  );
+};
+
+/* ==========================================
+   MORE INSIGHTS
+   ==========================================
+   Reuses the public blog list. No relevance data exists in the schema — no tags,
+   no categories — so the order is publication date and nothing more is claimed.
+   The current article and any non-published post are excluded.
+   ========================================== */
+
+const MoreInsights = ({ posts }) => {
+  if (!posts.length) return null;
+
+  return (
+    <section aria-labelledby="more-heading" className="mt-20 border-t border-[#e8e6f1] pt-12 lg:mt-28">
+      <h2 id="more-heading" className="font-[gilroy] text-xs uppercase tracking-[0.28em] text-[#8c86a1]">
+        More insights
+      </h2>
+
+      <ul className="mt-10 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => {
+          const thumbnail = optimizeImage(post.image, 600);
+
+          return (
+            <li key={post.slug}>
+              <article className="group relative flex h-full flex-col">
+                {thumbnail && (
+                  <div className="aspect-[16/9] overflow-hidden bg-[#f0eef8]">
+                    <img
+                      src={thumbnail}
+                      alt={imageAlt(post)}
+                      width={600}
+                      height={338}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                    />
+                  </div>
+                )}
+
+                <h3 className="mt-5 font-[larken] text-lg leading-snug text-[#231746]">
+                  <Link
+                    to={`/blog/${post.slug}`}
+                    className="after:absolute after:inset-0 transition-colors duration-300 hover:text-[#5a3dbd] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5a3dbd] motion-reduce:transition-none"
+                  >
+                    {post.title}
+                  </Link>
+                </h3>
+
+                {formatDate(publishDate(post)) && (
+                  <p className="mt-3 text-xs text-[#6b6483]">
+                    <time dateTime={publishDate(post)}>{formatDate(publishDate(post))}</time>
+                  </p>
+                )}
+              </article>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+};
+
+/* ==========================================
+   LOADING
+   ==========================================
+   Mirrors the real header and body shape so nothing jumps when the data lands.
+   ========================================== */
+
+const Bar = ({ className = "" }) => (
+  <div
+    className={`animate-pulse rounded-sm bg-[#e8e6f1] motion-reduce:animate-none ${className}`}
+  />
+);
+
+const ArticleSkeleton = () => (
+  <div
+    className="mx-auto w-full max-w-[1400px] px-5 py-14 sm:px-8 lg:px-12 lg:py-20"
+    aria-busy="true"
+  >
+    <span className="sr-only">Loading article</span>
+    <Bar className="h-3 w-28" />
+    <div className="mt-8 max-w-4xl">
+      <Bar className="h-10 w-full" />
+      <Bar className="mt-3 h-10 w-4/5" />
+    </div>
+    <Bar className="mt-8 h-5 w-full max-w-2xl" />
+    <Bar className="mt-3 h-5 w-3/5 max-w-2xl" />
+    <Bar className="mt-8 h-4 w-52" />
+    <Bar className="mt-12 aspect-[16/9] w-full" />
+
+    <div className="mx-auto mt-14 max-w-[46rem]">
+      <Bar className="h-4 w-full" />
+      <Bar className="mt-4 h-4 w-full" />
+      <Bar className="mt-4 h-4 w-11/12" />
+      <Bar className="mt-4 h-4 w-full" />
+      <Bar className="mt-4 h-4 w-2/3" />
+    </div>
+  </div>
+);
+
+/* ==========================================
+   ERROR
+   ==========================================
+   Reached when the API is reachable but the request failed for a reason other
+   than "no such article". Says nothing about why: no status code, no API host, no
+   upstream message. The real reason is written to the console for us, not for the
+   visitor.
+   ========================================== */
+
+const ArticleError = () => (
+  <>
+    <Helmet>
+      <title>{`Article unavailable | ${SITE_NAME}`}</title>
+      <meta
+        name="description"
+        content="This article could not be loaded right now. Browse all articles from the We Insightians blog instead."
+      />
+      <meta name="robots" content="noindex, follow" />
+      <meta property="og:title" content={`Article unavailable | ${SITE_NAME}`} />
+      <meta property="og:type" content="website" />
+      <meta property="og:image" content={BRAND_IMAGE} />
+    </Helmet>
+
+    {/* Same reasoning as /blogs: this wrapper sits below the sticky Navbar, so
+        min-h-screen would overshoot the viewport by the navbar's height and leave
+        the footer hanging past the fold. 5rem = Navbar h-20. */}
+    <div className="flex min-h-[calc(100svh-5rem)] w-full flex-col bg-white font-[gilroy] text-[#231746]">
+      <div className="flex-1">
+        <div className="mx-auto w-full max-w-[1400px] px-5 py-24 text-center sm:px-8 lg:px-12 lg:py-32">
+          <p className="font-[larken] text-3xl text-[#231746] sm:text-4xl">Article unavailable</p>
+          <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-[#6b6483]">
+            We could not load this article just now. Please try again in a moment, or browse
+            everything we have written so far.
+          </p>
+          <Link
+            to="/blogs"
+            className="mt-9 inline-flex items-center gap-2 border border-[#231746] px-7 py-3 font-[gilroy] text-xs font-medium uppercase tracking-[0.18em] text-[#231746] transition-colors duration-300 hover:bg-[#231746] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5a3dbd] motion-reduce:transition-none"
+          >
+            <FiArrowLeft aria-hidden="true" className="h-4 w-4" />
+            Back to insights
+          </Link>
+        </div>
+      </div>
+
+      {/* The old error state ended with a footer, so a failed load still looked
+          like a complete page rather than a truncated one. */}
+      <Footer />
+    </div>
+  </>
+);
+
+/* ==========================================
+   PAGE
+   ========================================== */
 
 const SingleBlog = () => {
   const { slug } = useParams();
   const [blog, setBlog] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
-  const [relatedBlogs, setRelatedBlogs] = useState([]);
+  const [related, setRelated] = useState([]);
+  const [status, setStatus] = useState("loading");
 
   useEffect(() => {
-    let cancelled = false;
+    let active = true;
 
-    const fetchBlog = async () => {
-      try {
-        const { data } = await axiosInstance.get(`/blogs/${slug}`);
-        if (cancelled) return;
-        setBlog(data.blog);
-        setNotFound(false);
-      } catch (error) {
-        if (cancelled) return;
-        // A 404 from the API means this slug does not exist. Render the real
-        // Not Found page instead of an empty article shell, so a dead URL
-        // can never look like a live, indexable post.
-        if (error?.response?.status === 404) {
-          setNotFound(true);
-        } else {
-          console.error("Failed to load blog:", error);
-        }
-        setBlog(null);
-      } finally {
-        if (!cancelled) setLoading(false);
+    setStatus("loading");
+    setBlog(null);
+    setRelated([]);
+
+    // Two independent requests, started together rather than one after the other.
+    // Related posts are an enhancement: their failure must never discard an
+    // article that loaded correctly.
+    Promise.allSettled([getSingleBlog(slug), getBlogs()]).then(([article, list]) => {
+      if (!active) return;
+
+      if (article.status === "fulfilled") {
+        setBlog(article.value.data?.blog || null);
+        setStatus(article.value.data?.blog ? "ready" : "missing");
+      } else {
+        // A 404 is a genuinely absent article and gets the real 404 page. Anything
+        // else is a failure worth retrying.
+        setStatus(article.reason?.response?.status === 404 ? "missing" : "error");
       }
 
-      // Related posts are an enhancement, not the article itself. A failure
-      // here must never discard an article that loaded fine, so it is fetched
-      // separately and simply left empty on error.
-      try {
-        const { data: all } = await axiosInstance.get("/blogs");
-        if (cancelled) return;
-        setRelatedBlogs((all.blogs || []).filter((b) => b.slug !== slug).slice(0, 3));
-      } catch (error) {
-        console.error("Failed to load related blogs:", error);
+      if (list.status === "fulfilled") {
+        setRelated(relatedArticles(list.value.data, slug));
       }
-    };
-
-    fetchBlog();
+    });
 
     return () => {
-      cancelled = true;
+      active = false;
     };
   }, [slug]);
 
-  // Calculate read time — strip HTML tags first for accurate word count
-  const calculateReadTime = (text) => {
-    if (!text) return 1;
-    const plainText = text.replace(/<[^>]*>/g, "");
-    const words = plainText.split(" ").length;
-    return Math.ceil(words / 200);
-  };
+  /* ---------- not found ---------- */
+  // Preserved exactly as before: a real 404 page, never an empty article shell and
+  // never a redirect to the listing, so a dead URL cannot look like a live post.
+  if (status === "missing") return <NotFound />;
 
-  // ==========================================
-  // NOT FOUND STATE
-  // A real 404 page, no redirect back to the blog list or the homepage.
-  // ==========================================
-  if (notFound) return <NotFound />;
+  if (status === "loading") return <ArticleSkeleton />;
 
-  // ==========================================
-  // LOADING STATE
-  // ==========================================
-  if (loading)
-    return (
-      <>
-        <Helmet>
-          <meta name="robots" content="noindex, follow" />
-        </Helmet>
-        <div className="max-w-4xl mx-auto px-6 py-12 animate-pulse space-y-6">
-          <div className="h-6 bg-gray-200 rounded w-1/4" />
-          <div className="w-full h-72 bg-gray-200 rounded-2xl" />
-          <div className="h-8 bg-gray-200 rounded w-3/4" />
-          <div className="h-4 bg-gray-200 rounded w-1/3" />
-          <div className="space-y-3 mt-6">
-            <div className="h-4 bg-gray-200 rounded w-full" />
-            <div className="h-4 bg-gray-200 rounded w-full" />
-            <div className="h-4 bg-gray-200 rounded w-5/6" />
-          </div>
-        </div>
-      </>
-    );
+  if (status === "error" || !blog) return <ArticleError />;
 
-  // ==========================================
-  // ERROR STATE
-  // The API is reachable but the post is missing (or the request failed for a
-  // reason other than 404). Noindex, and never a bare "Blog not found." line.
-  // ==========================================
-  if (!blog)
-    return (
-      <>
-        <Helmet>
-          <title>Article unavailable | We Insightians</title>
-          <meta name="description" content="This article could not be loaded right now. Browse all articles on the We Insightians blog instead." />
-          <meta name="robots" content="noindex, follow" />
-          <meta property="og:title" content="Article unavailable | We Insightians" />
-          <meta property="og:type" content="website" />
-        </Helmet>
-        <div className="h-full bg-[#ffffff] w-full text-black px-4 md:px-16 p-5">
-          <div className="max-w-4xl mx-auto py-20 text-center font-[gilroy]">
-            <h1 className="text-4xl md:text-5xl font-[Larken] font-bold">Article unavailable</h1>
-            <p className="mt-4 text-gray-600">
-              We could not load this article. It may have been moved or renamed.
-            </p>
-            <Link
-              to="/blogs"
-              className="mt-8 inline-block font-semibold text-indigo-600 hover:underline"
-            >
-              Back to all articles
-            </Link>
-          </div>
-        </div>
-        <Footer />
-      </>
-    );
+  /* ---------- article ---------- */
 
-  // The canonical must be the URL actually being served, so it is built from
-  // the route param rather than the slug stored on the document.
-  const canonical = `https://weinsightian.tech/blog/${slug}`;
-  const description = truncate(toPlainText(blog.description)) ||
-    truncate(toPlainText(blog.content)) ||
-    `${blog.title} — an article from the We Insightians team.`;
+  const canonical = articleCanonical(blog);
+  const description = articleDescription(blog);
+  const title = articleTitle(blog);
+  const socialImage = articleImage(blog) || BRAND_IMAGE;
+  const datePublished = publishedIso(blog);
+  const dateModified = modifiedIso(blog);
+  const structuredData = articleStructuredData(blog);
+  const summary = articleDescription(blog, 320);
 
   return (
     <>
-      {/* SEO META TAGS */}
       <Helmet>
-        <title>{blog.title} | We Insightians</title>
+        <title>{title}</title>
         <meta name="description" content={description} />
+        {/* A published article is meant to be indexed. Drafts never reach this
+            component: the API returns 404 for them. */}
         <meta name="robots" content="index, follow" />
         {blog.author ? <meta name="author" content={blog.author} /> : null}
-        <link rel="canonical" href={canonical} />
+        {/* Built from the article's own slug, so it is never /blogs, never the
+            title, and never a slugless /blog. */}
+        {canonical && <link rel="canonical" href={canonical} />}
+
         <meta property="og:type" content="article" />
-        <meta property="og:title" content={blog.title} />
+        <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        {blog.image ? <meta property="og:image" content={optimizeImage(blog.image, 1200)} /> : null}
         <meta property="og:url" content={canonical} />
-        <meta property="og:site_name" content="We Insightians" />
-        {blog.createdAt ? <meta property="article:published_time" content={blog.createdAt} /> : null}
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:image" content={socialImage} />
+        <meta property="og:image:alt" content={imageAlt(blog)} />
+        {datePublished ? <meta property="article:published_time" content={datePublished} /> : null}
+        {dateModified ? <meta property="article:modified_time" content={dateModified} /> : null}
         {blog.author ? <meta property="article:author" content={blog.author} /> : null}
-        <meta name="twitter:card" content={blog.image ? 'summary_large_image' : 'summary'} />
-        <meta name="twitter:title" content={blog.title} />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
-        {blog.image ? <meta name="twitter:image" content={optimizeImage(blog.image, 1200)} /> : null}
+        <meta name="twitter:image" content={socialImage} />
+        <meta name="twitter:image:alt" content={imageAlt(blog)} />
+
+        {/* One BlogPosting node for this page. The site-level Organization and
+            WebSite nodes come from StructuredData.jsx and are referenced by @id
+            here rather than redeclared, so nothing conflicts. */}
+        {structuredData && (
+          <script type="application/ld+json">{toSafeJson(structuredData)}</script>
+        )}
       </Helmet>
 
-      <div className="h-full bg-[#ffffff] w-full text-black px-4 md:px-16 p-5">
-        <div className="max-w-6xl mx-auto py-12">
-
-          {/* Back Button */}
-          <Link
-            to="/blogs"
-            className="text-gray-600 font-semibold hover:underline mb-6 inline-block"
-          >
-            <FiArrowLeft className="inline-block text-gray-600 mr-1" />
-            Back to Blogs
-          </Link>
-
-          {/* Featured Image — optimized at 1200px, loads eagerly as it's above the fold */}
-          {blog.image && (
-            <div className="mb-8">
-              <img
-                src={optimizeImage(blog.image, 1200)}
-                alt={blog.title}
-                className="w-full h-full object-cover rounded-2xl shadow-lg"
-                loading="eager"
-              />
-            </div>
-          )}
-
-          {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-            {blog.title}
-          </h1>
-
-          {/* Meta Info */}
-          <div className="flex flex-wrap items-center gap-4 text-gray-500 mb-8">
-            <span>By {blog.author}</span>
-            <span>•</span>
-            <span>{new Date(blog.createdAt).toLocaleDateString()}</span>
-            <span>•</span>
-            <span>{calculateReadTime(blog.content)} min read</span>
-          </div>
-
-          {/* Blog Content — renders Quill HTML properly */}
-          <div
-            className="prose max-w-none text-lg leading-8"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
-          />
-
-          {/* Tags */}
-          {blog.tags && blog.tags.length > 0 && (
-            <div className="mt-10 flex flex-wrap gap-3">
-              {blog.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="bg-indigo-100 text-indigo-600 px-4 py-1 rounded-full text-sm font-medium"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Share Section */}
-          <div className="mt-12 border-t pt-8">
-            <h3 className="text-xl font-semibold mb-4">Share this article</h3>
-            <div className="flex gap-4">
-              <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(blog.title)}&url=${encodeURIComponent(`https://weinsightian.tech/blog/${slug}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
-              >
-                Twitter
-              </a>
-              <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://weinsightian.tech/blog/${slug}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-              >
-                Facebook
-              </a>
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(`${blog.title} - https://weinsightian.tech/blog/${slug}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
-              >
-                WhatsApp
-              </a>
-            </div>
-          </div>
-
-          {/* Comment Section */}
-          <div className="mt-16 border-t pt-10">
-            <h3 className="text-2xl font-semibold mb-6">Leave a Comment</h3>
-            <form className="space-y-4">
-              <input
-                type="text"
-                placeholder="Your Name"
-                className="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <textarea
-                rows="4"
-                placeholder="Write your comment..."
-                className="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              ></textarea>
-              <button
-                type="submit"
-                className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition"
-              >
-                Post Comment
-              </button>
-            </form>
-          </div>
-
-          {/* Related Posts — images optimized at 400px */}
-          {relatedBlogs.length > 0 && (
-            <div className="mt-20 border-t pt-12">
-              <h2 className="text-2xl font-bold mb-8">Related Articles</h2>
-              <div className="grid md:grid-cols-3 gap-8">
-                {relatedBlogs.map((post) => (
-                  <div
-                    key={post.slug}
-                    className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden"
+      {/* PublicLayout already renders the page's single <main>, so this is a div. */}
+      {/* min-h-[calc(100svh-5rem)] rather than min-h-screen: this wrapper already
+          starts below the sticky Navbar (h-20), so a full-viewport minimum left
+          the footer ~80px past the fold and let flex-1 open a blank gap above it
+          on a short article. 5rem = Navbar h-20. */}
+      <div className="flex min-h-[calc(100svh-5rem)] w-full flex-col bg-white font-[gilroy] text-[#231746]">
+        <div className="flex-1">
+          <article>
+            {/* ---------- HEADER ---------- */}
+            <header className="border-b border-[#e8e6f1]">
+              <div className="mx-auto w-full max-w-[1400px] px-5 pb-12 pt-10 sm:px-8 lg:px-12 lg:pb-16 lg:pt-14">
+                <nav aria-label="Breadcrumb">
+                  <Link
+                    to="/blogs"
+                    className="inline-flex items-center gap-2 font-[gilroy] text-xs uppercase tracking-[0.28em] text-[#5a3dbd] transition-colors duration-300 hover:text-[#231746] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5a3dbd] motion-reduce:transition-none"
                   >
-                    {post.image && (
-                      <img
-                        src={optimizeImage(post.image, 400)}
-                        alt={post.title}
-                        className="w-full h-40 object-cover"
-                        loading="lazy"
-                      />
-                    )}
-                    <div className="p-4">
-                      <h3 className="font-semibold mb-2 line-clamp-2">
-                        {post.title}
-                      </h3>
-                      <p className="text-sm text-gray-500 mb-3">
-                        {new Date(post.createdAt).toLocaleDateString()}
-                      </p>
-                      <Link
-                        to={`/blog/${post.slug}`}
-                        className="text-indigo-600 text-sm font-semibold hover:underline"
-                      >
-                        Read More →
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+                    <FiArrowLeft aria-hidden="true" className="h-3.5 w-3.5" />
+                    Blog / Insights
+                  </Link>
+                </nav>
 
+                <h1 className="mt-8 max-w-5xl font-[larken] text-[2.125rem] leading-[1.08] text-[#231746] sm:text-5xl lg:text-6xl xl:text-[4.25rem]">
+                  {blog.title}
+                </h1>
+
+                {summary && (
+                  <p className="mt-7 max-w-2xl text-base leading-relaxed text-[#6b6483] sm:text-lg">
+                    {summary}
+                  </p>
+                )}
+
+                <Byline blog={blog} />
+
+                <FeaturedImage blog={blog} />
+              </div>
+            </header>
+
+            {/* ---------- BODY ---------- */}
+            {/* max-w-[46rem] is ~736px: a comfortable measure for reading. Letting
+                the text run the full desktop width would put well over 100
+                characters on a line, which is where readability falls apart. */}
+            <div className="mx-auto w-full max-w-[1400px] px-5 sm:px-8 lg:px-12">
+              <div
+                className="article-content mx-auto max-w-[46rem] py-14 lg:py-20"
+                // Stored HTML, sanitized server-side on write by
+                // sanitizeBlogContent(). See the note at the top of this file.
+                dangerouslySetInnerHTML={{ __html: blog.content }}
+              />
+
+              <div className="mx-auto max-w-[46rem]">
+                <ShareSection url={canonical} title={blog.title} />
+              </div>
+
+              <MoreInsights posts={related} />
+            </div>
+          </article>
         </div>
+
+        <Footer />
       </div>
-      <Footer />
     </>
   );
 };

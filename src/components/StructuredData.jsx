@@ -6,8 +6,13 @@ import { Helmet } from 'react-helmet-async';
  * Every value below is copied from content that already exists in this repo
  * (About page, Contact page, Privacy page, public/ assets). Nothing is
  * inferred: no ratings, no awards, no review markup, no invented addresses or
- * phone numbers. BlogPosting / LocalBusiness markup is deliberately not
- * included here — see the Phase 2 report for what data would be required.
+ * phone numbers.
+ *
+ * Per-article BlogPosting markup is deliberately NOT here. This component renders
+ * on every route and has no access to article data, so a post's own node is
+ * emitted by the article page instead — see `articleStructuredData()` in
+ * src/utils/article.js. That node references this Organization and WebSite by
+ * @id rather than declaring its own, so the two never conflict.
  */
 
 const ORIGIN = 'https://weinsightian.tech';

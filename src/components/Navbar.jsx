@@ -55,6 +55,11 @@ useEffect(() => {
     };
   }, []);
 
+  /* backdrop-filter is deliberately NOT in the transition list. It is not a
+   * compositor property: every frame of a tween made the browser re-read and
+   * re-blur the whole page behind this sticky bar, which is one of the
+   * clearest sources of scroll jank on a page this long. The blur itself is
+   * unchanged — it just arrives instantly instead of being interpolated. */
   const navbarStyle = {
     backgroundColor: isScrolled
       ? 'rgba(248, 248, 248, 0.72)'
@@ -68,7 +73,7 @@ useEffect(() => {
     border: `1px solid ${isScrolled ? 'rgba(255, 255, 255, 0.78)' : 'rgba(255, 255, 255, 0.125)'}`,
     boxShadow: isScrolled ? '0 8px 28px rgba(15, 23, 42, 0.12)' : 'none',
     transition:
-      'background-color 300ms ease, backdrop-filter 300ms ease, -webkit-backdrop-filter 300ms ease, border 300ms ease, box-shadow 300ms ease',
+      'background-color 300ms ease, border-color 300ms ease, box-shadow 300ms ease',
   };
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);

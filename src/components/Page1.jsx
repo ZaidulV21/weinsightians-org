@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
+import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
 import Button from './Button.jsx'
 
 const HERO_GRID = {
@@ -148,6 +148,19 @@ const LAYOUT_BY_ID = indexById(SERVICE_LAYOUT)
 
 /* Pointer tracking stays, but mobile gets a fraction of the desktop amplitude. */
 const dampPointer = (value) => value * 0.42
+
+/* The floating nodes, the orbital rings and the glass frames are pure transform
+ * work, so they run as CSS animations (see the wis-* keyframes in index.css)
+ * and never touch the main thread. `still` simply removes the animation, which
+ * is what reduced-motion and an off-screen hero both want. */
+const bobStyle = (lift, duration, delay) => ({
+  '--bob-lift': `${lift}px`,
+  animation: `wis-bob ${duration}s cubic-bezier(0.45, 0, 0.55, 1) ${delay}s infinite`,
+})
+
+const spinStyle = (duration, reverse = false) => ({
+  animation: `${reverse ? 'wis-spin-reverse' : 'wis-spin'} ${duration}s linear infinite`,
+})
 
 /* Desktop keeps the full orbital composition from lg upward. Below lg the
  * ecosystem becomes the square WI Insight Stack instead of a shrunken circle. */
@@ -351,8 +364,7 @@ const CoreSphere = ({ still, active, orbRef, orbRotate, dotX, dotY }) => {
         className="absolute inset-0 h-full w-full"
         viewBox="0 0 24 24"
         fill="none"
-        animate={still ? {} : { rotate: 360, transition: { duration: 72, repeat: Infinity, ease: 'linear' } }}
-        style={{ originX: '12px', originY: '12px' }}
+        style={{ originX: '12px', originY: '12px', ...(still ? undefined : spinStyle(72)) }}
       >
         {Array.from({ length: 12 }).map((_, tick) => (
           <line
@@ -411,12 +423,12 @@ const InsightCore = ({ still, engineRef, coreTilt, orbRotate, plateRotate, dotX,
         className="absolute left-1/2 top-1/2 h-52 w-52 sm:h-64 sm:w-64"
         style={{ transform: 'translate(-50%, -50%) rotateX(72deg)' }}
       >
-        <motion.div
+        <div
           className="relative h-full w-full rounded-full border border-dashed border-[#5a3dbd]/20"
-          animate={still ? {} : { rotate: 360, transition: { duration: 44, repeat: Infinity, ease: 'linear' } }}
+          style={still ? undefined : spinStyle(44)}
         >
           <i className="absolute left-1/2 top-[-2px] h-1 w-1 -translate-x-1/2 rounded-full bg-[#67e8f9]/70" />
-        </motion.div>
+        </div>
       </div>
 
       <div
@@ -424,12 +436,12 @@ const InsightCore = ({ still, engineRef, coreTilt, orbRotate, plateRotate, dotX,
         className="absolute left-1/2 top-1/2 h-60 w-60 sm:h-72 sm:w-72"
         style={{ transform: 'translate(-50%, -50%) rotateX(-64deg) rotateZ(18deg)' }}
       >
-        <motion.div
+        <div
           className="relative h-full w-full rounded-full border border-dashed border-[#a380ed]/20"
-          animate={still ? {} : { rotate: -360, transition: { duration: 62, repeat: Infinity, ease: 'linear' } }}
+          style={still ? undefined : spinStyle(62, true)}
         >
           <i className="absolute left-1/2 top-[-2px] h-1 w-1 -translate-x-1/2 rounded-full bg-[#a380ed]/70" />
-        </motion.div>
+        </div>
       </div>
 
       <div className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 sm:h-24 sm:w-24">
@@ -443,8 +455,7 @@ const InsightCore = ({ still, engineRef, coreTilt, orbRotate, plateRotate, dotX,
  * Desktop — the circular / orbital WI ecosystem. Rendered from lg up and
  * kept exactly as it was: same geometry, same plates, same hover story.
  * ------------------------------------------------------------------ */
-const DesktopInsightEngine = ({ shouldReduceMotion, engineRef, nodeParallax, engineStyle, plateRotate, orbRotate, dotX, dotY, plateLayers }) => {
-  const still = shouldReduceMotion
+const DesktopInsightEngine = ({ still, engineRef, nodeParallax, engineStyle, plateRotate, orbRotate, dotX, dotY, plateLayers }) => {
   const [active, setActive] = useState(null)
 
   const layout = SERVICE_LAYOUT
@@ -455,18 +466,10 @@ const DesktopInsightEngine = ({ shouldReduceMotion, engineRef, nodeParallax, eng
   const haloX = useTransform(dotX, [-26, 26], [-9, 9])
   const haloY = useTransform(dotY, [-26, 26], [-9, 9])
 
-  const nodeMotion = (node, dimmed) => {
-    const opacity = dimmed ? 0.42 : 1
-    if (still) return { opacity, transition: { duration: 0.35, ease: easeSoft } }
-    return {
-      opacity,
-      y: [0, -node.lift, 0],
-      transition: {
-        opacity: { duration: 0.35, ease: easeSoft },
-        y: { duration: node.duration, delay: node.delay, repeat: Infinity, ease: easeSoft },
-      },
-    }
-  }
+  const nodeMotion = (node, dimmed) => ({
+    opacity: dimmed ? 0.42 : 1,
+    transition: { duration: 0.35, ease: easeSoft },
+  })
 
   return (
     <div className="relative mx-auto aspect-square w-[min(100%,24rem)] sm:w-[min(100%,30rem)] lg:w-[min(100%,40rem)]">
@@ -485,7 +488,7 @@ const DesktopInsightEngine = ({ shouldReduceMotion, engineRef, nodeParallax, eng
         </defs>
 
         {ringMeta.map((ring) => (
-          <motion.circle
+          <circle
             key={ring.radius}
             cx={CORE_POINT.x}
             cy={CORE_POINT.y}
@@ -496,8 +499,7 @@ const DesktopInsightEngine = ({ shouldReduceMotion, engineRef, nodeParallax, eng
             strokeDasharray={ring.dash}
             strokeLinecap="round"
             opacity={ring.opacity}
-            animate={still ? {} : { rotate: 360, transition: { duration: ring.spin, repeat: Infinity, ease: 'linear' } }}
-            style={{ originX: '50px', originY: '50px' }}
+            style={{ originX: '50px', originY: '50px', ...(still ? undefined : spinStyle(Math.abs(ring.spin), ring.spin < 0)) }}
           />
         ))}
 
@@ -530,16 +532,26 @@ const DesktopInsightEngine = ({ shouldReduceMotion, engineRef, nodeParallax, eng
           )
         })}
 
-        {FLOW_LINKS.map((flow) => (
-          <motion.circle
-            key={flow.id}
-            className={TIER_CLASS[layoutById[flow.from].tier]}
-            r="0.6"
-            fill={flow.color}
-            animate={still ? {} : { cx: layoutById[flow.from].track.xs, cy: layoutById[flow.from].track.ys }}
-            transition={still ? {} : { duration: flow.duration, repeat: Infinity, ease: 'linear' }}
-          />
-        ))}
+        {FLOW_LINKS.map((flow) => {
+          const from = layoutById[flow.from]
+          return (
+            <motion.circle
+              key={flow.id}
+              className={TIER_CLASS[from.tier]}
+              r="0.6"
+              fill={flow.color}
+              /* Without an explicit starting value the keyframe array below is
+                 resolved lazily, and Framer renders cx/cy as the string
+                 "undefined" on the frames before the track is sampled. That
+                 produced "<circle> attribute cx: Expected length" errors in the
+                 console on every load. track.xs[0] is the node the particle
+                 starts from, so this is the same start point, just declared. */
+              initial={{ cx: from.track.xs[0], cy: from.track.ys[0] }}
+              animate={still ? {} : { cx: from.track.xs, cy: from.track.ys }}
+              transition={still ? {} : { duration: flow.duration, repeat: Infinity, ease: 'linear' }}
+            />
+          )
+        })}
       </svg>
 
       <div className="absolute inset-0 grid place-items-center">
@@ -578,6 +590,7 @@ const DesktopInsightEngine = ({ shouldReduceMotion, engineRef, nodeParallax, eng
           >
             <motion.div
               className="flex flex-col items-center"
+              style={still ? undefined : bobStyle(node.lift, node.duration, node.delay)}
               animate={nodeMotion(node, Boolean(active) && !isActive)}
             >
               <motion.div
@@ -639,8 +652,7 @@ const DesktopInsightEngine = ({ shouldReduceMotion, engineRef, nodeParallax, eng
  * same colours, same glyphs, same motion language. Nothing is scaled
  * down from the desktop, the geometry is re-authored.
  * ------------------------------------------------------------------ */
-const MobileInsightEngine = ({ shouldReduceMotion, engineRef, engineStyle, plateRotate, orbRotate, dotX, dotY }) => {
-  const still = shouldReduceMotion
+const MobileInsightEngine = ({ still, engineRef, engineStyle, plateRotate, orbRotate, dotX, dotY }) => {
   const [active, setActive] = useState(null)
 
   /* Pointer follow exists but only whispers on touch. */
@@ -656,21 +668,6 @@ const MobileInsightEngine = ({ shouldReduceMotion, engineRef, engineStyle, plate
 
   const activeNode = STACK_NODES.find((node) => node.id === active) || null
 
-  const nodeMotion = (node, dimmed, isActive) => {
-    const opacity = dimmed ? 0.45 : 1
-    if (still) return { opacity, scale: isActive ? 1.07 : 1, transition: { duration: 0.4, ease: easeSoft } }
-    return {
-      opacity,
-      scale: isActive ? 1.07 : 1,
-      y: [0, -node.lift * 0.4, 0],
-      transition: {
-        opacity: { duration: 0.35, ease: easeSoft },
-        scale: { duration: 0.45, ease: easeSoft },
-        y: { duration: node.duration * 0.8, delay: node.delay * 0.4, repeat: Infinity, ease: easeSoft },
-      },
-    }
-  }
-
   return (
     <div
       ref={engineRef}
@@ -683,27 +680,19 @@ const MobileInsightEngine = ({ shouldReduceMotion, engineRef, engineStyle, plate
       />
 
       {/* Two upright glass panels */}
-      <motion.div
+      <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-[1.5%] z-10 rounded-[2.4rem] border border-white/80 bg-[linear-gradient(158deg,rgba(255,255,255,0.94),rgba(226,216,252,0.5)_48%,rgba(206,231,255,0.56))] shadow-[0_38px_74px_-40px_rgba(35,23,70,0.6)] backdrop-blur-[3px]"
-        animate={
-          still
-            ? { rotate: -2.5 }
-            : { y: [0, -5, 0], rotate: [-2.5, -1.1, -2.5], transition: { duration: 13, repeat: Infinity, ease: easeSoft } }
-        }
+        style={still ? { transform: 'rotate(-2.5deg)' } : { animation: 'wis-panel-outer 13s cubic-bezier(0.45, 0, 0.55, 1) infinite' }}
       />
-      <motion.div
+      <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-[6.5%] z-10 overflow-hidden rounded-[1.85rem] border border-white/70 bg-[linear-gradient(150deg,rgba(255,255,255,0.8),rgba(238,232,255,0.4)_52%,rgba(215,238,255,0.46))] shadow-[0_26px_56px_-34px_rgba(35,23,70,0.5)] backdrop-blur-[2px]"
-        animate={
-          still
-            ? { rotate: 2 }
-            : { y: [0, 6, 0], rotate: [2, 3.3, 2], transition: { duration: 16, delay: 0.8, repeat: Infinity, ease: easeSoft } }
-        }
+        style={still ? { transform: 'rotate(2deg)' } : { animation: 'wis-panel-inner 16s cubic-bezier(0.45, 0, 0.55, 1) 0.8s infinite' }}
       >
         <div className="absolute inset-0 opacity-70" style={STACK_GRID} />
         <div className="absolute left-1/2 top-1/2 h-[64%] w-[64%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(90,61,189,0.15),transparent_72%)]" />
-      </motion.div>
+      </div>
 
       {/* Tilted 3D plates that read as the machine floor */}
       <div
@@ -724,20 +713,20 @@ const MobileInsightEngine = ({ shouldReduceMotion, engineRef, engineStyle, plate
 
       {/* Insight frame — square instead of circular, same slow orbital read */}
       <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2">
-        <motion.div
+        <div
           className="relative h-full w-full rounded-[1.7rem] border border-dashed border-[#5a3dbd]/25"
-          animate={still ? {} : { rotate: 360, transition: { duration: 48, repeat: Infinity, ease: 'linear' } }}
+          style={still ? undefined : spinStyle(48)}
         >
           <i className="absolute left-1/2 top-[-2px] h-1 w-1 -translate-x-1/2 rounded-full bg-[#67e8f9]/75" />
-        </motion.div>
+        </div>
       </div>
       <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-[60%] w-[60%] -translate-x-1/2 -translate-y-1/2">
-        <motion.div
+        <div
           className="relative h-full w-full rounded-[1.2rem] border border-[#a380ed]/25 bg-[linear-gradient(150deg,rgba(255,255,255,0.5),rgba(226,214,255,0.2))] backdrop-blur-[2px]"
-          animate={still ? {} : { rotate: -360, transition: { duration: 66, repeat: Infinity, ease: 'linear' } }}
+          style={still ? undefined : spinStyle(66, true)}
         >
           <i className="absolute bottom-[-2px] left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-[#a380ed]/75" />
-        </motion.div>
+        </div>
       </div>
 
       {/* Connection lines and travelling signal particles */}
@@ -775,37 +764,23 @@ const MobileInsightEngine = ({ shouldReduceMotion, engineRef, engineStyle, plate
           )
         })}
 
-        {STACK_FLOWS.map((flow) => (
-          <motion.circle
-            key={flow.id}
-            r="0.6"
-            fill={flow.color}
-            animate={still ? {} : { cx: STACK_NODES[flow.from].track.xs, cy: STACK_NODES[flow.from].track.ys }}
-            transition={still ? {} : { duration: flow.duration, repeat: Infinity, ease: 'linear' }}
-          />
-        ))}
+        {STACK_FLOWS.map((flow) => {
+          const from = STACK_NODES[flow.from]
+          return (
+            <motion.circle
+              key={flow.id}
+              r="0.6"
+              fill={flow.color}
+              /* See FLOW_LINKS above: an explicit start value keeps cx/cy from
+                 being rendered as "undefined" before the track is sampled. */
+              initial={{ cx: from.track.xs[0], cy: from.track.ys[0] }}
+              animate={still ? {} : { cx: from.track.xs, cy: from.track.ys }}
+              transition={still ? {} : { duration: flow.duration, repeat: Infinity, ease: 'linear' }}
+            />
+          )
+        })}
       </svg>
 
-      {/* Floating micro-elements */}
-      <motion.span
-        aria-hidden="true"
-        className="pointer-events-none absolute left-[16%] top-[31%] z-30 flex h-3 items-end gap-[3px]"
-        animate={still ? {} : { opacity: [0.4, 0.9, 0.4], transition: { duration: 5.5, repeat: Infinity, ease: easeSoft } }}
-      >
-        <i className="h-1 w-[3px] rounded-full bg-[#5a3dbd]/70" />
-        <i className="h-2 w-[3px] rounded-full bg-[#a380ed]/80" />
-        <i className="h-1.5 w-[3px] rounded-full bg-[#67e8f9]/70" />
-      </motion.span>
-      <motion.span
-        aria-hidden="true"
-        className="pointer-events-none absolute right-[23%] top-[30%] z-30 h-1.5 w-1.5 rounded-full bg-[#67e8f9]/70"
-        animate={still ? {} : { y: [0, -8, 0], opacity: [0.3, 0.85, 0.3], transition: { duration: 7.5, repeat: Infinity, ease: easeSoft } }}
-      />
-      <motion.span
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-[33%] left-[30%] z-30 h-1 w-1 rounded-full bg-[#a380ed]/70"
-        animate={still ? {} : { y: [0, 7, 0], opacity: [0.3, 0.8, 0.3], transition: { duration: 9, delay: 0.6, repeat: Infinity, ease: easeSoft } }}
-      />
       <span aria-hidden="true" className="pointer-events-none absolute left-[7.5%] top-[7.5%] z-30 h-4 w-4 rounded-tl-lg border-l border-t border-[#5a3dbd]/30" />
       <span aria-hidden="true" className="pointer-events-none absolute bottom-[7.5%] right-[7.5%] z-30 h-4 w-4 rounded-br-lg border-b border-r border-[#4f8bff]/30" />
 
@@ -866,39 +841,40 @@ const MobileInsightEngine = ({ shouldReduceMotion, engineRef, engineStyle, plate
             className="absolute z-50 flex flex-col items-center"
             style={{ left: `${node.slot.x}%`, top: `${node.slot.y}%`, transform: 'translate(-50%, -50%)' }}
           >
+            {/* The float is a compositor-only CSS animation, so this wrapper is
+                deliberately a plain div: Framer owns the transform on the child
+                (scale) and the two must not fight over it. */}
+            <div style={still ? undefined : bobStyle(node.lift * 0.4, node.duration * 0.8, node.delay * 0.4)}>
             <motion.div
+              className="flex flex-col items-center"
               initial={still ? false : { opacity: 0, scale: 0.62 }}
-              animate={{ opacity: active && !isActive ? 0.5 : 1, scale: 1 }}
+              animate={{ opacity: active && !isActive ? 0.5 : 1, scale: isActive ? 1.07 : 1 }}
               transition={{ duration: still ? 0.35 : 0.75, delay: still ? 0 : 0.2 + index * 0.09, ease: [0.16, 1, 0.3, 1] }}
             >
-              <motion.div
-                className="flex flex-col items-center"
-                animate={nodeMotion(node, Boolean(active) && !isActive, isActive)}
+              <motion.button
+                type="button"
+                aria-label={`${node.full} — ${node.tagline.split(' • ').join(', ').toLowerCase()}`}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setActive((current) => (current === node.id ? null : node.id))
+                }}
+                className={`grid ${STACK_CHIP.box} place-items-center border bg-[linear-gradient(150deg,rgba(255,255,255,0.97),rgba(255,255,255,0.62))] backdrop-blur-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#a380ed]/70 ${STACK_CHIP.shadow} ${
+                  isActive ? 'border-[#a380ed]/70 text-[#4a2fa8] ring-2 ring-[#a380ed]/35' : 'border-white/85 text-[#5a3dbd]'
+                }`}
+                whileTap={still ? undefined : { scale: 0.94 }}
               >
-                <motion.button
-                  type="button"
-                  aria-label={`${node.full} — ${node.tagline.split(' • ').join(', ').toLowerCase()}`}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    setActive((current) => (current === node.id ? null : node.id))
-                  }}
-                  className={`grid ${STACK_CHIP.box} place-items-center border bg-[linear-gradient(150deg,rgba(255,255,255,0.97),rgba(255,255,255,0.62))] backdrop-blur-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#a380ed]/70 ${STACK_CHIP.shadow} ${
-                    isActive ? 'border-[#a380ed]/70 text-[#4a2fa8] ring-2 ring-[#a380ed]/35' : 'border-white/85 text-[#5a3dbd]'
-                  }`}
-                  whileTap={still ? undefined : { scale: 0.94 }}
-                >
-                  <ServiceGlyph name={node.glyph} className={STACK_CHIP.icon} />
-                </motion.button>
+                <ServiceGlyph name={node.glyph} className={STACK_CHIP.icon} />
+              </motion.button>
 
-                <span
-                  className={`mt-1.5 whitespace-nowrap font-[gilroy] font-semibold uppercase transition-colors duration-300 ${STACK_CHIP.label} ${
-                    isActive ? 'text-[#4a2fa8]' : 'text-[#4b3a76]/70'
-                  }`}
-                >
-                  {node.short}
-                </span>
-              </motion.div>
+              <span
+                className={`mt-1.5 whitespace-nowrap font-[gilroy] font-semibold uppercase transition-colors duration-300 ${STACK_CHIP.label} ${
+                  isActive ? 'text-[#4a2fa8]' : 'text-[#4b3a76]/70'
+                }`}
+              >
+                {node.short}
+              </span>
             </motion.div>
+            </div>
           </div>
         )
       })}
@@ -916,6 +892,15 @@ const Page1 = () => {
   const shouldReduceMotion = useReducedMotion()
   const heroRef = useRef(null)
   const engineRef = useRef(null)
+
+  /* The engine used to keep every one of its loops running for the whole time
+   * the tab was open, hero included. That is the single biggest reason Home
+   * felt heavy to scroll: the animations were still ticking while Page2,
+   * Page3, the pricing section and the reviews were doing their own work.
+   * `still` folds "the user asked for reduced motion" together with "the hero
+   * is not on screen", so the loops exist only while they can actually be seen. */
+  const heroInView = useInView(heroRef, { initial: true, margin: '120px 0px' })
+  const still = shouldReduceMotion || !heroInView
 
   const pointerX = useMotionValue(0)
   const pointerY = useMotionValue(0)
@@ -951,8 +936,18 @@ const Page1 = () => {
   const glowX = useTransform(softX, range, ['36%', '64%'])
   const glowY = useTransform(softY, range, ['32%', '62%'])
 
-  const handlePointerMove = (event) => {
-    if (shouldReduceMotion) return
+  /* A mousemove can fire far more often than the screen refreshes. Reading two
+   * bounding boxes on every one of those events forces a layout each time, so
+   * the reads are collapsed into at most one per animation frame. */
+  const pointerFrame = useRef(0)
+  const pendingPointer = useRef(null)
+
+  const flushPointer = () => {
+    pointerFrame.current = 0
+    const event = pendingPointer.current
+    pendingPointer.current = null
+    if (!event) return
+
     const hero = heroRef.current
     if (!hero) return
     const heroBox = hero.getBoundingClientRect()
@@ -969,7 +964,23 @@ const Page1 = () => {
     dotY.set(y - engineBox.height / 2)
   }
 
+  const handlePointerMove = (event) => {
+    if (shouldReduceMotion) return
+    pendingPointer.current = event
+    if (pointerFrame.current === 0) {
+      pointerFrame.current = requestAnimationFrame(flushPointer)
+    }
+  }
+
+  useEffect(
+    () => () => {
+      if (pointerFrame.current !== 0) cancelAnimationFrame(pointerFrame.current)
+    },
+    [],
+  )
+
   const resetPointer = () => {
+    pendingPointer.current = null
     pointerX.set(0)
     pointerY.set(0)
     dotX.set(0)
@@ -998,13 +1009,13 @@ const Page1 = () => {
         className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(158deg,#f8f9fd_0%,#f4f1fb_36%,#eff2fd_64%,#eaf2fc_100%)]"
       />
 
-      <motion.div
-        aria-hidden="true"
-        className="pointer-events-none absolute -inset-[10%] -z-10 opacity-80"
-        style={HERO_GRID}
-        animate={shouldReduceMotion ? {} : { x: ['0%', '1.8%'], y: ['0%', '1.4%'], transition: { duration: 30, repeat: Infinity, ease: 'linear' } }}
-      />
-      <motion.div
+      <div aria-hidden="true" className="pointer-events-none absolute -inset-[10%] -z-10 opacity-80" style={HERO_GRID} />
+
+      {/* Two soft light pools. They used to breathe via a scale loop on top of a
+          64px blur filter, which meant re-rasterising a 30rem blurred layer on
+          every frame. A radial gradient that already fades to transparent needs
+          no blur at all, so the glow is kept and the filter is not. */}
+      <div
         aria-hidden="true"
         className="pointer-events-none absolute -z-10"
         style={{
@@ -1018,39 +1029,20 @@ const Page1 = () => {
           maskImage: 'radial-gradient(120% 95% at 50% 45%, #000 22%, transparent 76%)',
           WebkitMaskImage: 'radial-gradient(120% 95% at 50% 45%, #000 22%, transparent 76%)',
         }}
-        animate={shouldReduceMotion ? {} : { opacity: [0.7, 1, 0.7], transition: { duration: 20, repeat: Infinity, ease: 'easeInOut' } }}
       />
 
-      <motion.div
+      <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-[9rem] bottom-[-11rem] -z-10 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(79,139,255,0.20),transparent_64%)] blur-3xl"
-        animate={shouldReduceMotion ? {} : { scale: [1, 1.1, 1], transition: { duration: 24, repeat: Infinity, ease: 'easeInOut' } }}
+        className="pointer-events-none absolute -right-[9rem] bottom-[-11rem] -z-10 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(79,139,255,0.20),transparent_64%)]"
       />
-      <motion.div
+      <div
         aria-hidden="true"
-        className="pointer-events-none absolute -left-[8rem] top-[-9rem] -z-10 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(163,128,237,0.22),transparent_66%)] blur-3xl"
-        animate={shouldReduceMotion ? {} : { scale: [1, 1.12, 1], transition: { duration: 20, repeat: Infinity, ease: 'easeInOut' } }}
+        className="pointer-events-none absolute -left-[8rem] top-[-9rem] -z-10 h-[26rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(163,128,237,0.22),transparent_66%)]"
       />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 opacity-[0.045] mix-blend-multiply"
         style={{ backgroundImage: HERO_NOISE }}
-      />
-
-      <motion.span
-        aria-hidden="true"
-        className="pointer-events-none absolute left-[14%] top-[24%] -z-10 h-2 w-2 rounded-full bg-[#67e8f9]/70"
-        animate={shouldReduceMotion ? {} : { y: [0, -18, 0], opacity: [0.35, 0.8, 0.35], transition: { duration: 11, repeat: Infinity, ease: 'easeInOut' } }}
-      />
-      <motion.span
-        aria-hidden="true"
-        className="pointer-events-none absolute left-[62%] top-[16%] -z-10 h-1.5 w-1.5 rounded-full bg-[#a380ed]/60"
-        animate={shouldReduceMotion ? {} : { y: [0, 16, 0], opacity: [0.3, 0.75, 0.3], transition: { duration: 13, repeat: Infinity, ease: 'easeInOut' } }}
-      />
-      <motion.span
-        aria-hidden="true"
-        className="pointer-events-none absolute left-[48%] bottom-[18%] -z-10 h-2 w-2 rounded-full bg-[#4f8bff]/50"
-        animate={shouldReduceMotion ? {} : { y: [0, -14, 0], opacity: [0.25, 0.7, 0.25], transition: { duration: 15, repeat: Infinity, ease: 'easeInOut' } }}
       />
 
       <div className="relative z-10 mx-auto w-full max-w-7xl">
@@ -1110,7 +1102,7 @@ const Page1 = () => {
               transition={{ duration: 1, delay: shouldReduceMotion ? 0 : 0.2, ease: [0.16, 1, 0.3, 1] }}
             >
               <IdeaEngine
-                shouldReduceMotion={shouldReduceMotion}
+                still={still}
                 engineRef={engineRef}
                 nodeParallax={nodeParallax}
                 engineStyle={engineStyle}

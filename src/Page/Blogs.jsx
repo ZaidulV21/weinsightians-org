@@ -352,7 +352,15 @@ const Blogs = () => {
         <meta name="twitter:image" content={socialImage} />
       </Helmet>
 
-      <div className="flex min-h-screen w-full flex-col bg-white font-[gilroy] text-[#231746]">
+      {/* min-h-screen is deliberately NOT used here. This wrapper already starts
+          below the sticky Navbar that PublicLayout renders above it (h-20), so a
+          full-viewport minimum made the block one navbar taller than the screen:
+          the footer sat ~80px past the fold, and whenever the content was shorter
+          than a viewport (loading skeletons, the empty state) flex-1 opened a
+          large blank gap above it. Subtracting the bar's height makes the footer
+          land flush at the bottom of the screen with no overhang, and svh keeps
+          it stable on mobile when the browser chrome hides. 5rem = Navbar h-20. */}
+      <div className="flex min-h-[calc(100svh-5rem)] w-full flex-col bg-white font-[gilroy] text-[#231746]">
         {/* PublicLayout in App.jsx already renders the page's single <main>,
             so this stays a div — nesting a second one would break the landmark. */}
         <div className="flex-1">

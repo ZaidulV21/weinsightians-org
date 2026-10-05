@@ -8,6 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "test:blogs": "node --test src/utils/blogList.test.js",
+    "test:article": "node --test src/utils/article.test.js",
+    "test:public": "node --test src/utils/blogList.test.js src/utils/article.test.js",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -4,6 +4,7 @@ import { FiGrid, FiFileText, FiPlus, FiLogOut, FiMenu, FiX } from "react-icons/f
 import { adminLogout, clearAuthentication } from "../../api/authApi";
 import { lockScroll, unlockScroll } from "../../utils/scrollLock";
 import ConfirmDialog from "./ConfirmDialog";
+import { ADMIN_LOGIN_ROUTE } from "../../routes";
 
 /**
  * The admin workspace shell.
@@ -133,13 +134,13 @@ const AdminShell = ({ title, subtitle, action, guardNavigation, children }) => {
     } finally {
       clearAuthentication();
       setSigningOut(false);
-      navigate("/admin/login", { replace: true });
+      navigate(ADMIN_LOGIN_ROUTE, { replace: true });
     }
   };
 
   const handleLogout = () => {
     if (guardNavigation) {
-      setPendingNav("/admin/login");
+      setPendingNav(ADMIN_LOGIN_ROUTE);
       return;
     }
     performLogout();
@@ -153,7 +154,7 @@ const AdminShell = ({ title, subtitle, action, guardNavigation, children }) => {
 
     // Signing out still has to reach the logout endpoint; every other target is
     // just a page.
-    if (target === "/admin/login") performLogout();
+    if (target === ADMIN_LOGIN_ROUTE) performLogout();
     else navigate(target);
   };
 

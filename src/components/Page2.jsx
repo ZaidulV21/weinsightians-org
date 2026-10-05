@@ -28,7 +28,6 @@ const ReelItem = ({ progress, spot, animate, children }) => {
 
   return (
     <motion.div
-      className="will-change-transform"
       style={animate ? { y, opacity, scale } : undefined}
     >
       {children}
@@ -67,7 +66,7 @@ const Page2 = () => {
 
   const reelRef = useRef(null);
   const trackRef = useRef(null);
-  const [layout, setLayout] = useState({ travel: 1, spots: [] });
+  const [layout, setLayout] = useState({ travel: 1, reelHeight: 0, spots: [] });
   const [activeIndex, setActiveIndex] = useState(0);
 
   const { scrollY } = useScroll({ container: reelRef });
@@ -95,7 +94,33 @@ const Page2 = () => {
         return { t: clamp(centred, 0, 1), w };
       });
 
-      setLayout({ travel, spots });
+      /* Bail out when nothing actually moved. Without this every observer
+       * notification replaced the context value and re-rendered all nine
+       * cards, which is what made the reel feel like it was lagging behind
+       * the scroll. */
+      setLayout((current) => {
+        if (
+          current.travel === travel &&
+          current.reelHeight === reelHeight &&
+          current.spots.length === spots.length
+        ) {
+          return current;
+        }
+        return { travel, reelHeight, spots };
+      });
+    };
+
+    /* ResizeObserver can fire several times for one layout pass, and this
+     * handler reads scrollHeight/offsetTop for all nine cards before writing
+     * state. Collapsing the bursts into one frame per flush keeps the measure
+     * out of the middle of a scroll. */
+    let measureFrame = 0;
+    const scheduleMeasure = () => {
+      if (measureFrame) return;
+      measureFrame = requestAnimationFrame(() => {
+        measureFrame = 0;
+        measure();
+      });
     };
 
     measure();
@@ -104,12 +129,13 @@ const Page2 = () => {
       document.fonts.ready.then(measure).catch(() => {});
     }
 
-    const observer = new ResizeObserver(measure);
+    const observer = new ResizeObserver(scheduleMeasure);
     observer.observe(track);
     observer.observe(reel);
 
     return () => {
       cancelAnimationFrame(frame);
+      if (measureFrame) cancelAnimationFrame(measureFrame);
       observer.disconnect();
     };
   }, [isDesktop, services.length]);

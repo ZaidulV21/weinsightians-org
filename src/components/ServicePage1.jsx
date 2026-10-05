@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import OurServices2 from './OurServices2.jsx';
 import Footer from './Footer.jsx';
@@ -128,9 +128,18 @@ const indexById = (layout) =>
     return accumulator;
   }, {});
 
-const floatLoop = (lift, duration, delay) => ({
-  y: [0, -lift, 0],
-  transition: { duration, delay, repeat: Infinity, ease: 'easeInOut' },
+/* The node floats and the two orbits are pure transform work, so they run as
+ * compositor-only CSS animations (the wis-* keyframes in index.css) instead of
+ * ten main-thread Framer loops that used to keep ticking long after this hero
+ * had scrolled away. `still` removes the animation, which is what reduced
+ * motion and an off-screen hero both want. */
+const bobStyle = (lift, duration, delay) => ({
+  '--bob-lift': `${lift}px`,
+  animation: `wis-bob ${duration}s cubic-bezier(0.45, 0, 0.55, 1) ${delay}s infinite`,
+});
+
+const spinStyle = (duration, reverse = false) => ({
+  animation: `${reverse ? 'wis-spin-reverse' : 'wis-spin'} ${duration}s linear infinite`,
 });
 
 /* One node's parallax range, as a pair of transforms. Kept as its own hook so
@@ -223,8 +232,7 @@ const CoreGlyph = ({ name, className = '', strokeWidth = 1.15 }) => {
   return <svg {...shared}>{shapes[name]}</svg>;
 };
 
-const HeroCenterpiece = ({ shouldReduceMotion }) => {
-  const still = shouldReduceMotion;
+const HeroCenterpiece = ({ still }) => {
   const wide = useWideCore();
   const scale = wide ? CORE_SCALE.regular : CORE_SCALE.compact;
 
@@ -326,7 +334,7 @@ const HeroCenterpiece = ({ shouldReduceMotion }) => {
         fill="none"
         style={{ ...orbitTilt, transformOrigin: '50% 50%' }}
       >
-        <motion.circle
+        <circle
           cx="50"
           cy="50"
           r={scale.radius}
@@ -334,17 +342,15 @@ const HeroCenterpiece = ({ shouldReduceMotion }) => {
           strokeWidth="0.25"
           strokeDasharray="1.6 3.4"
           strokeLinecap="round"
-          style={{ transformBox: 'view-box', originX: '50px', originY: '50px' }}
-          animate={still ? {} : { rotate: 360, transition: { duration: 150, repeat: Infinity, ease: 'linear' } }}
+          style={{ transformBox: 'view-box', originX: '50px', originY: '50px', ...(still ? undefined : spinStyle(150)) }}
         />
-        <motion.circle
+        <circle
           cx="50"
           cy="50"
           r={scale.inner}
           stroke="rgba(79,139,255,0.18)"
           strokeWidth="0.22"
-          style={{ transformBox: 'view-box', originX: '50px', originY: '50px' }}
-          animate={still ? {} : { rotate: -360, transition: { duration: 110, repeat: Infinity, ease: 'linear' } }}
+          style={{ transformBox: 'view-box', originX: '50px', originY: '50px', ...(still ? undefined : spinStyle(110, true)) }}
         />
         <circle cx="50" cy={50 - scale.inner} r="0.5" fill="rgba(103,232,249,0.7)" />
         <circle cx={50 + scale.inner} cy="50" r="0.5" fill="rgba(163,128,237,0.6)" />
@@ -356,11 +362,10 @@ const HeroCenterpiece = ({ shouldReduceMotion }) => {
         className="pointer-events-none absolute left-1/2 top-1/2 z-20 h-[36%] w-[36%] -translate-x-1/2 -translate-y-1/2"
         style={{ perspective: '560px' }}
       >
-        <motion.div
-          className="relative h-full w-full"
-          style={{ ...plateTilt, transformStyle: 'preserve-3d' }}
-          animate={still ? {} : floatLoop(4, 11, 0.3)}
-        >
+        {/* The float sits on a plain div: the outer element's transform belongs
+            to the pointer parallax, so the two must not share it. */}
+        <motion.div className="relative h-full w-full" style={{ ...plateTilt, transformStyle: 'preserve-3d' }}>
+          <div className="relative h-full w-full" style={still ? undefined : bobStyle(4, 11, 0.3)}>
           {CORE_PLATES.map((plate) => (
             <div
               key={plate.depth}
@@ -370,6 +375,7 @@ const HeroCenterpiece = ({ shouldReduceMotion }) => {
               }}
             />
           ))}
+          </div>
         </motion.div>
       </div>
 
@@ -415,6 +421,7 @@ const HeroCenterpiece = ({ shouldReduceMotion }) => {
           return (
             <motion.g
               key={flow.from}
+              initial={{ x: track.xs[0], y: track.ys[0] }}
               animate={still ? { x: track.xs[0], y: track.ys[0] } : { x: track.xs, y: track.ys }}
               transition={still ? {} : { duration: flow.duration, repeat: Infinity, ease: 'linear' }}
             >
@@ -499,11 +506,11 @@ const HeroCenterpiece = ({ shouldReduceMotion }) => {
             onFocus={() => setHoverId(node.id)}
             onBlur={() => setHoverId(null)}
           >
-            <motion.div
-              className="flex flex-col items-center"
-              style={nodeParallax[index]}
-              animate={still ? {} : floatLoop(node.lift, node.duration, node.delay)}
-            >
+            <div style={still ? undefined : bobStyle(node.lift, node.duration, node.delay)}>
+              <motion.div
+                className="flex flex-col items-center"
+                style={nodeParallax[index]}
+              >
               <motion.button
                 type="button"
                 aria-label={node.label}
@@ -531,7 +538,8 @@ const HeroCenterpiece = ({ shouldReduceMotion }) => {
               >
                 {node.label}
               </span>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
         );
       })}
@@ -541,6 +549,14 @@ const HeroCenterpiece = ({ shouldReduceMotion }) => {
 
 const ServicePage1 = () => {
   const shouldReduceMotion = useReducedMotion();
+  const heroRef = useRef(null);
+
+  /* Same reason as the Home hero: the centerpiece kept all of its loops alive
+   * for the whole time the tab was open, so the page paid for them while the
+   * visitor was already reading the service list and the pricing table. They
+   * now exist only while the hero can actually be seen. */
+  const heroInView = useInView(heroRef, { initial: true, margin: '120px 0px' });
+  const still = shouldReduceMotion || !heroInView;
 
   const scrollToServices = (event) => {
     const target = document.getElementById('services');
@@ -553,25 +569,24 @@ const ServicePage1 = () => {
   return (
     <div className="w-full bg-services">
       <section
+        ref={heroRef}
         aria-labelledby="services-hero-title"
         className="relative isolate flex min-h-[clamp(38rem,94svh,54rem)] w-full flex-col justify-center overflow-hidden bg-white px-4 pb-16 pt-14 sm:px-8 sm:pb-20 sm:pt-16 lg:px-16 lg:pb-24 lg:pt-20 lg:-mt-9"
       >
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute -inset-[12%] opacity-90"
-          style={HERO_GRID}
-          animate={shouldReduceMotion ? {} : { x: ['0%', '2.2%'], y: ['0%', '1.6%'], transition: { duration: 26, repeat: Infinity, ease: 'linear' } }}
-        />
+        {/* The grid and the two light pools are static. They used to drift and
+            breathe on top of a 64px blur filter, which meant re-rasterising a
+            30rem blurred layer every frame for the whole session. A radial
+            gradient that already fades to transparent needs no blur, so the
+            glow is kept and the filter is not. */}
+        <div aria-hidden="true" className="pointer-events-none absolute -inset-[12%] opacity-90" style={HERO_GRID} />
 
-        <motion.div
+        <div
           aria-hidden="true"
-          className="pointer-events-none absolute -left-[12rem] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(163,128,237,0.30),transparent_62%)] blur-3xl"
-          animate={shouldReduceMotion ? {} : { scale: [1, 1.12, 1], opacity: [0.75, 1, 0.75], transition: { duration: 18, repeat: Infinity, ease: 'easeInOut' } }}
+          className="pointer-events-none absolute -left-[12rem] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(163,128,237,0.30),transparent_62%)]"
         />
-        <motion.div
+        <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-[10rem] bottom-[-12rem] h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(79,139,255,0.24),transparent_64%)] blur-3xl"
-          animate={shouldReduceMotion ? {} : { scale: [1, 1.1, 1], opacity: [0.7, 1, 0.7], transition: { duration: 22, repeat: Infinity, ease: 'easeInOut' } }}
+          className="pointer-events-none absolute -right-[10rem] bottom-[-12rem] h-[32rem] w-[32rem] rounded-full bg-[radial-gradient(circle,rgba(79,139,255,0.24),transparent_64%)]"
         />
         <div
           aria-hidden="true"
@@ -668,7 +683,7 @@ const ServicePage1 = () => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ duration: 1, delay: shouldReduceMotion ? 0 : 0.24, ease: [0.16, 1, 0.3, 1] }}
               >
-                <HeroCenterpiece shouldReduceMotion={shouldReduceMotion} />
+                <HeroCenterpiece still={still} />
               </motion.div>
             </div>
           </div>
