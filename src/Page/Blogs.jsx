@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { FiArrowUpRight, FiSearch, FiX } from "react-icons/fi";
 import Footer from "../components/Footer";
-import { getBlogs } from "../api/blogApi";
+import { publicBlogList } from "../api/blogListApi";
 import {
   BRAND_IMAGE,
   CANONICAL,
@@ -12,6 +12,7 @@ import {
   formatDate,
   imageAlt,
   isSearching,
+  listingView,
   matchesQuery,
   optimizeImage,
   publishDate,
@@ -266,18 +267,32 @@ const ErrorState = ({ onRetry }) => (
    ========================================== */
 
 const Blogs = () => {
-  const [status, setStatus] = useState("loading");
-  const [blogs, setBlogs] = useState([]);
+  // Anything the cache already holds renders immediately, so returning to the
+  // listing shows the real cards instead of a skeleton while a request the browser
+  // already has the answer to runs again.
+  const cached = publicBlogList.getCached();
+  const [status, setStatus] = useState(cached ? "ready" : "loading");
+  const [blogs, setBlogs] = useState(() => selectPublicBlogs(cached));
   const [searchTerm, setSearchTerm] = useState("");
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let active = true;
 
-    setStatus("loading");
+    // A fresh cache is already reflected in state: a revisit makes no request.
+    if (attempt === 0 && publicBlogList.isFresh()) {
+      return undefined;
+    }
 
-    getBlogs()
-      .then(({ data }) => {
+    // Only a first load with nothing to show gets skeletons. A stale-cache
+    // refresh keeps the existing cards on screen until the new data lands.
+    if (!publicBlogList.hasCached()) {
+      setStatus("loading");
+    }
+
+    publicBlogList
+      .load({ force: attempt > 0 })
+      .then((data) => {
         if (!active) return;
         // The public endpoint returns published posts only. This is not a security
         // boundary — the API filters drafts — it is a guard so a response that
@@ -288,8 +303,14 @@ const Blogs = () => {
       .catch((error) => {
         if (!active) return;
         console.error("Public blog list failed to load:", error?.message || "unknown error");
-        setBlogs([]);
-        setStatus("error");
+        // A failed refresh must never blank content the visitor can already see.
+        // The error state is reserved for a failure with nothing cached at all.
+        if (publicBlogList.hasCached()) {
+          setStatus("ready");
+        } else {
+          setBlogs([]);
+          setStatus("error");
+        }
       });
 
     return () => {
@@ -319,7 +340,10 @@ const Blogs = () => {
   // The social card follows the lead article, falling back to the brand mark.
   const socialImage = optimizeImage(featured?.image, 1200) || BRAND_IMAGE;
 
-  const isLoading = status === "loading";
+  // loading / error / empty / no-results / content, decided in one testable place.
+  const view = listingView({ status, blogCount: ordered.length, matchCount: matches.length });
+
+  const isLoading = view === "loading";
 
   return (
     <>
@@ -429,7 +453,7 @@ const Blogs = () => {
 
             {/* ---------- CONTENT ---------- */}
             <div className="py-14 lg:py-20" aria-busy={isLoading}>
-              {isLoading ? (
+              {view === "loading" ? (
                 <div className="flex flex-col gap-20">
                   <FeaturedSkeleton />
                   <div className="grid gap-x-8 gap-y-14 sm:grid-cols-2 xl:grid-cols-3">
@@ -438,11 +462,11 @@ const Blogs = () => {
                     ))}
                   </div>
                 </div>
-              ) : status === "error" ? (
+              ) : view === "error" ? (
                 <ErrorState onRetry={retry} />
-              ) : !hasAnyBlogs ? (
+              ) : view === "empty" ? (
                 <EmptyState searching={false} />
-              ) : matches.length === 0 ? (
+              ) : view === "no-results" ? (
                 <EmptyState searching />
               ) : (
                 <div className="flex flex-col gap-20">

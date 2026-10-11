@@ -8,6 +8,7 @@ import {
   formatDate,
   imageAlt,
   isSearching,
+  listingView,
   matchesQuery,
   optimizeImage,
   publishDate,
@@ -215,6 +216,34 @@ describe("optimizeImage", () => {
     assert.equal(optimizeImage(undefined, 800), null);
     assert.equal(optimizeImage(null, 800), null);
     assert.equal(optimizeImage("", 800), null);
+  });
+});
+
+describe("listingView", () => {
+  it("shows skeletons while the first load is in flight", () => {
+    assert.equal(listingView({ status: "loading", blogCount: 0, matchCount: 0 }), "loading");
+  });
+
+  it("shows the error state rather than an empty grid when the request fails", () => {
+    assert.equal(listingView({ status: "error", blogCount: 0, matchCount: 0 }), "error");
+  });
+
+  it("shows the honest empty state when the API returns no posts", () => {
+    assert.equal(listingView({ status: "ready", blogCount: 0, matchCount: 0 }), "empty");
+  });
+
+  it("separates an empty search from an empty feed", () => {
+    assert.equal(listingView({ status: "ready", blogCount: 5, matchCount: 0 }), "no-results");
+  });
+
+  it("renders content when at least one post is available", () => {
+    assert.equal(listingView({ status: "ready", blogCount: 5, matchCount: 5 }), "content");
+    assert.equal(listingView({ status: "ready", blogCount: 5, matchCount: 2 }), "content");
+  });
+
+  it("never reports content while loading or after an error", () => {
+    assert.notEqual(listingView({ status: "loading", blogCount: 5, matchCount: 5 }), "content");
+    assert.notEqual(listingView({ status: "error", blogCount: 5, matchCount: 5 }), "content");
   });
 });
 
