@@ -240,6 +240,42 @@ test('the admin list is reachable with a session and includes drafts', async () 
   }
 });
 
+test('the admin list returns the existing posts with truthful counts', async () => {
+  const original = User.findById;
+  User.findById = () => chain({ _id: ADMIN_ID, role: 'admin', tokenVersion: 0 });
+
+  try {
+    // Two posts already in the workspace: one published, one draft. The database
+    // is not empty, so the dashboard must show rows and real numbers.
+    const existing = [
+      { _id: new mongoose.Types.ObjectId(), title: 'Live post', slug: 'live-post', status: BLOG_STATUS.PUBLISHED },
+      { _id: new mongoose.Types.ObjectId(), title: 'In progress', slug: 'in-progress', status: BLOG_STATUS.DRAFT },
+    ];
+
+    await withStubs(
+      {
+        find: (query) => {
+          assert.deepEqual(query, {}, 'the admin list is unfiltered');
+          return chain(existing);
+        },
+      },
+      async () => {
+        const res = await asAdmin(request(app).get('/api/v1/blogs/admin/all'));
+
+        assert.equal(res.status, 200);
+        assert.equal(res.body.success, true);
+        assert.equal(res.body.count, 2);
+        assert.equal(res.body.publishedCount, 1);
+        assert.equal(res.body.draftCount, 1);
+        assert.equal(res.body.blogs.length, 2);
+        assert.deepEqual(res.body.blogs.map((b) => b.slug).sort(), ['in-progress', 'live-post']);
+      }
+    );
+  } finally {
+    User.findById = original;
+  }
+});
+
 test('the admin list is closed to anonymous callers', async () => {
   const res = await request(app).get('/api/v1/blogs/admin/all');
   assert.equal(res.status, 401);

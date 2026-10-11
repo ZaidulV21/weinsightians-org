@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children }) => {
     let active = true;
 
     getCurrentAdmin()
-      .then((response) => {
+      .then(() => {
         if (!active) return;
         markAuthenticated();
         setState("allowed");

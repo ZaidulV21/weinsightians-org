@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ScrollToTop from "./components/ScrollToTop";
@@ -104,8 +104,39 @@ export default function App() {
           }
         />
 
+        {/* "/admin/blogs" is the long name for the same workspace screen. It is
+            guarded exactly like /admin/dashboard, so nothing here is reachable
+            without a live session. */}
+        <Route
+          path="/admin/blogs"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <NoIndex>
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              </NoIndex>
+            </Suspense>
+          }
+        />
+
         <Route
           path="/admin/create"
+          element={
+            <Suspense fallback={<RouteFallback />}>
+              <NoIndex>
+                <ProtectedRoute>
+                  <CreateBlog />
+                </ProtectedRoute>
+              </NoIndex>
+            </Suspense>
+          }
+        />
+
+        {/* "/admin/create-blog" reads as what the screen does; it is guarded the
+            same way as /admin/create and renders the same editor. */}
+        <Route
+          path="/admin/create-blog"
           element={
             <Suspense fallback={<RouteFallback />}>
               <NoIndex>

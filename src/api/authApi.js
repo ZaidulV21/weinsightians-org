@@ -1,5 +1,6 @@
 // src/api/authApi.js
 import axiosInstance from "./axiosInstance";
+import { isAuthenticatedSession } from "../utils/session";
 
 export const adminLogin = (data) => {
   return axiosInstance.post("/auth/login", data);
@@ -12,8 +13,17 @@ export const adminLogout = () => {
 // Asks the server whether the session cookie is still valid. This is the only
 // trustworthy answer: a flag in browser storage can be set by hand, an expired
 // cookie cannot.
-export const getCurrentAdmin = () => {
-  return axiosInstance.get("/auth/me");
+//
+// A 2xx status alone is not accepted as proof of a session — a host that is not
+// really the API can return its own page (HTML, 200) for every path, and this
+// request would resolve with that markup. The body must carry the API's
+// authenticated shape ({ user: {...} }) or the session is treated as missing.
+export const getCurrentAdmin = async () => {
+  const response = await axiosInstance.get("/auth/me");
+  if (!isAuthenticatedSession(response?.data)) {
+    throw new Error("Session could not be confirmed by the API");
+  }
+  return response;
 };
 
 // ==========================================

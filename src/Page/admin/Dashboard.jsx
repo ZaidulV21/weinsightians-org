@@ -16,6 +16,7 @@ import BlogCardList from "../../components/admin/BlogCardList";
 import BlogTable from "../../components/admin/BlogTable";
 import ConfirmDialog from "../../components/admin/ConfirmDialog";
 import { canPublish, isDraft } from "../../components/admin/blogMeta";
+import { parseAdminList } from "../../utils/adminBlogs";
 
 const FILTERS = [
   { key: "all", label: "All" },
@@ -67,6 +68,10 @@ const Dashboard = () => {
   // The counts on the stat cards come straight from the server's own totals
   // rather than being counted here, so the numbers always describe the whole
   // collection instead of only the rows that survived a filter.
+  //
+  // The body has to match the documented JSON shape. A success page (HTML) or
+  // any other body without a blogs array is a load failure, never "0 posts" —
+  // that number is only real when the API said so.
   // ==========================================
   const loadBlogs = useCallback(async ({ silent = false } = {}) => {
     if (silent) {
@@ -78,12 +83,16 @@ const Dashboard = () => {
     try {
       const { data } = await getAdminBlogs();
 
-      setBlogs(Array.isArray(data.blogs) ? data.blogs : []);
-      setCounts({
-        total: Number(data.count) || 0,
-        published: Number(data.publishedCount) || 0,
-        drafts: Number(data.draftCount) || 0,
-      });
+      const parsed = parseAdminList(data);
+      if (!parsed.ok) {
+        setBlogs([]);
+        setCounts(NO_COUNTS);
+        setLoadState("error");
+        return;
+      }
+
+      setBlogs(parsed.blogs);
+      setCounts(parsed.counts);
       setLoadState("ready");
     } catch (error) {
       // A 401 means the session ended, and the B1 axios interceptor is already
