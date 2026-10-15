@@ -123,3 +123,22 @@ export const splitLeadAndGrid = (matches, searching) =>
     : { lead: matches[0] || null, grid: matches.slice(1) };
 
 export const isSearching = (query) => typeof query === "string" && query.trim().length > 0;
+
+/* ---------- rendering ---------- */
+
+// Which branch of the listing should render. Kept out of the component so the
+// decision is testable without a DOM, and so there is exactly one place that can
+// silently turn a failure or an empty feed into a blank page.
+//
+//   loading    — the request is in flight and nothing cached; skeletons.
+//   error      — the request failed and there is nothing to show; retry state.
+//   empty      — the API answered, but there are no published posts.
+//   no-results — posts exist, the active search matched none.
+//   content    — at least one post to render.
+export const listingView = ({ status, blogCount, matchCount }) => {
+  if (status === "loading") return "loading";
+  if (status === "error") return "error";
+  if (blogCount === 0) return "empty";
+  if (matchCount === 0) return "no-results";
+  return "content";
+};

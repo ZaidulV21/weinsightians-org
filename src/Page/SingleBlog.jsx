@@ -5,7 +5,8 @@ import { FiArrowLeft, FiCheck, FiCopy, FiLinkedin, FiFacebook, FiTwitter } from 
 import { FaWhatsapp } from "react-icons/fa";
 import Footer from "../components/Footer";
 import NotFound from "./NotFound";
-import { getBlogs, getSingleBlog } from "../api/blogApi";
+import { getSingleBlog } from "../api/blogApi";
+import { publicBlogList } from "../api/blogListApi";
 import { BRAND_IMAGE, authorName, formatDate, imageAlt, optimizeImage, publishDate } from "../utils/blogList";
 import {
   SITE_NAME,
@@ -386,7 +387,11 @@ const SingleBlog = () => {
     // Two independent requests, started together rather than one after the other.
     // Related posts are an enhancement: their failure must never discard an
     // article that loaded correctly.
-    Promise.allSettled([getSingleBlog(slug), getBlogs()]).then(([article, list]) => {
+    //
+    // The list goes through the shared cache, so an article opened from the
+    // listing reuses the payload the listing already fetched rather than asking
+    // the API for the same posts a second time.
+    Promise.allSettled([getSingleBlog(slug), publicBlogList.load()]).then(([article, list]) => {
       if (!active) return;
 
       if (article.status === "fulfilled") {
@@ -399,7 +404,7 @@ const SingleBlog = () => {
       }
 
       if (list.status === "fulfilled") {
-        setRelated(relatedArticles(list.value.data, slug));
+        setRelated(relatedArticles(list.value, slug));
       }
     });
 

@@ -9,8 +9,8 @@
     "lint": "eslint .",
     "test:blogs": "node --test src/utils/blogList.test.js",
     "test:article": "node --test src/utils/article.test.js",
-    "test:admin": "node --test src/utils/session.test.js src/utils/adminBlogs.test.js",
-    "test:public": "node --test src/utils/blogList.test.js src/utils/article.test.js",
+    "test:cache": "node --test src/utils/blogListCache.test.js",
+    "test:public": "node --test src/utils/blogList.test.js src/utils/article.test.js src/utils/blogListCache.test.js",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -22,6 +22,7 @@
     "multer": "^2.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-helmet": "^6.1.0",
     "react-helmet-async": "^2.0.5",
     "react-icons": "^5.5.0",
     "react-quill": "^2.0.0",

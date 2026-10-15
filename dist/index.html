@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#ffffff" />
 
+    <!-- The blog listing's data comes from a different origin, and measured
+         handshakes to it cost DNS + TCP + TLS before the first byte (up to
+         ~0.2-0.7s on a cold connection). Opening that connection while the
+         HTML/CSS/JS are still downloading means the XHR reuses a warm socket
+         instead of paying for the handshake on the critical path.
+
+         The host must match VITE_API_URL (.env). If the API host ever moves,
+         this line moves with it; a stale preconnect is ignored harmlessly. -->
+    <link rel="preconnect" href="https://weinsightians-backend-repo.onrender.com" crossorigin />
+    <link rel="dns-prefetch" href="https://weinsightians-backend-repo.onrender.com" />
+
     <!-- Per-page titles, descriptions, canonicals and OG tags are set by
          react-helmet-async. What is here is only the pre-hydration default,
          so a crawler that does not run JavaScript still sees correct signals
@@ -33,10 +44,10 @@
     <link rel="alternate icon" type="image/x-icon" href="/img/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
     <link rel="manifest" href="/img/site.webmanifest" />
-    <script type="module" crossorigin src="/assets/index-DTdcfmpO.js"></script>
+    <script type="module" crossorigin src="/assets/index-Do9jG5ki.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-5r0BcXyN.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
   </body>
 </html>
